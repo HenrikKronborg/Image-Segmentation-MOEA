@@ -1,4 +1,4 @@
-package functions;
+package model.functions;
 
 public class FitnessCalc {
     public FitnessCalc() {

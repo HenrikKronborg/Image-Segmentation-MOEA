@@ -1,4 +1,4 @@
-package functions;
+package model.functions;
 
 import model.Position;
 
