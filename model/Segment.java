@@ -6,6 +6,7 @@ import model.segmentGeneration.Node;
 import java.util.ArrayList;
 
 public class Segment {
+
     private ArrayList<Position> pixels = new ArrayList<>();
 
     public Segment(){
@@ -22,8 +23,8 @@ public class Segment {
         }
     }
 
-    public Position getPosition() {
-        return null;
+    public ArrayList<Position> getPixels() {
+        return pixels;
     }
 
 }
