@@ -14,6 +14,10 @@ public class Chromosome {
     /*
      * Methods
      */
+    public Chromosome(int[] gene){
+        this.gene = gene;
+    }
+
     public  List<Segment> generatePhenotype() {
         Node[] nodes = new Node[gene.length];
         ArrayList<Node> notPlaced = new ArrayList<>();
