@@ -18,8 +18,9 @@ public class FitnessCalc {
      */
     public double[] generateFitness(ArrayList<Segment> segments) {
         double deviation = deviation(segments);
+        double connectivity = connectivity(segments);
 
-        return null;
+        return new double[]{deviation,connectivity};
     }
 
     private double deviation(ArrayList<Segment> segments) {
@@ -60,9 +61,73 @@ public class FitnessCalc {
         return deviation;
     }
 
-    private void connectivity() {
+    private double connectivity(ArrayList<Segment> segments) {
+        double conn = 0.0;
+        for (Segment segment : segments) {
+            conn += segmentConnectivity(segment);
+        }
 
+        return conn;
     }
+
+    private double segmentConnectivity(Segment segment) {
+        ArrayList<Position> pixels = segment.getPixels();
+        double conn = 0.0;
+        for(int i = 0; i < pixels.size(); i++){
+            Position pix = pixels.get(i);
+
+            if(pix.getX() != ImageLoader.getWidth()-1){
+                if(!segment.contains(pix.getX()+1,pix.getY())){
+                    conn += 1;
+                }
+
+                if(pix.getY() != 0){
+                    if(!segment.contains(pix.getX()+1,pix.getY()-1)){
+                        conn += 0.2;
+                    }
+                }
+
+                if(pix.getY() != ImageLoader.getHeight()-1){
+                    if(!segment.contains(pix.getX()+1,pix.getY()+1)){
+                        conn += 0.166;
+                    }
+                }
+            }
+
+            if(pix.getX() != 0){
+                if(!segment.contains(pix.getX()-1,pix.getY())){
+                    conn += 0.5;
+                }
+                if(pix.getY() != 0){
+                    if(!segment.contains(pix.getX()-1,pix.getY()-1)){
+                        conn += 0.143;
+                    }
+                }
+
+                if(pix.getY() != ImageLoader.getHeight()-1){
+                    if(!segment.contains(pix.getX()-1,pix.getY()+1)){
+                        conn += 0.125;
+                    }
+                }
+            }
+
+            if(pix.getY() != 0){
+                if(!segment.contains(pix.getX(),pix.getY()-1)){
+                    conn += 0.333;
+                }
+            }
+
+            if(pix.getY() != ImageLoader.getHeight()-1){
+                if(!segment.contains(pix.getX(),pix.getY()+1)){
+                    conn += 0.25;
+                }
+            }
+
+
+        }
+        return conn;
+    }
+
 
     private void edge() {
 

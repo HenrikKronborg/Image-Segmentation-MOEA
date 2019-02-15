@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class ImageLoader {
     private Color[][] pixels;
@@ -30,13 +31,14 @@ public class ImageLoader {
         height = image.getHeight();
 
         // Create 2D array of image
-        pixels = new Color[image.getWidth()][image.getHeight()];
+        pixels = new Color[height][width];
 
-        for(int i = 0; i < image.getWidth(); i++) {
-            for(int j = 0; j < image.getHeight(); j++) {
-                pixels[i][j] = new Color(image.getRGB(i, j));
+        for(int i = 0; i < height; i++) {
+            for(int j = 0; j < width; j++) {
+                pixels[i][j] = new Color(image.getRGB(j, i));
             }
         }
+
     }
 
     public Color getPixelValue(Position pos) {
