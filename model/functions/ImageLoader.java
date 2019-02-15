@@ -35,7 +35,7 @@ public class ImageLoader {
     }
 
     public Color getPixelValue(Position pos) {
-        return pixels[pos.getX()][pos.getY()];
+        return pixels[pos.getY()][pos.getX()];
     }
 
     /*
