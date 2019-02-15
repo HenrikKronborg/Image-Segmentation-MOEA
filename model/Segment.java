@@ -1,11 +1,12 @@
 package model;
 
+import model.functions.ImageLoader;
 import model.segmentGeneration.Node;
 
 import java.util.ArrayList;
 
 public class Segment {
-    private Position[] pixels;
+    private ArrayList<Position> pixels;
 
     public Segment(){
 
@@ -16,8 +17,9 @@ public class Segment {
     }
 
     public Segment(ArrayList<Node> list) {
-
-
+        for(Node n : list) {
+            pixels.add(n.getPosition());
+        }
     }
 
     public Position getPosition() {
