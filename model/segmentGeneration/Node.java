@@ -14,7 +14,7 @@ public class Node {
     private Position position;
 
     public Node(int value){
-
+        this.value = value;
     }
 
     public void setChild(Node child) {
@@ -23,7 +23,8 @@ public class Node {
     }
 
     public static void generatePositions(Node[] list) {
-        int width = ImageLoader.getWidth();
+        //int width = ImageLoader.getWidth();
+        int width = 4;
         int x = 0;
         int y = 0;
 

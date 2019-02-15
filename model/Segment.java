@@ -6,7 +6,7 @@ import model.segmentGeneration.Node;
 import java.util.ArrayList;
 
 public class Segment {
-    private ArrayList<Position> pixels;
+    private ArrayList<Position> pixels = new ArrayList<>();
 
     public Segment(){
 
