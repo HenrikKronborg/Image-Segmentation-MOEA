@@ -1,4 +1,4 @@
-package controller;
+package functions;
 
 public class FitnessCalc {
     public FitnessCalc() {

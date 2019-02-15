@@ -1,4 +1,4 @@
-package controller;
+package functions;
 
 import model.Position;
 
