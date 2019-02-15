@@ -23,13 +23,15 @@ public class Chromosome {
             notPlaced.add(nodes[i]);
         }
 
+        Node.generatePositions(nodes);
+
         for(int i = 0;i < gene.length;i++){
             nodes[i].setChild(nodes[gene[i]]);
         }
 
         ArrayList<Segment> segments = new ArrayList<>();
 
-        while (notPlaced.size() >0){
+        while (notPlaced.size() > 0){
             Node toRemove = notPlaced.remove(0);
 
             HashSet<Node> list = generateSegment(toRemove, new HashSet<>());

@@ -10,6 +10,8 @@ import java.io.IOException;
 
 public class ImageLoader {
     private Color[][] pixels;
+    private static int width;
+    private static int height;
 
     public ImageLoader() {
 
@@ -23,6 +25,9 @@ public class ImageLoader {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        width = image.getWidth();
+        height = image.getHeight();
 
         // Create 2D array of image
         pixels = new Color[image.getWidth()][image.getHeight()];
@@ -43,5 +48,11 @@ public class ImageLoader {
      */
     public Color[][] getPixels() {
         return pixels;
+    }
+    public static int getWidth() {
+        return width;
+    }
+    public static int getHeight() {
+        return height;
     }
 }
