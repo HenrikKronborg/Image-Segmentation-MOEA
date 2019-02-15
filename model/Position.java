@@ -13,13 +13,6 @@ public class Position {
     }
 
     /*
-     * Methods
-     */
-    public static double distanceTo(Position d, Position c){
-        return Math.sqrt(Math.pow(d.getX() - c.getX(), 2) + Math.pow(d.getY() - c.getY(), 2));
-    }
-
-    /*
      * Getters and Setters
      */
     public int getX() {
