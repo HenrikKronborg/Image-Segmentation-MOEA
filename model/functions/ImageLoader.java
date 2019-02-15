@@ -3,28 +3,45 @@ package model.functions;
 import model.Position;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 public class ImageLoader {
-    private BufferedImage image;
+    private Color[][] pixels;
 
     public ImageLoader() {
 
     }
 
-    public BufferedImage loadImage() {
+    public void loadImage(String name) {
+        BufferedImage image = null;
+
         try {
-            image = ImageIO.read(new File("test.jpg"));
+            image = ImageIO.read(new File("./src/img/" + name));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return image;
+        // Create 2D array of image
+        pixels = new Color[image.getWidth()][image.getHeight()];
+
+        for(int i = 0; i < image.getWidth(); i++) {
+            for(int j = 0; j < image.getHeight(); j++) {
+                pixels[i][j] = new Color(image.getRGB(i, j));
+            }
+        }
     }
 
-    public int[] getPixelValue(Position pos) {
-        return null;
+    public Color getPixelValue(Position pos) {
+        return pixels[pos.getX()][pos.getY()];
+    }
+
+    /*
+     * Getters and Setters
+     */
+    public Color[][] getPixels() {
+        return pixels;
     }
 }
