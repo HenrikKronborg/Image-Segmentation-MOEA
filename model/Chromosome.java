@@ -37,8 +37,6 @@ public class Chromosome {
     }
 
     public void generateRandomGene(){
-        this.width = ImageLoader.getWidth();
-        this.height = ImageLoader.getHeight();
         gene = new int[(width*height)];
 
         int x = 0;
