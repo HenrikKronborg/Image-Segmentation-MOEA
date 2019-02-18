@@ -3,6 +3,7 @@ package controller;
 import model.Solution;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class MOEA {
     private static int popSize = 100; // Population size
@@ -14,6 +15,21 @@ public class MOEA {
 
     private static ArrayList<Solution> population;
     private static Solution bestSolution;
+
+    /*
+     * Methods
+     */
+    // Første element i listen er en ny liste, der det første elementet er en liste over rank 1
+    public void generateRank() {
+        LinkedList<Solution> list = new LinkedList<>();
+        list.pop();
+
+        for(Solution solution : population) {
+
+        }
+
+        // if dominates
+    }
 
     /*
      * Getters and Setters
