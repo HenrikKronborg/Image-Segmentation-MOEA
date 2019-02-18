@@ -19,11 +19,16 @@ public class Chromosome {
     public Chromosome(){
     }
 
-    public Chromosome(int[] gene){
+    public Chromosome(int[] gene,int width, int height){
         this.gene = gene;
+
+        this.width = width;
+        this.height = height;
     }
 
     public void generateRandomGene(int width, int height){
+        this.width = width;
+        this.height = height;
         gene = new int[(width*height)];
 
         int x = 0;
@@ -121,7 +126,7 @@ public class Chromosome {
             return null;
         }
 
-        Chromosome[] offsprings = new Chromosome[]{new Chromosome(new int[gene.length]), new Chromosome(new int[gene.length])};
+        Chromosome[] offsprings = new Chromosome[]{new Chromosome(new int[gene.length],width,height), new Chromosome(new int[gene.length],width,height)};
 
         for(int i = 0; i < gene.length; i++) {
             if(Math.random() < 0.5) {
@@ -144,7 +149,7 @@ public class Chromosome {
         }
 
         int crossoverPoint = (int) (Math.random()*(gene.length - 2));
-        Chromosome[] offsprings = new Chromosome[]{new Chromosome(new int[gene.length]), new Chromosome(new int[gene.length])};
+        Chromosome[] offsprings = new Chromosome[]{new Chromosome(new int[gene.length],width,height), new Chromosome(new int[gene.length],width,height)};
 
 
         for(int i = 0; i < gene.length; i++) {
