@@ -20,7 +20,7 @@ public class MOEA {
     /*
      * Methods
      */
-    public void generateRank() {
+    public LinkedList<LinkedList<Solution>> generateRank() {
         LinkedList<LinkedList<Solution>> ranks = new LinkedList<>();
 
         // Need a Solution to compare against
@@ -74,6 +74,8 @@ public class MOEA {
                 ranks.addLast(new LinkedList<Solution>(Arrays.asList(solution)));
             }
         }
+
+        return ranks;
     }
 
     /*
