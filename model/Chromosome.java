@@ -17,6 +17,8 @@ public class Chromosome {
      */
 
     public Chromosome(){
+        this.width = ImageLoader.getWidth();
+        this.height = ImageLoader.getHeight();
     }
 
     public Chromosome(int[] gene){
@@ -52,7 +54,7 @@ public class Chromosome {
             x++;
         }
     }
-    public  List<Segment> generatePhenotype() {
+    public ArrayList<Segment> generatePhenotype() {
         Node[] nodes = new Node[gene.length];
         ArrayList<Node> notPlaced = new ArrayList<>();
 

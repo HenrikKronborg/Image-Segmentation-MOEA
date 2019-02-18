@@ -24,7 +24,6 @@ public class Node {
 
     public static void generatePositions(Node[] list) {
         int width = ImageLoader.getWidth();
-        //int width = 4;
         int x = 0;
         int y = 0;
 
