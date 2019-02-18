@@ -8,6 +8,7 @@ import model.functions.Validators;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 public class MOEA {
     private static int popSize = 10; // Population size
@@ -38,8 +39,9 @@ public class MOEA {
         for(Solution solution : population) {
             fitness.generateFitness(solution);
         }
-
-        System.out.println(Validators.validateRank(generateRank()));
+        LinkedList<LinkedList<Solution>> linkedLists = generateRank();
+        System.out.println(Validators.validateRank(linkedLists));
+        printRank(linkedLists);
     }
 
     /*
@@ -109,6 +111,16 @@ public class MOEA {
         }
     }
 
+    public void printRank(LinkedList<LinkedList<Solution>> rankedPopulation){
+        int rankInt = 0;
+        for(List<Solution> rank : rankedPopulation) {
+            rankInt++;
+            System.out.println("\nRank: "+rankInt);
+            for (Solution ind : rank) {
+                System.out.println("<"+ind.getFitnessDeviation()+", "+ind.getFitnessConnectivity()+">");
+            }
+        }
+    }
     /*
      * Getters and Setters
      */
