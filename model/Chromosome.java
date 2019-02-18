@@ -16,12 +16,12 @@ public class Chromosome {
      * Methods
      */
 
-    public Chromosome(){
+    public Chromosome() {
         this.width = ImageLoader.getWidth();
         this.height = ImageLoader.getHeight();
     }
 
-    public Chromosome(int[] gene){
+    public Chromosome(int[] gene) {
         this.gene = gene;
 
         this.width = ImageLoader.getWidth();
@@ -31,19 +31,19 @@ public class Chromosome {
     /*
     Debug only
      */
-    public Chromosome(int[] gene, int w, int h){
+    public Chromosome(int[] gene, int w, int h) {
         this.gene = gene;
 
         this.width = w;
         this.height = h;
     }
 
-    public void generateRandomGene(){
+    public void generateRandomGene() {
         gene = new int[(width*height)];
 
         int x = 0;
         int y = 0;
-        for(int i = 0; i < gene.length; i++){
+        for(int i = 0; i < gene.length; i++) {
             if(x == width){
                 x = 0;
                 y++;
@@ -58,20 +58,20 @@ public class Chromosome {
         Node[] nodes = new Node[gene.length];
         ArrayList<Node> notPlaced = new ArrayList<>();
 
-        for(int i = 0;i < gene.length; i++){
+        for(int i = 0;i < gene.length; i++) {
             nodes[i] = new Node(i);
             notPlaced.add(nodes[i]);
         }
 
         Node.generatePositions(nodes);
 
-        for(int i = 0;i < gene.length;i++){
+        for(int i = 0;i < gene.length;i++) {
             nodes[i].setChild(nodes[gene[i]]);
         }
 
         ArrayList<Segment> segments = new ArrayList<>();
 
-        while (notPlaced.size() > 0){
+        while (notPlaced.size() > 0) {
             Node toRemove = notPlaced.remove(0);
 
             HashSet<Node> list = generateSegment(toRemove, new HashSet<>());
@@ -84,14 +84,14 @@ public class Chromosome {
         return segments;
     }
 
-    private HashSet<Node> generateSegment(Node node, HashSet<Node> segment){
-        if(segment.contains(node)){
+    private HashSet<Node> generateSegment(Node node, HashSet<Node> segment) {
+        if(segment.contains(node)) {
             return segment;
         }else{
             segment.add(node);
         }
 
-        generateSegment(node.getChild(),segment);
+        generateSegment(node.getChild(), segment);
         for(Node n : node.getParents()){
             generateSegment(n,segment);
         }

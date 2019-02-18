@@ -4,6 +4,7 @@ import model.Chromosome;
 import model.Segment;
 import model.functions.FitnessCalc;
 import model.functions.ImageLoader;
+import model.functions.Validators;
 
 import java.awt.Color;
 import java.sql.Array;
@@ -16,6 +17,10 @@ public class Main {
         ImageLoader image = new ImageLoader();
         image.loadImage("test4x4.jpg");
 
+        MOEA algorithm = new MOEA();
+        algorithm.run(image);
+
+        /*
 
         System.out.println("\nTest Chrom:");
         //int[] gene = new int[]{1,5,1,3,0,4,2,3,9,10,14,7,8,12,15,15};
@@ -30,5 +35,7 @@ public class Main {
         System.out.println(Arrays.toString(f.generateFitness(segments)));
 
         System.out.println("t");
+
+        */
     }
 }

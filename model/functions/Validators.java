@@ -2,11 +2,12 @@ package model.functions;
 
 import model.Solution;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class Validators {
 
-    public static boolean validateRank(List<List<Solution>> rankedPopulation){
+    public static String validateRank(LinkedList<LinkedList<Solution>> rankedPopulation){
         // Step 1: is there any solution in a rank that dominates another?
         for(List<Solution> rank : rankedPopulation){
             for(Solution ind : rank){
@@ -15,7 +16,7 @@ public class Validators {
                         if(cmp.getFitnessConnectivity() <= ind.getFitnessConnectivity()){
                             if(cmp.getFitnessDeviation() <= ind.getFitnessDeviation()){
                                 if(cmp.getFitnessDeviation() != ind.getFitnessDeviation() || cmp.getFitnessConnectivity() != ind.getFitnessConnectivity())
-                                    return false;
+                                    return "first";
                             }
                         }
                     }
@@ -35,16 +36,16 @@ public class Validators {
 
                     }
                     if(ind.getFitnessConnectivity() > cmp.getFitnessConnectivity() && ind.getFitnessDeviation() > cmp.getFitnessDeviation())
-                        return false;
+                        return "second";
                 }
 
                 if(!dominated)
-                    return false;
+                    return "third";
 
             }
 
         }
 
-        return true;
+        return "funket";
     }
 }

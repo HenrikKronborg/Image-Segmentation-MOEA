@@ -2,6 +2,7 @@ package model.functions;
 
 import model.Position;
 import model.Segment;
+import model.Solution;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -16,9 +17,12 @@ public class FitnessCalc {
     /*
      * Methods
      */
-    public double[] generateFitness(ArrayList<Segment> segments) {
-        double deviation = deviation(segments);
-        double connectivity = connectivity(segments);
+    public double[] generateFitness(Solution solution) {
+        double deviation = deviation(solution.getSegments());
+        double connectivity = connectivity(solution.getSegments());
+
+        solution.setFitnessDeviation(deviation);
+        solution.setFitnessConnectivity(connectivity);
 
         return new double[]{deviation,connectivity};
     }
@@ -136,6 +140,4 @@ public class FitnessCalc {
     public void setImageLoader(ImageLoader img) {
         this.img = img;
     }
-
-
 }

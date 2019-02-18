@@ -10,6 +10,16 @@ public class Solution {
     private double fitnessConnectivity;
     private double fitnessEdge;
 
+    public Solution() {
+        initalize();
+    }
+
+    public void initalize() {
+        chromosome = new Chromosome();
+        chromosome.generateRandomGene();
+        segments = chromosome.generatePhenotype();
+    }
+
     /*
      * Methods
      */

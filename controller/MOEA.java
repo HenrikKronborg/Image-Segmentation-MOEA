@@ -1,13 +1,16 @@
 package controller;
 
 import model.Solution;
+import model.functions.FitnessCalc;
+import model.functions.ImageLoader;
+import model.functions.Validators;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 
 public class MOEA {
-    private static int popSize = 100; // Population size
+    private static int popSize = 10; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.08; // Mutation rate
     private static double recombProbability = 0.7; // Used only for Generational. recombProbability of doing crossover, and 1-recombProbability of copying a parent
@@ -16,6 +19,28 @@ public class MOEA {
 
     private static ArrayList<Solution> population;
     private static Solution bestSolution;
+
+    public MOEA() {
+
+    }
+
+    public void run(ImageLoader image) {
+        population = new ArrayList<>();
+
+        while(population.size() < popSize) {
+            population.add(new Solution());
+        }
+        System.out.println("Initialize population done. " + popSize + " random solutions found");
+
+        // Calculate fitness value
+        FitnessCalc fitness = new FitnessCalc();
+        fitness.setImageLoader(image);
+        for(Solution solution : population) {
+            fitness.generateFitness(solution);
+        }
+
+        System.out.println(Validators.validateRank(generateRank()));
+    }
 
     /*
      * Methods
@@ -76,6 +101,12 @@ public class MOEA {
         }
 
         return ranks;
+    }
+
+    public void crowdingDistance() {
+        for(int i = 0; i < population.size(); i++) {
+
+        }
     }
 
     /*
