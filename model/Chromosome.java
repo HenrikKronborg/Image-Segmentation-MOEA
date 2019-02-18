@@ -8,6 +8,10 @@ import java.util.*;
 public class Chromosome {
     private int[] gene;
 
+    private int width, height;
+
+    private Random randGenerator = new Random();
+
     /*
      * Methods
      */
@@ -21,7 +25,6 @@ public class Chromosome {
 
     public void generateRandomGene(int width, int height){
         gene = new int[(width*height)];
-        Random rand = new Random();
 
         int x = 0;
         int y = 0;
@@ -32,68 +35,7 @@ public class Chromosome {
                 y++;
             }
 
-            if(x == 0){
-                if(y == 0){
-                    int rnd = rand.nextInt(3); // 0,1 and 4 available.
-                    if(rnd == 2){
-                        rnd = 4;
-                    }
-                    select = rnd;
-
-                }else if(y == height -1){
-                    int rnd = rand.nextInt(3); // 0,1 and 3 available.
-                    if(rnd == 2){
-                        rnd = 3;
-                    }
-                    select = rnd;
-
-                }else{
-                    int rnd = rand.nextInt(4); // 0,1,3 and 4 available.
-                    if(rnd == 2){
-                        rnd = 4;
-                    }
-                    select = rnd;
-
-                }
-
-            } else if(x == width -1){
-                if(y == 0){
-                    int rnd = rand.nextInt(3); // 0,2 and 4 available.
-                    if(rnd == 1){
-                        rnd = 4;
-                    }
-                    select = rnd;
-
-                }else if(y == height -1){
-                    int rnd = rand.nextInt(3); // 0,2 and 3 available.
-                    if(rnd == 1){
-                        rnd = 3;
-                    }
-                    select = rnd;
-
-
-                }else{
-                    int rnd = rand.nextInt(4); // 0,2,3 and 4 available.
-                    if(rnd == 1){
-                        rnd = 4;
-                    }
-                    select = rnd;
-                }
-            }else{
-                if(y == 0){
-                    int rnd = rand.nextInt(4); // 0,1,2 and 4 available.
-                    if(rnd == 3){
-                        rnd = 4;
-                    }
-                    select = rnd;
-
-                }else if(y == height -1){
-                    select = rand.nextInt(4); // 0,1,2 and 3 available.
-
-                }else {
-                    select = rand.nextInt(5);// 0,1,2,3 and 4 available.
-                }
-            }
+            select = getaRandomAvailableNode(x,y);
 
             switch (select) {
                 case 0:             // links to itself.
@@ -170,6 +112,21 @@ public class Chromosome {
 
 
     }
+    public void mutateFlip(double mutationRate){
+        int x = 0;
+        int y = 0;
+        for(int i = 0; i < gene.length; i++) {
+            if(x == width){
+                x = 0;
+                y++;
+            }
+            
+            if (Math.random() <= mutationRate) {
+                gene[i] = getaRandomAvailableNode(x,y);
+            }
+            x++;
+        }
+    }
 
     public Chromosome[] uniformCrossover(Chromosome mother) {
         if(mother.gene.length != gene.length){
@@ -217,4 +174,80 @@ public class Chromosome {
         return offsprings;
     }
 
+    /**
+        Available nodes to link explained:
+        Method returns an int where the int represents a neighboring Node.
+        Given a node N (where 0 represents N):
+
+                            3
+                       2    N   1
+                            4
+
+     Edges of the image (frame): A node that will be outside the image will not be returned.
+     */
+    private int getaRandomAvailableNode(int x, int y){
+        int select = 0;
+        if(x == 0){
+            if(y == 0){
+                int rnd = randGenerator.nextInt(3); // 0,1 and 4 available.
+                if(rnd == 2){
+                    rnd = 4;
+                }
+                select = rnd;
+
+            }else if(y == height -1){
+                int rnd = randGenerator.nextInt(3); // 0,1 and 3 available.
+                if(rnd == 2){
+                    rnd = 3;
+                }
+                select = rnd;
+
+            }else{
+                int rnd = randGenerator.nextInt(4); // 0,1,3 and 4 available.
+                if(rnd == 2){
+                    rnd = 4;
+                }
+                select = rnd;
+            }
+
+        } else if(x == width -1){
+            if(y == 0){
+                int rnd = randGenerator.nextInt(3); // 0,2 and 4 available.
+                if(rnd == 1){
+                    rnd = 4;
+                }
+                select = rnd;
+
+            }else if(y == height -1){
+                int rnd = randGenerator.nextInt(3); // 0,2 and 3 available.
+                if(rnd == 1){
+                    rnd = 3;
+                }
+                select = rnd;
+
+            }else{
+                int rnd = randGenerator.nextInt(4); // 0,2,3 and 4 available.
+                if(rnd == 1){
+                    rnd = 4;
+                }
+                select = rnd;
+            }
+        }else{
+            if(y == 0){
+                int rnd = randGenerator.nextInt(4); // 0,1,2 and 4 available.
+                if(rnd == 3){
+                    rnd = 4;
+                }
+                select = rnd;
+
+            }else if(y == height -1){
+                select = randGenerator.nextInt(4); // 0,1,2 and 3 available.
+
+            }else {
+                select = randGenerator.nextInt(5);// 0,1,2,3 and 4 available.
+            }
+        }
+
+        return select;
+    }
 }
