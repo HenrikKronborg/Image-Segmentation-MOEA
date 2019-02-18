@@ -41,7 +41,7 @@ public class MOEA {
         }
         LinkedList<LinkedList<Solution>> linkedLists = generateRank();
         System.out.println(Validators.validateRank(linkedLists));
-        printRank(linkedLists);
+        //printRank(linkedLists);
     }
 
     /*
@@ -53,6 +53,7 @@ public class MOEA {
         // Need a Solution to compare against
         ranks.push(new LinkedList<>(Arrays.asList(population.get(0))));
 
+        printRank(ranks);
         for(int i = 1; i < population.size(); i++) {
             Solution solution = population.get(i);
             boolean isPlaced = false;
@@ -100,6 +101,9 @@ public class MOEA {
             if(!isPlaced) {
                 ranks.addLast(new LinkedList<Solution>(Arrays.asList(solution)));
             }
+            System.out.print("\nNew Iteration:");
+            printRank(ranks);
+
         }
 
         return ranks;
