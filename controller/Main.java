@@ -29,7 +29,7 @@ public class Main {
         int[] gene = new int[]{1,5,1,3,0,4,2,3,9,10,14,7,8,12,15,15};
 
         Chromosome c = new Chromosome(gene,4,4);
-        c.generateRandomGene(ImageLoader.getWidth(),ImageLoader.getHeight());
+        c.generateRandomGene();
         List<Segment> segments = c.generatePhenotype();
         System.out.println("test:" + segments.size());
 
