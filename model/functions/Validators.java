@@ -31,11 +31,11 @@ public class Validators {
                 boolean dominated = false;
 
                 for(Solution cmp : rankedPopulation.get(i-1)){
-                    if(cmp.getFitnessConnectivity() > ind.getFitnessConnectivity() && cmp.getFitnessDeviation() > ind.getFitnessDeviation()){
+                    if(cmp.getFitnessConnectivity() >= ind.getFitnessConnectivity() && cmp.getFitnessDeviation() >= ind.getFitnessDeviation()){
                         dominated = true;
 
                     }
-                    if(ind.getFitnessConnectivity() > cmp.getFitnessConnectivity() && ind.getFitnessDeviation() > cmp.getFitnessDeviation())
+                    if(ind.getFitnessConnectivity() >= cmp.getFitnessConnectivity() && ind.getFitnessDeviation() >= cmp.getFitnessDeviation())
                         return "second";
                 }
 

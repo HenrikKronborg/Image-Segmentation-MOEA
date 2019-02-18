@@ -66,7 +66,7 @@ public class MOEA {
                         break;
                     }
                     // Check if solution dominates
-                    else if(solution.getFitnessDeviation() > rankedSolution.getFitnessDeviation() && solution.getFitnessConnectivity() > rankedSolution.getFitnessConnectivity()) {
+                    else if(solution.getFitnessDeviation() >= rankedSolution.getFitnessDeviation() && solution.getFitnessConnectivity() >= rankedSolution.getFitnessConnectivity()) {
                         dominates = true;
                         sameRank = false;
                     }
@@ -79,7 +79,7 @@ public class MOEA {
                     for(int j = 0; j < ranks.get(rank+1).size(); j++) {
                         Solution rankedSolution = ranks.get(rank+1).get(j);
 
-                        if(solution.getFitnessDeviation() <= rankedSolution.getFitnessDeviation() || solution.getFitnessConnectivity() <= rankedSolution.getFitnessConnectivity()) {
+                        if(solution.getFitnessDeviation() < rankedSolution.getFitnessDeviation() || solution.getFitnessConnectivity() < rankedSolution.getFitnessConnectivity()) {
                             ranks.get(rank).add(rankedSolution);
                             ranks.get(rank+1).remove(j);
                             j--;

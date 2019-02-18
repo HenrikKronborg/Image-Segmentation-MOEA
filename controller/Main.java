@@ -15,7 +15,7 @@ import java.util.List;
 public class Main {
     public static void main(String... args) {
         ImageLoader image = new ImageLoader();
-        image.loadImage("test4x4.jpg");
+        image.loadImage("test4x4multiColor.jpg");
 
         MOEA algorithm = new MOEA();
         algorithm.run(image);
