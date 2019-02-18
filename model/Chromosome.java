@@ -29,31 +29,12 @@ public class Chromosome {
         int x = 0;
         int y = 0;
         for(int i = 0; i < gene.length; i++){
-            int select = 0; // Equals 0 to 4 representing all neighboring cells and itself.
             if(x == width){
                 x = 0;
                 y++;
             }
 
-            select = getaRandomAvailableNode(x,y);
-
-            switch (select) {
-                case 0:             // links to itself.
-                    gene[i] = i;
-                    break;
-                case 1:
-                    gene[i] = i + 1; // links to the next node (X dir.)
-                    break;
-                case 2:
-                    gene[i] = i - 1; // links to the previous node (X dir.)
-                    break;
-                case 3:
-                    gene[i] = i - width; // links to the upper node (Y dir.)
-                    break;
-                case 4:
-                    gene[i] = i + width; // links to the bottom node (Y dir.)
-                    break;
-            }
+            setSelectedGene(getRandomAvailableNode(x,y),i); // Gives the gene an random legal value.
 
             x++;
         }
@@ -112,6 +93,11 @@ public class Chromosome {
 
 
     }
+
+    /*
+     *  Below this point: Evolutionary algorithm methods
+     *
+     */
     public void mutateFlip(double mutationRate){
         int x = 0;
         int y = 0;
@@ -120,13 +106,14 @@ public class Chromosome {
                 x = 0;
                 y++;
             }
-            
+
             if (Math.random() <= mutationRate) {
-                gene[i] = getaRandomAvailableNode(x,y);
+                setSelectedGene(getRandomAvailableNode(x,y),i);
             }
             x++;
         }
     }
+
 
     public Chromosome[] uniformCrossover(Chromosome mother) {
         if(mother.gene.length != gene.length){
@@ -174,6 +161,11 @@ public class Chromosome {
         return offsprings;
     }
 
+    /*
+     *  Private methods for intern logic.
+     *
+     */
+
     /**
         Available nodes to link explained:
         Method returns an int where the int represents a neighboring Node.
@@ -185,7 +177,7 @@ public class Chromosome {
 
      Edges of the image (frame): A node that will be outside the image will not be returned.
      */
-    private int getaRandomAvailableNode(int x, int y){
+    private int getRandomAvailableNode(int x, int y){
         int select = 0;
         if(x == 0){
             if(y == 0){
@@ -249,5 +241,25 @@ public class Chromosome {
         }
 
         return select;
+    }
+
+    private void setSelectedGene(int select, int index){
+        switch (select) {
+            case 0:             // links to itself.
+                gene[index] = index;
+                break;
+            case 1:
+                gene[index] = index + 1; // links to the next node (X dir.)
+                break;
+            case 2:
+                gene[index] = index - 1; // links to the previous node (X dir.)
+                break;
+            case 3:
+                gene[index] = index - width; // links to the upper node (Y dir.)
+                break;
+            case 4:
+                gene[index] = index + width; // links to the bottom node (Y dir.)
+                break;
+        }
     }
 }
