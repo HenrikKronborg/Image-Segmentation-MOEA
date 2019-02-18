@@ -11,6 +11,10 @@ public class Chromosome {
     /*
      * Methods
      */
+
+    public Chromosome(){
+    }
+
     public Chromosome(int[] gene){
         this.gene = gene;
     }
@@ -165,6 +169,52 @@ public class Chromosome {
     public void generateGenFromImage(ImageLoader img){
 
 
+    }
+
+    public Chromosome[] uniformCrossover(Chromosome mother) {
+        if(mother.gene.length != gene.length){
+            System.out.println("ERROR");
+            return null;
+        }
+
+        Chromosome[] offsprings = new Chromosome[]{new Chromosome(new int[gene.length]), new Chromosome(new int[gene.length])};
+
+        for(int i = 0; i < gene.length; i++) {
+            if(Math.random() < 0.5) {
+                offsprings[0].gene[i]= gene[i];
+                offsprings[1].gene[i]= mother.gene[i];
+            }
+            else {
+                offsprings[0].gene[i]= mother.gene[i];
+                offsprings[1].gene[i]= gene[i];
+            }
+        }
+
+        return offsprings;
+    }
+
+    public Chromosome[] singlePointCrossover(Chromosome mother) {
+        if(mother.gene.length != gene.length){
+            System.out.println("ERROR");
+            return null;
+        }
+
+        int crossoverPoint = (int) (Math.random()*(gene.length - 2));
+        Chromosome[] offsprings = new Chromosome[]{new Chromosome(new int[gene.length]), new Chromosome(new int[gene.length])};
+
+
+        for(int i = 0; i < gene.length; i++) {
+            if(i <= crossoverPoint) {
+                offsprings[0].gene[i]= gene[i];
+                offsprings[1].gene[i]= mother.gene[i];
+            }
+            else {
+                offsprings[0].gene[i]= mother.gene[i];
+                offsprings[1].gene[i]= gene[i];
+            }
+        }
+
+        return offsprings;
     }
 
 }
