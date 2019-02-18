@@ -3,7 +3,7 @@ package model.functions;
 import model.Position;
 import model.Segment;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 
 public class FitnessCalc {

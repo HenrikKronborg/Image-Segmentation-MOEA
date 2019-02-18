@@ -3,7 +3,7 @@ package model.functions;
 import model.Position;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +23,7 @@ public class ImageLoader {
 
         try {
             image = ImageIO.read(new File("./src/img/" + name));
+
         } catch (IOException e) {
             e.printStackTrace();
         }
