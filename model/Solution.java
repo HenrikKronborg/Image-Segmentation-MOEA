@@ -5,9 +5,10 @@ import java.util.ArrayList;
 public class Solution {
     private Chromosome chromosome;
     private ArrayList<Segment> segments;
-    private double fitnessEdge;
-    private double fitnessConnectivity;
+    private int rank;
     private double fitnessDeviation;
+    private double fitnessConnectivity;
+    private double fitnessEdge;
 
     /*
      * Methods

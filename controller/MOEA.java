@@ -3,6 +3,7 @@ package controller;
 import model.Solution;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 
 public class MOEA {
@@ -19,16 +20,62 @@ public class MOEA {
     /*
      * Methods
      */
-    // Første element i listen er en ny liste, der det første elementet er en liste over rank 1
-    public void generateRank() {
-        LinkedList<Solution> list = new LinkedList<>();
-        list.pop();
+    public LinkedList<LinkedList<Solution>> generateRank() {
+        LinkedList<LinkedList<Solution>> ranks = new LinkedList<>();
 
-        for(Solution solution : population) {
+        // Need a Solution to compare against
+        ranks.push(new LinkedList<>(Arrays.asList(population.get(0))));
 
+        for(int i = 1; i < population.size(); i++) {
+            Solution solution = population.get(i);
+            boolean isPlaced = false;
+
+            for(int rank = 0; rank < ranks.size(); rank++) {
+                boolean sameRank = true;
+                boolean dominates = false;
+
+                for(Solution rankedSolution : ranks.get(rank)) {
+                    // Check if solution is dominated
+                    if(solution.getFitnessDeviation() <= rankedSolution.getFitnessDeviation() && solution.getFitnessConnectivity() <= rankedSolution.getFitnessConnectivity()) {
+                        sameRank = false;
+                        break;
+                    }
+                    // Check if solution dominates
+                    else if(solution.getFitnessDeviation() > rankedSolution.getFitnessDeviation() && solution.getFitnessConnectivity() > rankedSolution.getFitnessConnectivity()) {
+                        dominates = true;
+                        sameRank = false;
+                    }
+                }
+
+                if(dominates){
+                    ranks.add(rank, new LinkedList<>(Arrays.asList(solution)));
+                    isPlaced = true;
+
+                    for(int j = 0; j < ranks.get(rank+1).size(); j++) {
+                        Solution rankedSolution = ranks.get(rank+1).get(j);
+
+                        if(solution.getFitnessDeviation() <= rankedSolution.getFitnessDeviation() || solution.getFitnessConnectivity() <= rankedSolution.getFitnessConnectivity()) {
+                            ranks.get(rank).add(rankedSolution);
+                            ranks.get(rank+1).remove(j);
+                            j--;
+                        }
+                    }
+
+                    break;
+                }
+                else if(sameRank) {
+                    ranks.get(rank).push(solution);
+                    isPlaced = true;
+                    break;
+                }
+            }
+
+            if(!isPlaced) {
+                ranks.addLast(new LinkedList<Solution>(Arrays.asList(solution)));
+            }
         }
 
-        // if dominates
+        return ranks;
     }
 
     /*
