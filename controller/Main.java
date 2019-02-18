@@ -14,33 +14,20 @@ import java.util.List;
 public class Main {
     public static void main(String... args) {
         ImageLoader image = new ImageLoader();
-        image.loadImage("test.jpg");
+        image.loadImage("test4x4.jpg");
 
-        /*
-        for(Color[] i : pixels) {
-            for(Color j : i) {
-                System.out.println(j);
-            }
-            System.out.println();
-        }
-        */
 
         System.out.println("\nTest Chrom:");
-        int[] gene = new int[]{1,5,1,3,0,4,2,3,9,10,14,7,8,12,15,15};
+        //int[] gene = new int[]{1,5,1,3,0,4,2,3,9,10,14,7,8,12,15,15};
 
-        Chromosome c = new Chromosome(gene,4,4);
+        Chromosome c = new Chromosome();
         c.generateRandomGene();
-        List<Segment> segments = c.generatePhenotype();
+        ArrayList<Segment> segments = c.generatePhenotype();
         System.out.println("test:" + segments.size());
-
-
-        ArrayList<Segment> list = new ArrayList<>();
-        Segment s = new Segment(image.getPixels());
-        list.add(s);
 
         FitnessCalc f = new FitnessCalc();
         f.setImageLoader(image);
-        System.out.println(Arrays.toString(f.generateFitness(list)));
+        System.out.println(Arrays.toString(f.generateFitness(segments)));
 
         System.out.println("t");
     }
