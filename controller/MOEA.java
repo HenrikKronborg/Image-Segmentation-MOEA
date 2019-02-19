@@ -54,7 +54,56 @@ public class MOEA {
     /*
      * Methods
      */
-    
+    public void fastNonDominatedSort() {
+        LinkedList<LinkedList<Solution>> frontier = new LinkedList<>();
+
+        ArrayList<ArrayList<Solution>> sp = new ArrayList<>();
+
+        int index = 0;
+        for(Solution p : population) {
+            //ArrayList<Solution> sp = new ArrayList<>(); // Set of solutions that the solution p dominates
+            int np = 0; // Domination count
+
+            for(Solution q : population) {
+                if(p.dominates(q)) {
+                    //sp.add(q);
+                    sp.get(index).add(q);
+                }
+                else if(q.dominates(p)) {
+                    np++;
+                }
+            }
+
+            // If p belongs to the first front
+            if(np == 0) {
+                int pRank = 1;
+                frontier.push(new LinkedList<>(Arrays.asList(p)));
+            }
+            index++;
+        }
+
+        int i = 0;
+        while(!frontier.get(i).isEmpty()) {
+            LinkedList<Solution> Q = new LinkedList<>(); // Store members of the next
+
+            for(Solution p : frontier.get(i)) {
+                // ?
+                int nq = sp.get(i).size();
+
+                for(Solution q : sp.get(i)) {
+                    nq--;
+
+                    if(nq == 0) {
+                        int qRank = i++;
+                        Q.push(q);
+                    }
+                }
+            }
+
+            i++;
+            frontier.push(Q);
+        }
+    }
 
 
     /*
