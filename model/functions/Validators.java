@@ -13,10 +13,11 @@ public class Validators {
             for(Solution ind : rank){
                 for(Solution cmp : rank){
                     if(!ind.equals(cmp)){
-                        if(cmp.getFitnessConnectivity() <= ind.getFitnessConnectivity()){
-                            if(cmp.getFitnessDeviation() <= ind.getFitnessDeviation()){
-                                if(cmp.getFitnessDeviation() != ind.getFitnessDeviation() || cmp.getFitnessConnectivity() != ind.getFitnessConnectivity())
+                        if(!(cmp.getFitnessConnectivity() == ind.getFitnessConnectivity() && cmp.getFitnessDeviation() == cmp.getFitnessDeviation())){
+                            if(cmp.getFitnessConnectivity() <= ind.getFitnessConnectivity()){
+                                if(cmp.getFitnessDeviation() <= ind.getFitnessDeviation()) {
                                     return "first";
+                                }
                             }
                         }
                     }
@@ -31,12 +32,14 @@ public class Validators {
                 boolean dominated = false;
 
                 for(Solution cmp : rankedPopulation.get(i-1)){
-                    if(cmp.getFitnessConnectivity() >= ind.getFitnessConnectivity() && cmp.getFitnessDeviation() >= ind.getFitnessDeviation()){
-                        dominated = true;
+                    if(!(cmp.getFitnessConnectivity() == ind.getFitnessConnectivity() && cmp.getFitnessDeviation() == cmp.getFitnessDeviation())){
 
+                        if(cmp.getFitnessConnectivity() <= ind.getFitnessConnectivity() && cmp.getFitnessDeviation() <= ind.getFitnessDeviation()){
+                            dominated = true;
+                        }
+                        if(cmp.getFitnessConnectivity() >= ind.getFitnessConnectivity() && cmp.getFitnessDeviation() >= ind.getFitnessDeviation())
+                            return "second";
                     }
-                    if(ind.getFitnessConnectivity() >= cmp.getFitnessConnectivity() && ind.getFitnessDeviation() >= cmp.getFitnessDeviation())
-                        return "second";
                 }
 
                 if(!dominated)

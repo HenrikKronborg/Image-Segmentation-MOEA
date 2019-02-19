@@ -63,15 +63,20 @@ public class MOEA {
                 boolean dominates = false;
 
                 for(Solution rankedSolution : ranks.get(rank)) {
-                    // Check if solution is dominated
-                    if(solution.getFitnessDeviation() <= rankedSolution.getFitnessDeviation() && solution.getFitnessConnectivity() <= rankedSolution.getFitnessConnectivity()) {
-                        sameRank = false;
-                        break;
-                    }
-                    // Check if solution dominates
-                    else if(solution.getFitnessDeviation() >= rankedSolution.getFitnessDeviation() && solution.getFitnessConnectivity() >= rankedSolution.getFitnessConnectivity()) {
-                        dominates = true;
-                        sameRank = false;
+                    if (!(solution.getFitnessDeviation() == rankedSolution.getFitnessDeviation() && solution.getFitnessConnectivity() == rankedSolution.getFitnessConnectivity())){
+
+                        // Check if solution is dominated
+                        if(solution.getFitnessDeviation() >= rankedSolution.getFitnessDeviation() && solution.getFitnessConnectivity() >= rankedSolution.getFitnessConnectivity()) {
+                                sameRank = false;
+                                break;
+
+                        }
+                        // Check if solution dominates
+                        else if(solution.getFitnessDeviation() <= rankedSolution.getFitnessDeviation() && solution.getFitnessConnectivity() <= rankedSolution.getFitnessConnectivity()) {
+
+                            dominates = true;
+                            sameRank = false;
+                        }
                     }
                 }
 
@@ -82,7 +87,8 @@ public class MOEA {
                     for(int j = 0; j < ranks.get(rank+1).size(); j++) {
                         Solution rankedSolution = ranks.get(rank+1).get(j);
 
-                        if(solution.getFitnessDeviation() < rankedSolution.getFitnessDeviation() || solution.getFitnessConnectivity() < rankedSolution.getFitnessConnectivity()) {
+                        if(solution.getFitnessDeviation() > rankedSolution.getFitnessDeviation() || solution.getFitnessConnectivity() > rankedSolution.getFitnessConnectivity()
+                                || solution.getFitnessDeviation() == rankedSolution.getFitnessDeviation() && solution.getFitnessConnectivity() == rankedSolution.getFitnessConnectivity()) {
                             ranks.get(rank).add(rankedSolution);
                             ranks.get(rank+1).remove(j);
                             j--;
