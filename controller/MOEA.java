@@ -43,14 +43,9 @@ public class MOEA {
         //System.out.println(Validators.validateRank(linkedLists));
         //printRank(linkedLists);
 
-        /*
+
         // Test dominates
-        for(int i = 0; i < 2; i++) {
-            System.out.println("d:" + population.get(i).getFitnessDeviation() + " || c: " + population.get(i).getFitnessConnectivity());
-            if(i == 0)
-                System.out.println(population.get(i).dominates(population.get(i+1)));
-        }
-        */
+
 
         for(LinkedList<Solution> list : fastNonDominatedSort()) {
             for(Solution solution : list) {
@@ -65,45 +60,32 @@ public class MOEA {
     public LinkedList<LinkedList<Solution>> fastNonDominatedSort() {
         LinkedList<LinkedList<Solution>> frontier = new LinkedList<>();
 
-        ArrayList<ArrayList<Solution>> sp = new ArrayList<>();
-        sp.add(new ArrayList<>());
-
-        int index = 0;
         for(Solution p : population) {
-            //ArrayList<Solution> sp = new ArrayList<>(); // Set of solutions that the solution p dominates
-            int np = 0; // Domination count
-
             for(Solution q : population) {
                 if(p.dominates(q)) {
-                    //sp.add(q);
-                    sp.get(index).add(q);
+                    p.S.add(q);
                 }
                 else if(q.dominates(p)) {
-                    np++;
+                    p.n++;
                 }
             }
 
             // If p belongs to the first front
-            if(np == 0) {
-                int pRank = 1;
+            if(p.n == 0) {
+                p.setRank(1);
                 frontier.push(new LinkedList<>(Arrays.asList(p)));
             }
-            index++;
         }
 
         int i = 0;
         while(!frontier.get(i).isEmpty()) {
             LinkedList<Solution> Q = new LinkedList<>(); // Store members of the next
-
+            System.out.println(frontier.get(i));
             for(Solution p : frontier.get(i)) {
-                // ?
-                int nq = sp.get(i).size();
-
-                for(Solution q : sp.get(i)) {
-                    nq--;
-
-                    if(nq == 0) {
-                        int qRank = i++;
+                for(Solution q : p.S) {
+                    q.n--;
+                    if(q.n == 0) {
+                        q.setRank(i+2);
                         Q.push(q);
                     }
                 }

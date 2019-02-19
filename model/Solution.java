@@ -10,6 +10,9 @@ public class Solution {
     private double fitnessConnectivity;
     private double fitnessEdge;
 
+    public int n; // Number of dominating elements.
+    public ArrayList<Solution> S = new ArrayList<>();
+
     public Solution() {
         initalize();
     }
@@ -77,5 +80,29 @@ public class Solution {
 
     public void setFitnessDeviation(double fitnessDeviation) {
         this.fitnessDeviation = fitnessDeviation;
+    }
+
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
+    }
+
+    public int getN() {
+        return n;
+    }
+
+    public void setN(int n) {
+        this.n = n;
+    }
+
+    public ArrayList<Solution> getS() {
+        return S;
+    }
+
+    public void setS(ArrayList<Solution> s) {
+        S = s;
     }
 }
