@@ -27,9 +27,12 @@ public class Solution {
      * Methods
      */
     public boolean dominates(Solution x) {
-        // Check if this Solution dominates a Solution x
-        if(fitnessDeviation <= x.getFitnessDeviation() && fitnessConnectivity <= x.getFitnessConnectivity()) {
-            return true;
+        // Check if the Solutions have the same fitness value
+        if (!(fitnessDeviation == x.getFitnessDeviation() && fitnessConnectivity == x.getFitnessConnectivity())) {
+            // Check if this Solution dominates a Solution x
+            if (fitnessDeviation <= x.getFitnessDeviation() && fitnessConnectivity <= x.getFitnessConnectivity()) {
+                return true;
+            }
         }
 
         return false;
