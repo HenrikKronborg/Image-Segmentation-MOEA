@@ -42,10 +42,6 @@ public class MOEA {
         LinkedList<LinkedList<Solution>> linkedLists = fastNonDominatedSort();
         System.out.println(Validators.validateRank(linkedLists));
         printRank(linkedLists);
-
-
-        // Test dominates
-
     }
 
     /*
@@ -67,9 +63,9 @@ public class MOEA {
             // If p belongs to the first front
             if(p.n == 0) {
                 p.setRank(1);
-                if(frontier.size()== 0){
+                if(frontier.size()== 0) {
                     frontier.push(new LinkedList<>(Arrays.asList(p)));
-                }else{
+                } else {
                     frontier.get(0).add(p);
                 }
             }
@@ -88,80 +84,15 @@ public class MOEA {
                 }
             }
 
-            i++;
-            if(!Q.isEmpty())
+            if(!Q.isEmpty()) {
                 frontier.addLast(Q);
+            }
+            
+            i++;
         }
 
         return frontier;
     }
-
-    /*
-    public LinkedList<LinkedList<Solution>> generateRank() {
-        LinkedList<LinkedList<Solution>> ranks = new LinkedList<>();
-
-        // Need a Solution to compare against
-        ranks.push(new LinkedList<>(Arrays.asList(population.get(0))));
-
-        printRank(ranks);
-        for(int i = 1; i < population.size(); i++) {
-            Solution solution = population.get(i);
-            boolean isPlaced = false;
-
-            for(int rank = 0; rank < ranks.size(); rank++) {
-                boolean sameRank = true;
-                boolean dominates = false;
-
-                for(Solution rankedSolution : ranks.get(rank)) {
-                    if (!(solution.getFitnessDeviation() == rankedSolution.getFitnessDeviation() && solution.getFitnessConnectivity() == rankedSolution.getFitnessConnectivity())) {
-                        // Check if solution is dominated
-                        if(solution.getFitnessDeviation() >= rankedSolution.getFitnessDeviation() && solution.getFitnessConnectivity() >= rankedSolution.getFitnessConnectivity()) {
-                                sameRank = false;
-                                break;
-                        }
-                        // Check if solution dominates
-                        else if(solution.getFitnessDeviation() <= rankedSolution.getFitnessDeviation() && solution.getFitnessConnectivity() <= rankedSolution.getFitnessConnectivity()) {
-                            sameRank = false;
-                            dominates = true;
-                            break;
-                        }
-                    }
-                }
-
-                if(dominates) {
-                    ranks.add(rank, new LinkedList<>(Arrays.asList(solution)));
-                    isPlaced = true;
-
-                    for(int j = 0; j < ranks.get(rank+1).size(); j++) {
-                        Solution rankedSolution = ranks.get(rank+1).get(j);
-
-                        if(solution.getFitnessDeviation() > rankedSolution.getFitnessDeviation() || solution.getFitnessConnectivity() > rankedSolution.getFitnessConnectivity()
-                                || solution.getFitnessDeviation() == rankedSolution.getFitnessDeviation() && solution.getFitnessConnectivity() == rankedSolution.getFitnessConnectivity()) {
-                            ranks.get(rank).add(rankedSolution);
-                            ranks.get(rank+1).remove(j);
-                            j--;
-                        }
-                    }
-
-                    break;
-                }
-                else if(sameRank) {
-                    ranks.get(rank).push(solution);
-                    isPlaced = true;
-                    break;
-                }
-            }
-
-            if(!isPlaced) {
-                ranks.addLast(new LinkedList<Solution>(Arrays.asList(solution)));
-            }
-            System.out.print("\nNew Iteration:");
-            printRank(ranks);
-        }
-
-        return ranks;
-    }
-    */
 
     public void crowdingDistance() {
         int l = population.size();
