@@ -23,25 +23,13 @@ public class Solution {
     /*
      * Methods
      */
-    public boolean dominates(Solution q) {
-        // Check if this Solution dominates Solution q
-        if(fitnessDeviation <= q.getFitnessDeviation() && fitnessConnectivity <= q.getFitnessConnectivity()) {
+    public boolean dominates(Solution x) {
+        // Check if this Solution dominates a Solution x
+        if(fitnessDeviation <= x.getFitnessDeviation() && fitnessConnectivity <= x.getFitnessConnectivity()) {
             return true;
         }
 
         return false;
-        /*
-        if (!(fitnessDeviation == q.getFitnessDeviation() && fitnessConnectivity == q.getFitnessConnectivity())) {
-            // Check if solution is dominated
-            if(fitnessDeviation >= q.getFitnessDeviation() && fitnessConnectivity >= q.getFitnessConnectivity()) {
-                return false;
-            }
-            // Check if solution dominates
-            else if(fitnessDeviation <= q.getFitnessDeviation() && fitnessConnectivity <= q.getFitnessConnectivity()) {
-                return true;
-            }
-        }
-        */
     }
 
     public Position[] findBorders() {

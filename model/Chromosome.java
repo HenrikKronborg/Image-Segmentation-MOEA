@@ -260,7 +260,7 @@ public class Chromosome {
 
     private void setSelectedGene(int select, int index){
         switch (select) {
-            case 0:             // links to itself.
+            case 0: // links to itself.
                 gene[index] = index;
                 break;
             case 1:

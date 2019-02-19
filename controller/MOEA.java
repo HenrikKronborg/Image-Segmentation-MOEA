@@ -43,21 +43,30 @@ public class MOEA {
         //System.out.println(Validators.validateRank(linkedLists));
         //printRank(linkedLists);
 
+        /*
         // Test dominates
         for(int i = 0; i < 2; i++) {
             System.out.println("d:" + population.get(i).getFitnessDeviation() + " || c: " + population.get(i).getFitnessConnectivity());
             if(i == 0)
                 System.out.println(population.get(i).dominates(population.get(i+1)));
         }
+        */
+
+        for(LinkedList<Solution> list : fastNonDominatedSort()) {
+            for(Solution solution : list) {
+                System.out.println(solution.getFitnessDeviation());
+            }
+        }
     }
 
     /*
      * Methods
      */
-    public void fastNonDominatedSort() {
+    public LinkedList<LinkedList<Solution>> fastNonDominatedSort() {
         LinkedList<LinkedList<Solution>> frontier = new LinkedList<>();
 
         ArrayList<ArrayList<Solution>> sp = new ArrayList<>();
+        sp.add(new ArrayList<>());
 
         int index = 0;
         for(Solution p : population) {
@@ -103,8 +112,9 @@ public class MOEA {
             i++;
             frontier.push(Q);
         }
-    }
 
+        return frontier;
+    }
 
     /*
     public LinkedList<LinkedList<Solution>> generateRank() {
@@ -174,7 +184,10 @@ public class MOEA {
     */
 
     public void crowdingDistance() {
-        for(int i = 0; i < population.size(); i++) {
+        int l = population.size();
+        int[] crowdingValues = new int[100];
+
+        for(int i = 0; i < l; i++) {
 
         }
     }
