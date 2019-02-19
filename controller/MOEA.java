@@ -39,19 +39,13 @@ public class MOEA {
         for(Solution solution : population) {
             fitness.generateFitness(solution);
         }
-        //LinkedList<LinkedList<Solution>> linkedLists = generateRank();
-        //System.out.println(Validators.validateRank(linkedLists));
-        //printRank(linkedLists);
+        LinkedList<LinkedList<Solution>> linkedLists = fastNonDominatedSort();
+        System.out.println(Validators.validateRank(linkedLists));
+        printRank(linkedLists);
 
 
         // Test dominates
 
-
-        for(LinkedList<Solution> list : fastNonDominatedSort()) {
-            for(Solution solution : list) {
-                System.out.println(solution.getFitnessDeviation());
-            }
-        }
     }
 
     /*
@@ -73,14 +67,17 @@ public class MOEA {
             // If p belongs to the first front
             if(p.n == 0) {
                 p.setRank(1);
-                frontier.push(new LinkedList<>(Arrays.asList(p)));
+                if(frontier.size()== 0){
+                    frontier.push(new LinkedList<>(Arrays.asList(p)));
+                }else{
+                    frontier.get(0).add(p);
+                }
             }
         }
 
         int i = 0;
-        while(!frontier.get(i).isEmpty()) {
+        while(frontier.size() > i) {
             LinkedList<Solution> Q = new LinkedList<>(); // Store members of the next
-            System.out.println(frontier.get(i));
             for(Solution p : frontier.get(i)) {
                 for(Solution q : p.S) {
                     q.n--;
@@ -92,7 +89,8 @@ public class MOEA {
             }
 
             i++;
-            frontier.push(Q);
+            if(!Q.isEmpty())
+                frontier.addLast(Q);
         }
 
         return frontier;
