@@ -1,6 +1,5 @@
 package model;
 
-import model.functions.ImageLoader;
 import model.segmentGeneration.Node;
 
 import java.awt.*;
@@ -16,8 +15,8 @@ public class Segment {
     }
 
     public Segment(Color[][] list){
-        for(int i=0; i < list.length; i++){
-            for(int j=0; j < list[i].length; j++){
+        for(int i = 0; i < list.length; i++){
+            for(int j = 0; j < list[i].length; j++){
                 pixels.add(new Position(j,i));
             }
         }

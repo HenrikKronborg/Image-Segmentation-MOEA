@@ -4,7 +4,7 @@ import model.Position;
 import model.Segment;
 import model.Solution;
 
-import java.awt.Color;
+import javafx.scene.paint.Color;
 import java.util.ArrayList;
 
 public class FitnessCalc {
@@ -51,9 +51,9 @@ public class FitnessCalc {
             blue += temp.getBlue();
             green += temp.getGreen();
         }
-        red    /= color.length;
+        red   /= color.length;
         green /= color.length;
-        blue /= color.length;
+        blue  /= color.length;
 
 
         double deviation = 0.0;
