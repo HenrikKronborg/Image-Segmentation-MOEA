@@ -16,7 +16,8 @@ public class MOEA {
     private static int tournamentSize = 2; // Number of individuals to choose from population at random
 
     private static ArrayList<Solution> population;
-    private static Solution bestSolution;
+    private static LinkedList<Solution> front;
+    private ArrayList<LinkedList<Solution>> ob;
 
     public MOEA() {
 
@@ -36,12 +37,17 @@ public class MOEA {
         for(Solution solution : population) {
             fitness.generateFitness(solution);
         }
+
         LinkedList<LinkedList<Solution>> linkedLists = fastNonDominatedSort();
         System.out.println(Validators.validateRank(linkedLists));
         printRank(linkedLists);
+
         for(LinkedList<Solution> l : linkedLists)
             crowdingDistance(l);
 
+
+        front = linkedLists.get(0);
+        ob.add(front);
     }
 
     /*
@@ -154,5 +160,6 @@ public class MOEA {
     public void setTournamentSize(int tournamentSize) { this.tournamentSize = tournamentSize; }
 
     public static ArrayList<Solution> getPopulation() { return population; }
-    public static Solution getBestSolution() { return bestSolution; }
+    public static LinkedList<Solution> getFront() { return front; }
+    public void loadObservableList(ArrayList<LinkedList<Solution>> ob) { this.ob = ob; }
 }
