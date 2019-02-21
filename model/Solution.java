@@ -109,4 +109,49 @@ public class Solution {
     public void setS(ArrayList<Solution> s) {
         S = s;
     }
+
+    public double getCrowdingDistance() {
+        return crowdingDistance;
+    }
+
+    public void setCrowdingDistance(double crowdingDistance) {
+        this.crowdingDistance = crowdingDistance;
+    }
+
+    public void addToCrowdingDistance(double crowdingDistance) {
+        if(this.crowdingDistance != Double.MAX_VALUE)
+            this.crowdingDistance += crowdingDistance;
+        else
+            System.out.println("ERROR?");
+    }
+
+    public int compareDeviationTo(Solution other){
+        double cmp = this.fitnessDeviation - other.fitnessDeviation;
+        if(cmp > 0){
+            return 1;
+        }if(cmp == 0){
+            return 0;
+        }
+        return -1;
+    }
+
+    public int compareConnectivityTo(Solution other){
+        double cmp = this.fitnessConnectivity - other.fitnessConnectivity;
+        if(cmp > 0){
+            return 1;
+        }if(cmp == 0){
+            return 0;
+        }
+        return -1;
+    }
+
+    public int compareEdgeTo(Solution other){
+        double cmp = this.fitnessEdge - other.fitnessEdge;
+        if(cmp > 0){
+            return 1;
+        }if(cmp == 0){
+            return 0;
+        }
+        return -1;
+    }
 }

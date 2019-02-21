@@ -5,10 +5,7 @@ import model.functions.FitnessCalc;
 import model.functions.ImageLoader;
 import model.functions.Validators;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class MOEA {
     private static int popSize = 10; // Population size
@@ -42,6 +39,9 @@ public class MOEA {
         LinkedList<LinkedList<Solution>> linkedLists = fastNonDominatedSort();
         System.out.println(Validators.validateRank(linkedLists));
         printRank(linkedLists);
+        for(LinkedList<Solution> l : linkedLists)
+            crowdingDistance(l);
+
     }
 
     /*
@@ -100,9 +100,31 @@ public class MOEA {
     public void crowdingDistance(LinkedList<Solution> I) {
         int l = I.size();
 
-        for(int i = 0; i < l; i++) {
+        I.sort((Solution a, Solution b)-> a.compareDeviationTo(b));
+        Solution first = I.getFirst();
+        Solution last = I.getLast();
 
+        // If we Use 3D, be careful with MAX_Value, does not act as 
+        first.setCrowdingDistance(Double.MAX_VALUE);
+        last.setCrowdingDistance(Double.MAX_VALUE);
+
+        for(int i =1; i < I.size()-1;i++){
+            I.get(i).setCrowdingDistance((I.get(i+1).getFitnessDeviation()-I.get(i-1).getFitnessDeviation())/(last.getFitnessDeviation()-first.getFitnessDeviation()));
         }
+
+
+        I.sort((Solution a, Solution b)-> a.compareConnectivityTo(b));
+        first = I.getFirst();
+        last = I.getLast();
+
+        first.setCrowdingDistance(Double.MAX_VALUE);
+        last.setCrowdingDistance(Double.MAX_VALUE);
+
+        for(int i =1; i < I.size()-1;i++){
+            I.get(i).addToCrowdingDistance((I.get(i+1).getFitnessConnectivity()-I.get(i-1).getFitnessConnectivity())/(last.getFitnessConnectivity()-first.getFitnessConnectivity()));
+        }
+
+
     }
 
     public void printRank(LinkedList<LinkedList<Solution>> rankedPopulation){
