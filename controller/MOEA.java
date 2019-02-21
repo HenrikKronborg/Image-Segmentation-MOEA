@@ -9,7 +9,7 @@ import model.functions.Validators;
 import java.util.*;
 
 public class MOEA {
-    private static int popSize = 70; // Population size
+    private static int popSize = 10; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.08; // Mutation rate
     private static double recombProbability = 0.7; // Used only for Generational. recombProbability of doing crossover, and 1-recombProbability of copying a parent
@@ -30,6 +30,7 @@ public class MOEA {
         while(population.size() < popSize) {
             population.add(new Solution());
         }
+
         System.out.println("Initialize population done. " + popSize + " random solutions found");
 
         // Calculate fitness value
@@ -45,7 +46,6 @@ public class MOEA {
             crowdingDistance(l);
         }
 
-        ob.add(front);
         int generation = 1;
         while(generation++ <= maxRuns){
             while (population.size() < popSize + numOffsprings){
@@ -63,15 +63,40 @@ public class MOEA {
                 crowdingDistance(l);
             }
 
-            ArrayList<Solution> tempPopulation = new ArrayList<>();
-
-            for(int i = 0; i < popSize; i++) {
-
+            ArrayList<Solution> tempPopulation = new ArrayList<>(popSize);
+            for(LinkedList<Solution> l : frontiers){
+                if(tempPopulation.size() >= popSize){
+                    break;
+                }
+                if(l.size()+tempPopulation.size() <= popSize){
+                    tempPopulation.addAll(l);
+                }else{
+                    l.sort((Solution a, Solution b)-> a.compareCrowdTo(b));
+                    for(Solution s : l){
+                        if(tempPopulation.size() <= popSize){
+                            tempPopulation.add(s);
+                        }else{
+                            break;
+                        }
+                    }
+                }
             }
 
+            population = tempPopulation;
 
             front = frontiers.get(0);
             ob.add(front);
+
+            //If memory becomes a problem...
+            /*
+            population.sort((Solution a, Solution b)-> a.getRank()-b.getRank());// Sort on rank
+            int lastRank = 0;
+            for(int i = 0; i < popSize; i++) {
+                lastRank = population.get(i).getRank();
+            }
+            for(int i = popSize; i < population.size(); i++){
+                if()
+            }*/
         }
     }
 

@@ -176,6 +176,15 @@ public class Solution {
         }
         return -1;
     }
+    public int compareCrowdTo(Solution other){
+        double cmp = other.crowdingDistance - this.crowdingDistance;
+        if(cmp > 0){
+            return 1;
+        }if(cmp == 0){
+            return 0;
+        }
+        return -1;
+    }
 
 
 
