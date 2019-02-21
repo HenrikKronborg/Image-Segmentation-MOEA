@@ -11,8 +11,8 @@ import java.util.*;
 public class MOEA {
     private static int popSize = 10; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
-    private static double mutationRate = 0.08; // Mutation rate
-    private static double recombProbability = 0.7; // Used only for Generational. recombProbability of doing crossover, and 1-recombProbability of copying a parent
+    private static double mutationRate = 0.02; // Mutation rate
+    private static double recombProbability = 0.8; // Used only for Generational. recombProbability of doing crossover, and 1-recombProbability of copying a parent
     private static int maxRuns = 5; // Maximum number of runs before termination
     private static int tournamentSize = 2; // Number of individuals to choose from population at random
 

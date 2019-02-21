@@ -22,10 +22,13 @@ import java.util.ResourceBundle;
 
 public class GUI implements Initializable {
     @FXML
-    private Canvas canvas;
+    private Canvas canvas1;
+    @FXML
+    private Canvas canvas2;
     //private ImageView imageView;
 
-    private GraphicsContext gc;
+    private GraphicsContext gc1;
+    private GraphicsContext gc2;
 
     private MOEA algorithm;
     private ImageLoader image;
@@ -40,11 +43,12 @@ public class GUI implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Load image and draw onto canvas
-        gc = canvas.getGraphicsContext2D();
+        gc1 = canvas1.getGraphicsContext2D();
+        gc2 = canvas2.getGraphicsContext2D();
 
         image = new ImageLoader();
         Image view = image.loadImage("353013.jpg");
-        gc.drawImage(view, 0, 0);
+        gc1.drawImage(view, 0, 0);
 
         // Algorithm and calculations in threads
         initListener();
@@ -63,11 +67,12 @@ public class GUI implements Initializable {
     }
 
     private void drawSegments(Solution solution) {
+        gc2.clearRect(0,0,canvas2.getWidth(),canvas2.getHeight());
         for(Segment segment : solution.getSegments()) {
-            gc.setFill(new Color(Math.random(), Math.random(), Math.random(), 0.5));
+            gc2.setFill(new Color(Math.random(), Math.random(), Math.random(), 0.5));
 
             for(Position position : segment.getPixels()) {
-                gc.fillRect(position.getX(), position.getY(), 1, 1);
+                gc2.fillRect(position.getX(), position.getY(), 1, 1);
             }
         }
     }
