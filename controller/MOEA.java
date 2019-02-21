@@ -8,7 +8,7 @@ import model.functions.Validators;
 import java.util.*;
 
 public class MOEA {
-    private static int popSize = 10; // Population size
+    private static int popSize = 70; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.08; // Mutation rate
     private static double recombProbability = 0.7; // Used only for Generational. recombProbability of doing crossover, and 1-recombProbability of copying a parent
@@ -36,18 +36,28 @@ public class MOEA {
         fitness.setImageLoader(image);
         for(Solution solution : population) {
             fitness.generateFitness(solution);
+            
         }
 
-        LinkedList<LinkedList<Solution>> linkedLists = fastNonDominatedSort();
-        System.out.println(Validators.validateRank(linkedLists));
-        printRank(linkedLists);
-
-        for(LinkedList<Solution> l : linkedLists)
-            crowdingDistance(l);
 
 
-        front = linkedLists.get(0);
-        ob.add(front);
+        int generation = 1;
+        while(generation++ <= maxRuns){
+            LinkedList<LinkedList<Solution>> linkedLists = fastNonDominatedSort();
+
+            while (population.size() < popSize + numOffsprings){
+
+
+            }
+            //System.out.println(Validators.validateRank(linkedLists));
+            //printRank(linkedLists);
+            for(LinkedList<Solution> l : linkedLists)
+                crowdingDistance(l);
+
+
+            front = linkedLists.get(0);
+            ob.add(front);
+        }
     }
 
     /*
@@ -143,6 +153,7 @@ public class MOEA {
             }
         }
     }
+
     /*
      * Getters and Setters
      */
