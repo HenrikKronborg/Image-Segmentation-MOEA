@@ -129,8 +129,26 @@ public class MOEA {
         for(int i =1; i < I.size()-1;i++){
             I.get(i).addToCrowdingDistance((I.get(i+1).getFitnessConnectivity()-I.get(i-1).getFitnessConnectivity())/(last.getFitnessConnectivity()-first.getFitnessConnectivity()));
         }
+    }
 
+    public Solution[] tournamentSelection() {
+        List<Solution> tournament = new ArrayList<>();
 
+        for(int i = 0; i < tournamentSize; i++) {
+            while(true) {
+                int randomIndex = (int) (Math.random()*population.size());
+                Solution tempSolution = population.get(randomIndex);
+
+                if(!tournament.contains(tempSolution)) {
+                    tournament.add(tempSolution);
+                    break;
+                }
+            }
+        }
+
+        Collections.sort(tournament);
+
+        return new Solution[]{tournament.get(0), tournament.get(1)};
     }
 
     public void printRank(LinkedList<LinkedList<Solution>> rankedPopulation){
