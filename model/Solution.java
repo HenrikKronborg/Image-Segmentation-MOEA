@@ -9,6 +9,7 @@ public class Solution {
     private double fitnessDeviation;
     private double fitnessConnectivity;
     private double fitnessEdge;
+    private double crowdingDistance;
 
     public int n; // Number of dominating elements.
     public ArrayList<Solution> S = new ArrayList<>();

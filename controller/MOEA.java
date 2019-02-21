@@ -51,6 +51,9 @@ public class MOEA {
         LinkedList<LinkedList<Solution>> frontier = new LinkedList<>();
 
         for(Solution p : population) {
+            p.S = new ArrayList<>();
+            p.n = 0;
+
             for(Solution q : population) {
                 if(p.dominates(q)) {
                     p.S.add(q);
@@ -94,9 +97,8 @@ public class MOEA {
         return frontier;
     }
 
-    public void crowdingDistance() {
-        int l = population.size();
-        int[] crowdingValues = new int[100];
+    public void crowdingDistance(LinkedList<Solution> I) {
+        int l = I.size();
 
         for(int i = 0; i < l; i++) {
 

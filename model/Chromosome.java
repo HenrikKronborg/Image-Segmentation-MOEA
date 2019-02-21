@@ -56,7 +56,7 @@ public class Chromosome {
     }
     public ArrayList<Segment> generatePhenotype() {
         Node[] nodes = new Node[gene.length];
-        ArrayList<Node> notPlaced = new ArrayList<>();
+        ArrayList<Node> notPlaced = new ArrayList<>(); // Maybe able to remove and just use nodes array
 
         for(int i = 0;i < gene.length; i++) {
             nodes[i] = new Node(i);
@@ -88,14 +88,12 @@ public class Chromosome {
         node.placed = true;
         segment.add(node);
 
-
         generateSegment(node.getChild(), segment);
         for(Node n : node.getParents()){
             generateSegment(n,segment);
         }
 
         return segment;
-
     }
 
     public Position[] getSegmentBorder() {
