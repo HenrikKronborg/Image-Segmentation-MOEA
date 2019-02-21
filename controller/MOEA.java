@@ -1,5 +1,6 @@
 package controller;
 
+import model.Chromosome;
 import model.Solution;
 import model.functions.FitnessCalc;
 import model.functions.ImageLoader;
@@ -12,7 +13,7 @@ public class MOEA {
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.08; // Mutation rate
     private static double recombProbability = 0.7; // Used only for Generational. recombProbability of doing crossover, and 1-recombProbability of copying a parent
-    private static int maxRuns = 100; // Maximum number of runs before termination
+    private static int maxRuns = 5; // Maximum number of runs before termination
     private static int tournamentSize = 2; // Number of individuals to choose from population at random
 
     private static ArrayList<Solution> population;
@@ -39,23 +40,37 @@ public class MOEA {
             
         }
 
+        LinkedList<LinkedList<Solution>> frontiers = fastNonDominatedSort();
+        for(LinkedList<Solution> l : frontiers) {
+            crowdingDistance(l);
+        }
 
-
+        ob.add(front);
         int generation = 1;
         while(generation++ <= maxRuns){
-            LinkedList<LinkedList<Solution>> linkedLists = fastNonDominatedSort();
-
             while (population.size() < popSize + numOffsprings){
+                Solution father = NSGAIItournament();
+                Solution mother = NSGAIItournament();
 
+                for(Solution child : father.crossoverAndMutate(mother,mutationRate)) {
+                    population.add(child);
+                }
+            }
+
+            // Sort and calculate crowding distance
+            frontiers = fastNonDominatedSort();
+            for(LinkedList<Solution> l : frontiers) {
+                crowdingDistance(l);
+            }
+
+            ArrayList<Solution> tempPopulation = new ArrayList<>();
+
+            for(int i = 0; i < popSize; i++) {
 
             }
-            //System.out.println(Validators.validateRank(linkedLists));
-            //printRank(linkedLists);
-            for(LinkedList<Solution> l : linkedLists)
-                crowdingDistance(l);
 
 
-            front = linkedLists.get(0);
+            front = frontiers.get(0);
             ob.add(front);
         }
     }
@@ -141,24 +156,31 @@ public class MOEA {
         }
     }
 
-    public Solution[] tournamentSelection() {
-        List<Solution> tournament = new ArrayList<>();
+    public Solution NSGAIItournament() {
+        Solution first, second;
 
-        for(int i = 0; i < tournamentSize; i++) {
-            while(true) {
-                int randomIndex = (int) (Math.random()*population.size());
-                Solution tempSolution = population.get(randomIndex);
+        int randomIndex = (int) (Math.random()*popSize);
+        first = population.get(randomIndex);
+        while(true) {
+            randomIndex = (int) (Math.random()*popSize);
+            second = population.get(randomIndex);
 
-                if(!tournament.contains(tempSolution)) {
-                    tournament.add(tempSolution);
-                    break;
-                }
+            if(!second.equals(first)) {
+                break;
             }
         }
 
-        Collections.sort(tournament);
+        if(first.getRank() < second.getRank()){
+            return first;
+        }else if(first.getRank() > second.getRank()){
+            return second;
+        }
 
-        return new Solution[]{tournament.get(0), tournament.get(1)};
+        if(first.getCrowdingDistance() > second.getCrowdingDistance()){
+            return first;
+        }
+
+        return second;
     }
 
     public void printRank(LinkedList<LinkedList<Solution>> rankedPopulation){

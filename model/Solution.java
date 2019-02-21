@@ -18,6 +18,11 @@ public class Solution {
         initalize();
     }
 
+    public Solution(Chromosome chromosome){
+        this.chromosome = chromosome;
+        segments = chromosome.generatePhenotype();
+    }
+
     public void initalize() {
         chromosome = new Chromosome();
         chromosome.generateRandomGene();
@@ -37,6 +42,23 @@ public class Solution {
         }
 
         return false;
+    }
+    public Solution[] crossoverAndMutate(Solution mother, double mutateRate){
+        Chromosome[] children = chromosome.uniformCrossover(mother.chromosome);
+
+        Solution[] solutions = new Solution[children.length];
+
+        for(int i = 0; i< children.length; i++){
+
+            // Perform Mutate on children.
+            children[i].mutateFlip(mutateRate);
+
+            // Add to return array.
+            solutions[i]= new Solution(children[i]);
+        }
+
+        return solutions;
+
     }
 
     public Position[] findBorders() {
@@ -154,4 +176,7 @@ public class Solution {
         }
         return -1;
     }
+
+
+
 }

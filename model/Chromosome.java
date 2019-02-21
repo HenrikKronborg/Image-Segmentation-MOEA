@@ -269,18 +269,7 @@ public class Chromosome {
             case 4:
                 gene[index] = index + width; // links to the bottom node (Y dir.)
                 break;
-            case 5:
-                gene[index] = index + width; //
-                break;
-            case 6:
-                gene[index] = index + width; //
-                break;
-            case 7:
-                gene[index] = index + width; //
-                break;
-            case 8:
-                gene[index] = index + width; //
-                break;
+
         }
     }
 }
