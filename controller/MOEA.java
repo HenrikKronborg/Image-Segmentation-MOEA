@@ -9,11 +9,11 @@ import model.functions.Validators;
 import java.util.*;
 
 public class MOEA {
-    private static int popSize = 10; // Population size
+    private static int popSize = 5; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.02; // Mutation rate
     private static double recombProbability = 0.8; // Used only for Generational. recombProbability of doing crossover, and 1-recombProbability of copying a parent
-    private static int maxRuns = 5; // Maximum number of runs before termination
+    private static int maxRuns = 30; // Maximum number of runs before termination
     private static int tournamentSize = 2; // Number of individuals to choose from population at random
 
     private static ArrayList<Solution> population;
@@ -83,6 +83,8 @@ public class MOEA {
             }
 
             population = tempPopulation;
+
+            System.out.println(generation);
 
             front = frontiers.get(0);
             ob.add(front);

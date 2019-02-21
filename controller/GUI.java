@@ -86,7 +86,7 @@ public class GUI implements Initializable {
                     listenerListSize = listenerList.size();
 
                     front = listenerList.get(listenerListSize-1);
-                    bestSolution = front.get(r.nextInt(listenerList.size()));
+                    bestSolution = front.get(r.nextInt(front.size()));
 
                     drawSegments(bestSolution);
                 }
