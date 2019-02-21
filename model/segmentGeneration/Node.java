@@ -12,6 +12,7 @@ public class Node {
     private int value;
     private Node child;
     private Position position;
+    public boolean placed = false;
 
     public Node(int value){
         this.value = value;

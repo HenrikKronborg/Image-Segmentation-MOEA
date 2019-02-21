@@ -71,25 +71,23 @@ public class Chromosome {
 
         ArrayList<Segment> segments = new ArrayList<>();
 
-        while (notPlaced.size() > 0) {
-            Node toRemove = notPlaced.remove(0);
-
-            HashSet<Node> list = generateSegment(toRemove, new HashSet<>());
-
-            notPlaced.removeAll(list);
-
-            segments.add(new Segment(new ArrayList<>(list)));
+        for(Node n : notPlaced){
+            if(!n.placed){
+                ArrayList<Node> list = generateSegment(n, new ArrayList<>());
+                segments.add(new Segment(list));
+            }
         }
 
         return segments;
     }
 
-    private HashSet<Node> generateSegment(Node node, HashSet<Node> segment) {
-        if(segment.contains(node)) {
+    private ArrayList<Node> generateSegment(Node node, ArrayList<Node> segment) {
+        if(node.placed) {
             return segment;
-        }else{
-            segment.add(node);
         }
+        node.placed = true;
+        segment.add(node);
+
 
         generateSegment(node.getChild(), segment);
         for(Node n : node.getParents()){
@@ -274,6 +272,18 @@ public class Chromosome {
                 break;
             case 4:
                 gene[index] = index + width; // links to the bottom node (Y dir.)
+                break;
+            case 5:
+                gene[index] = index + width; //
+                break;
+            case 6:
+                gene[index] = index + width; //
+                break;
+            case 7:
+                gene[index] = index + width; //
+                break;
+            case 8:
+                gene[index] = index + width; //
                 break;
         }
     }

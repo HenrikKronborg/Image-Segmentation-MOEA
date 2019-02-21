@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MOEA {
-    private static int popSize = 10; // Population size
+    private static int popSize = 1; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.08; // Mutation rate
     private static double recombProbability = 0.7; // Used only for Generational. recombProbability of doing crossover, and 1-recombProbability of copying a parent

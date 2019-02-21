@@ -8,10 +8,10 @@ import java.util.HashSet;
 
 public class Segment {
 
-    private HashSet<Position> pixels = new HashSet<>();
+    private HashSet<Position> pixels;
 
     public Segment(){
-
+        pixels = new HashSet<>();
     }
 
     public Segment(Color[][] list){
@@ -23,6 +23,7 @@ public class Segment {
     }
 
     public Segment(ArrayList<Node> list) {
+        pixels = new HashSet<>();
         for(Node n : list) {
             pixels.add(n.getPosition());
         }
