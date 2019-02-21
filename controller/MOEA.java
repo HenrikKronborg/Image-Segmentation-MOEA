@@ -87,7 +87,7 @@ public class MOEA {
             if(!Q.isEmpty()) {
                 frontier.addLast(Q);
             }
-            
+
             i++;
         }
 

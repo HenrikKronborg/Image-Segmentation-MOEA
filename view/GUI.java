@@ -21,10 +21,8 @@ public class GUI implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         image = new ImageLoader();
-        Image viewImage = image.loadImage("test4x4multiColor.jpg");
-
-        imageView = new ImageView(viewImage);
-        //imageView.setImage(viewImage);
+        Image view = image.loadImage("test4x4multiColor.jpg");
+        imageView.setImage(view);
 
         initCalculateThread();
         calculateThread.start();
