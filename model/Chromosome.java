@@ -87,9 +87,8 @@ public class Chromosome {
     private HashSet<Node> generateSegment(Node node, HashSet<Node> segment) {
         if(segment.contains(node)) {
             return segment;
-        }else{
-            segment.add(node);
         }
+        segment.add(node);
 
         generateSegment(node.getChild(), segment);
         for(Node n : node.getParents()){
@@ -97,7 +96,6 @@ public class Chromosome {
         }
 
         return segment;
-
     }
 
     public Position[] getSegmentBorder() {

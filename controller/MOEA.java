@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MOEA {
-    private static int popSize = 10; // Population size
+    private static int popSize = 1; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.08; // Mutation rate
     private static double recombProbability = 0.7; // Used only for Generational. recombProbability of doing crossover, and 1-recombProbability of copying a parent
@@ -51,6 +51,9 @@ public class MOEA {
         LinkedList<LinkedList<Solution>> frontier = new LinkedList<>();
 
         for(Solution p : population) {
+            p.S = new ArrayList<>();
+            p.n = 0;
+
             for(Solution q : population) {
                 if(p.dominates(q)) {
                     p.S.add(q);
@@ -94,9 +97,8 @@ public class MOEA {
         return frontier;
     }
 
-    public void crowdingDistance() {
-        int l = population.size();
-        int[] crowdingValues = new int[100];
+    public void crowdingDistance(LinkedList<Solution> I) {
+        int l = I.size();
 
         for(int i = 0; i < l; i++) {
 
