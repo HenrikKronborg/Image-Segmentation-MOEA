@@ -7,18 +7,20 @@ import model.functions.ImageLoader;
 import model.functions.Validators;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MOEA {
     private static int popSize = 5; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.02; // Mutation rate
     private static double recombProbability = 0.8; // Used only for Generational. recombProbability of doing crossover, and 1-recombProbability of copying a parent
-    private static int maxRuns = 30; // Maximum number of runs before termination
+    private static int maxRuns = 5; // Maximum number of runs before termination
     private static int tournamentSize = 2; // Number of individuals to choose from population at random
 
     private static ArrayList<Solution> population;
     private static LinkedList<Solution> front;
     private ArrayList<LinkedList<Solution>> ob;
+    private AtomicInteger generation = new AtomicInteger(0);
 
     public MOEA() {
 
@@ -46,9 +48,8 @@ public class MOEA {
             crowdingDistance(l);
         }
 
-        int generation = 1;
-        while(generation++ <= maxRuns){
-            while (population.size() < popSize + numOffsprings){
+        while(generation.get() < maxRuns) {
+            while (population.size() < popSize + numOffsprings) {
                 Solution father = NSGAIItournament();
                 Solution mother = NSGAIItournament();
 
@@ -64,18 +65,18 @@ public class MOEA {
             }
 
             ArrayList<Solution> tempPopulation = new ArrayList<>(popSize);
-            for(LinkedList<Solution> l : frontiers){
-                if(tempPopulation.size() >= popSize){
+            for(LinkedList<Solution> l : frontiers) {
+                if(tempPopulation.size() >= popSize) {
                     break;
                 }
-                if(l.size()+tempPopulation.size() <= popSize){
+                if(l.size()+tempPopulation.size() <= popSize) {
                     tempPopulation.addAll(l);
                 }else{
                     l.sort((Solution a, Solution b)-> a.compareCrowdTo(b));
-                    for(Solution s : l){
-                        if(tempPopulation.size() <= popSize){
+                    for(Solution s : l) {
+                        if(tempPopulation.size() <= popSize) {
                             tempPopulation.add(s);
-                        }else{
+                        } else {
                             break;
                         }
                     }
@@ -88,6 +89,8 @@ public class MOEA {
 
             front = frontiers.get(0);
             ob.add(front);
+
+            generation.getAndIncrement();
 
             //If memory becomes a problem...
             /*
@@ -156,8 +159,6 @@ public class MOEA {
     }
 
     public void crowdingDistance(LinkedList<Solution> I) {
-        int l = I.size();
-
         I.sort((Solution a, Solution b)-> a.compareDeviationTo(b));
         Solution first = I.getFirst();
         Solution last = I.getLast();
@@ -240,4 +241,5 @@ public class MOEA {
     public static ArrayList<Solution> getPopulation() { return population; }
     public static LinkedList<Solution> getFront() { return front; }
     public void loadObservableList(ArrayList<LinkedList<Solution>> ob) { this.ob = ob; }
+    public AtomicInteger getGeneration() { return generation; }
 }

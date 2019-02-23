@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
@@ -25,7 +26,8 @@ public class GUI implements Initializable {
     private Canvas canvas1;
     @FXML
     private Canvas canvas2;
-    //private ImageView imageView;
+    @FXML
+    private Label generation;
 
     private GraphicsContext gc1;
     private GraphicsContext gc2;
@@ -76,6 +78,9 @@ public class GUI implements Initializable {
             }
         }
     }
+    private void drawText(Solution s) {
+        generation.setText(algorithm.getGeneration().toString());
+    }
 
     public void initListener(){
         listenerList = new ArrayList<>();
@@ -89,6 +94,8 @@ public class GUI implements Initializable {
                     bestSolution = front.get(r.nextInt(front.size()));
 
                     drawSegments(bestSolution);
+
+                    drawText(bestSolution);
                 }
             }
         }.start();
