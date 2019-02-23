@@ -77,52 +77,52 @@ public class FitnessCalc {
     private double segmentConnectivity(Segment segment) {
         ArrayList<Position> pixels = segment.getPixels();
         double conn = 0.0;
-        for(int i = 0; i < pixels.size(); i++){
+        for(int i = 0; i < pixels.size(); i++) {
             Position pix = pixels.get(i);
 
-            if(pix.getX() != ImageLoader.getWidth()-1){
-                if(!segment.contains(pix.getX()+1,pix.getY())){
+            if(pix.getX() != ImageLoader.getWidth()-1) {
+                if(!segment.contains(pix.getX()+1,pix.getY())) {
                     conn += 1;
                 }
 
-                if(pix.getY() != 0){
-                    if(!segment.contains(pix.getX()+1,pix.getY()-1)){
+                if(pix.getY() != 0) {
+                    if(!segment.contains(pix.getX()+1,pix.getY()-1)) {
                         conn += 0.2;
                     }
                 }
 
-                if(pix.getY() != ImageLoader.getHeight()-1){
-                    if(!segment.contains(pix.getX()+1,pix.getY()+1)){
+                if(pix.getY() != ImageLoader.getHeight()-1) {
+                    if(!segment.contains(pix.getX()+1,pix.getY()+1)) {
                         conn += 0.166;
                     }
                 }
             }
 
-            if(pix.getX() != 0){
-                if(!segment.contains(pix.getX()-1,pix.getY())){
+            if(pix.getX() != 0) {
+                if(!segment.contains(pix.getX()-1,pix.getY())) {
                     conn += 0.5;
                 }
-                if(pix.getY() != 0){
-                    if(!segment.contains(pix.getX()-1,pix.getY()-1)){
+                if(pix.getY() != 0) {
+                    if(!segment.contains(pix.getX()-1,pix.getY()-1)) {
                         conn += 0.143;
                     }
                 }
 
-                if(pix.getY() != ImageLoader.getHeight()-1){
-                    if(!segment.contains(pix.getX()-1,pix.getY()+1)){
+                if(pix.getY() != ImageLoader.getHeight()-1) {
+                    if(!segment.contains(pix.getX()-1,pix.getY()+1)) {
                         conn += 0.125;
                     }
                 }
             }
 
-            if(pix.getY() != 0){
-                if(!segment.contains(pix.getX(),pix.getY()-1)){
+            if(pix.getY() != 0) {
+                if(!segment.contains(pix.getX(),pix.getY()-1)) {
                     conn += 0.333;
                 }
             }
 
-            if(pix.getY() != ImageLoader.getHeight()-1){
-                if(!segment.contains(pix.getX(),pix.getY()+1)){
+            if(pix.getY() != ImageLoader.getHeight()-1) {
+                if(!segment.contains(pix.getX(),pix.getY()+1)) {
                     conn += 0.25;
                 }
             }
@@ -130,11 +130,6 @@ public class FitnessCalc {
 
         }
         return conn;
-    }
-
-
-    private void edge() {
-
     }
 
     public void setImageLoader(ImageLoader img) {

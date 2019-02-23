@@ -1,17 +1,10 @@
 package model.functions;
 
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.paint.Color;
 import model.Position;
-
-import javax.imageio.ImageIO;
-
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 
 public class ImageLoader {
     private Color[][] pixels;
