@@ -2,7 +2,7 @@ package model;
 
 import java.util.ArrayList;
 
-public class Solution {
+public class Individual {
     private Chromosome chromosome;
     private ArrayList<Segment> segments;
     private int rank;
@@ -12,13 +12,13 @@ public class Solution {
     private double crowdingDistance;
 
     public int n; // Number of dominating elements.
-    public ArrayList<Solution> S = new ArrayList<>();
+    public ArrayList<Individual> S = new ArrayList<>();
 
-    public Solution() {
+    public Individual() {
         initalize();
     }
 
-    public Solution(Chromosome chromosome){
+    public Individual(Chromosome chromosome){
         this.chromosome = chromosome;
         segments = chromosome.generatePhenotype();
     }
@@ -32,10 +32,14 @@ public class Solution {
     /*
      * Methods
      */
-    public boolean dominates(Solution x) {
+    public void generateIndividual() {
+        ArrayList<Neighbor> neighbors = new ArrayList<>();
+    }
+
+    public boolean dominates(Individual x) {
         // Check if the Solutions have the same fitness value
         if (!(fitnessDeviation == x.getFitnessDeviation() && fitnessConnectivity == x.getFitnessConnectivity())) {
-            // Check if this Solution dominates a Solution x
+            // Check if this Individual dominates a Individual x
             if (fitnessDeviation <= x.getFitnessDeviation() && fitnessConnectivity <= x.getFitnessConnectivity()) {
                 return true;
             }
@@ -43,10 +47,11 @@ public class Solution {
 
         return false;
     }
-    public Solution[] crossoverAndMutate(Solution mother, double mutateRate){
+
+    public Individual[] crossoverAndMutate(Individual mother, double mutateRate){
         Chromosome[] children = chromosome.uniformCrossover(mother.chromosome);
 
-        Solution[] solutions = new Solution[children.length];
+        Individual[] individuals = new Individual[children.length];
 
         for(int i = 0; i< children.length; i++){
 
@@ -54,11 +59,10 @@ public class Solution {
             children[i].mutateFlip(mutateRate);
 
             // Add to return array.
-            solutions[i]= new Solution(children[i]);
+            individuals[i]= new Individual(children[i]);
         }
 
-        return solutions;
-
+        return individuals;
     }
 
     public Position[] findBorders() {
@@ -124,11 +128,11 @@ public class Solution {
         this.n = n;
     }
 
-    public ArrayList<Solution> getS() {
+    public ArrayList<Individual> getS() {
         return S;
     }
 
-    public void setS(ArrayList<Solution> s) {
+    public void setS(ArrayList<Individual> s) {
         S = s;
     }
 
@@ -147,45 +151,42 @@ public class Solution {
             System.out.println("ERROR?");
     }
 
-    public int compareDeviationTo(Solution other){
+    public int compareDeviationTo(Individual other){
         double cmp = this.fitnessDeviation - other.fitnessDeviation;
         if(cmp > 0){
             return 1;
-        }if(cmp == 0){
+        } else if(cmp == 0){
             return 0;
         }
         return -1;
     }
 
-    public int compareConnectivityTo(Solution other){
+    public int compareConnectivityTo(Individual other){
         double cmp = this.fitnessConnectivity - other.fitnessConnectivity;
         if(cmp > 0){
             return 1;
-        }if(cmp == 0){
+        } else if(cmp == 0){
             return 0;
         }
         return -1;
     }
 
-    public int compareEdgeTo(Solution other){
+    public int compareEdgeTo(Individual other){
         double cmp = this.fitnessEdge - other.fitnessEdge;
         if(cmp > 0){
             return 1;
-        }if(cmp == 0){
+        } else if(cmp == 0){
             return 0;
         }
         return -1;
     }
-    public int compareCrowdTo(Solution other){
+    public int compareCrowdTo(Individual other){
         double cmp = other.crowdingDistance - this.crowdingDistance;
         if(cmp > 0){
             return 1;
-        }if(cmp == 0){
+        } else if(cmp == 0){
             return 0;
         }
         return -1;
     }
-
-
-
 }

@@ -1,15 +1,13 @@
 package model;
 
-import model.functions.ImageLoader;
+import model.utils.ImageLoader;
 import model.segmentGeneration.Node;
 
 import java.util.*;
 
 public class Chromosome {
     private int[] gene;
-
     private int width, height;
-
     private Random randGenerator = new Random();
 
     /*

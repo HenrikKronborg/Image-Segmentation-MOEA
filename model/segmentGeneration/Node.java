@@ -1,11 +1,9 @@
 package model.segmentGeneration;
 
 import model.Position;
-import model.functions.ImageLoader;
+import model.utils.ImageLoader;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 public class Node {
     private LinkedList<Node> parents = new LinkedList<>();
@@ -39,7 +37,6 @@ public class Node {
             x++;
         }
     }
-
 
     public Node getChild() {
         return child;

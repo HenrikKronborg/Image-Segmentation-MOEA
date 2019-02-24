@@ -1,6 +1,6 @@
 package controller;
 
-import model.Solution;
+import model.Individual;
 
 import java.util.ArrayList;
 
@@ -13,8 +13,8 @@ public class GeneticAlgorithm {
     private static int maxRuns = 100; // Maximum number of runs before termination
     private static int tournamentSize = 20; // Number of individuals to choose from population at random
 
-    private static ArrayList<Solution> population;
-    private static Solution bestSolution;
+    private static ArrayList<Individual> population;
+    private static Individual bestIndividual;
 
 
 }

@@ -1,8 +1,8 @@
-package model.functions;
+package model.utils;
 
 import model.Position;
 import model.Segment;
-import model.Solution;
+import model.Individual;
 
 import javafx.scene.paint.Color;
 import java.util.ArrayList;
@@ -17,12 +17,12 @@ public class FitnessCalc {
     /*
      * Methods
      */
-    public double[] generateFitness(Solution solution) {
-        double deviation = deviation(solution.getSegments());
-        double connectivity = connectivity(solution.getSegments());
+    public double[] generateFitness(Individual individual) {
+        double deviation = deviation(individual.getSegments());
+        double connectivity = connectivity(individual.getSegments());
 
-        solution.setFitnessDeviation(deviation);
-        solution.setFitnessConnectivity(connectivity);
+        individual.setFitnessDeviation(deviation);
+        individual.setFitnessConnectivity(connectivity);
 
         return new double[]{deviation,connectivity};
     }
@@ -55,12 +55,10 @@ public class FitnessCalc {
         green /= color.length;
         blue  /= color.length;
 
-
         double deviation = 0.0;
         for(Color c : color){
             deviation += Math.sqrt(Math.pow(c.getRed()-red,2)+Math.pow(c.getGreen()-green,2)+Math.pow(c.getBlue()-blue,2));
         }
-
 
         return deviation;
     }
@@ -126,8 +124,6 @@ public class FitnessCalc {
                     conn += 0.25;
                 }
             }
-
-
         }
         return conn;
     }

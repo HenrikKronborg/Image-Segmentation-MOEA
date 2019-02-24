@@ -1,17 +1,17 @@
-package model.functions;
+package model.utils;
 
-import model.Solution;
+import model.Individual;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class Validators {
 
-    public static String validateRank(LinkedList<LinkedList<Solution>> rankedPopulation){
+    public static String validateRank(LinkedList<LinkedList<Individual>> rankedPopulation){
         // Step 1: is there any solution in a rank that dominates another?
-        for(List<Solution> rank : rankedPopulation){
-            for(Solution ind : rank){
-                for(Solution cmp : rank){
+        for(List<Individual> rank : rankedPopulation){
+            for(Individual ind : rank){
+                for(Individual cmp : rank){
                     if(!ind.equals(cmp)){
                         if(!(cmp.getFitnessConnectivity() == ind.getFitnessConnectivity() && cmp.getFitnessDeviation() == cmp.getFitnessDeviation())){
                             if(cmp.getFitnessConnectivity() <= ind.getFitnessConnectivity()){
@@ -28,10 +28,10 @@ public class Validators {
         // Step 2: a solution has to be dominated by a solution in the previous rank.
         // Step 3: a solution can not dominate a solution in the previous rank.
         for(int i = 1; i < rankedPopulation.size(); i++){
-            for(Solution ind : rankedPopulation.get(i)){
+            for(Individual ind : rankedPopulation.get(i)){
                 boolean dominated = false;
 
-                for(Solution cmp : rankedPopulation.get(i-1)){
+                for(Individual cmp : rankedPopulation.get(i-1)){
                     if(!(cmp.getFitnessConnectivity() == ind.getFitnessConnectivity() && cmp.getFitnessDeviation() == cmp.getFitnessDeviation())){
 
                         if(cmp.getFitnessConnectivity() <= ind.getFitnessConnectivity() && cmp.getFitnessDeviation() <= ind.getFitnessDeviation()){

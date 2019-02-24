@@ -1,4 +1,4 @@
-package model.functions;
+package model.utils;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;

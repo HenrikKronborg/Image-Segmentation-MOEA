@@ -1,6 +1,5 @@
 package controller;
 
-import controller.MOEA;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -8,12 +7,11 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+import model.Individual;
 import model.Position;
 import model.Segment;
-import model.Solution;
-import model.functions.ImageLoader;
+import model.utils.ImageLoader;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -36,9 +34,9 @@ public class GUI implements Initializable {
     private ImageLoader image;
     private Thread calculateThread;
 
-    private ArrayList<LinkedList<Solution>> listenerList;
-    private LinkedList<Solution> front;
-    Solution bestSolution;
+    private ArrayList<LinkedList<Individual>> listenerList;
+    private LinkedList<Individual> front;
+    Individual bestIndividual;
     int listenerListSize = 0;
     Random r = new Random();
 
@@ -61,16 +59,16 @@ public class GUI implements Initializable {
     private void initCalculateThread() {
         calculateThread = new Thread(new Runnable() {
             public void run() {
-                algorithm = new MOEA();
+                algorithm = new MOEA(image);
                 algorithm.loadObservableList(listenerList);
-                algorithm.run(image);
+                algorithm.run();
             }
         });
     }
 
-    private void drawSegments(Solution solution) {
+    private void drawSegments(Individual individual) {
         gc2.clearRect(0,0,canvas2.getWidth(),canvas2.getHeight());
-        for(Segment segment : solution.getSegments()) {
+        for(Segment segment : individual.getSegments()) {
             gc2.setFill(new Color(Math.random(), Math.random(), Math.random(), 0.5));
 
             for(Position position : segment.getPixels()) {
@@ -78,7 +76,7 @@ public class GUI implements Initializable {
             }
         }
     }
-    private void drawText(Solution s) {
+    private void drawText(Individual s) {
         generation.setText(algorithm.getGeneration().toString());
     }
 
@@ -91,11 +89,11 @@ public class GUI implements Initializable {
                     listenerListSize = listenerList.size();
 
                     front = listenerList.get(listenerListSize-1);
-                    bestSolution = front.get(r.nextInt(front.size()));
+                    bestIndividual = front.get(r.nextInt(front.size()));
 
-                    drawSegments(bestSolution);
+                    drawSegments(bestIndividual);
 
-                    drawText(bestSolution);
+                    drawText(bestIndividual);
                 }
             }
         }.start();
