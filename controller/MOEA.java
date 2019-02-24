@@ -2,7 +2,7 @@ package controller;
 
 import model.Individual;
 import model.Pixel;
-import model.utils.FitnessCalc;
+import model.Position;
 import model.utils.ImageLoader;
 
 import java.util.*;
@@ -22,13 +22,25 @@ public class MOEA {
     private AtomicInteger generation = new AtomicInteger(0);
 
     private ImageLoader image;
-    private Pixel[][] pixels;
+    private static Pixel[][] pixels = new Pixel[ImageLoader.getWidth()][ImageLoader.getHeight()];
 
     public MOEA(ImageLoader loader) {
         this.image = loader;
+        generatePixels();
     }
 
     public void run() {
+        LinkedList<LinkedList<Individual>> frontiers = new LinkedList<>();
+
+        /*
+        for(Pixel[] x: pixels) {
+            for(Pixel y : x) {
+                System.out.println(y.getNeighbors());
+            }
+        }
+        */
+
+        /*
         population = new ArrayList<>();
 
         while(population.size() < popSize) {
@@ -93,6 +105,7 @@ public class MOEA {
             ob.add(front);
 
             generation.getAndIncrement();
+        */
             //If memory becomes a problem...
             /*
             population.sort((Individual a, Individual b)-> a.getRank()-b.getRank());// Sort on rank
@@ -104,19 +117,71 @@ public class MOEA {
                 if()
             }*/
 
-        }
+        //}
     }
 
     /*
      * Methods
      */
+    private void generatePixels() {
+        for(int x = 0; x < ImageLoader.getWidth(); x++) {
+            for(int y = 0; y < ImageLoader.getHeight(); y++) {
+                Pixel pixel = new Pixel(x, y, image.getPixelValue(new Position(x, y)));
+                pixels[x][y] = pixel;
+            }
+        }
+        findNeighbors();
+    }
+
     private void findNeighbors() {
         for(int x = 0; x < ImageLoader.getWidth(); x++) {
             for(int y = 0; y < ImageLoader.getHeight(); y++) {
+                Pixel pixel = pixels[x][y];
 
+                // Right
+                if(x + 1 < ImageLoader.getWidth()) {
+                    pixel.addNeighbor(pixels[x+1][y]);
+                }
+
+                // Left
+                if(x - 1 >= 0) {
+                    pixel.addNeighbor(pixels[x-1][y]);
+                }
+
+                // Bottom
+                if(y + 1 < ImageLoader.getHeight()) {
+                    pixel.addNeighbor(pixels[x][y+1]);
+                }
+
+                // Top
+                if(y - 1 >= 0) {
+                    pixel.addNeighbor(pixels[x][y-1]);
+                }
+
+                // Top right
+                if(y - 1 >= 0 && x + 1 < ImageLoader.getWidth()) {
+                    pixel.addNeighbor(pixels[x+1][y-1]);
+                }
+
+                // Top left
+                if(y - 1 >= 0 && x - 1 >= 0) {
+                    pixel.addNeighbor(pixels[x-1][y-1]);
+                }
+
+                // Bottom right
+                if(y + 1 < ImageLoader.getHeight() && x + 1 < ImageLoader.getHeight()) {
+                    pixel.addNeighbor(pixels[x+1][y+1]);
+                }
+
+                // Bottom left
+                if(y + 1 < ImageLoader.getHeight() && x - 1 >= 0) {
+                    pixel.addNeighbor(pixels[x-1][y+1]);
+                }
             }
         }
     }
+
+
 
     public LinkedList<LinkedList<Individual>> fastNonDominatedSort() {
         LinkedList<LinkedList<Individual>> frontier = new LinkedList<>();
@@ -252,4 +317,6 @@ public class MOEA {
     public static LinkedList<Individual> getFront() { return front; }
     public void loadObservableList(ArrayList<LinkedList<Individual>> ob) { this.ob = ob; }
     public AtomicInteger getGeneration() { return generation; }
+
+    public static Pixel[][] getPixels() { return pixels; }
 }

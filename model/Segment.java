@@ -10,7 +10,7 @@ public class Segment {
 
     private HashSet<Position> pixels;
 
-    public Segment(){
+    public Segment() {
         pixels = new HashSet<>();
     }
 

@@ -10,10 +10,6 @@ public class Chromosome {
     private int width, height;
     private Random randGenerator = new Random();
 
-    /*
-     * Methods
-     */
-
     public Chromosome() {
         this.width = ImageLoader.getWidth();
         this.height = ImageLoader.getHeight();
@@ -25,6 +21,10 @@ public class Chromosome {
         this.width = ImageLoader.getWidth();
         this.height = ImageLoader.getHeight();
     }
+
+    /*
+     * Methods
+     */
 
     /*
     Debug only

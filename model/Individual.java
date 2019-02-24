@@ -1,6 +1,11 @@
 package model;
 
+import controller.MOEA;
+
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 public class Individual {
     private Chromosome chromosome;
@@ -13,6 +18,7 @@ public class Individual {
 
     public int n; // Number of dominating elements.
     public ArrayList<Individual> S = new ArrayList<>();
+    Random r = new Random();
 
     public Individual() {
         initalize();
@@ -32,8 +38,30 @@ public class Individual {
     /*
      * Methods
      */
+    // Minimum Spanning Tree (MST)
     public void generateIndividual() {
-        ArrayList<Neighbor> neighbors = new ArrayList<>();
+        // List of all pixels in the image
+        ArrayList<Pixel> pixelsNeedAssigned = new ArrayList<>();
+        for(Pixel[] pixels : MOEA.getPixels()) {
+            pixelsNeedAssigned.addAll(Arrays.asList(pixels));
+        }
+
+        ArrayList<Pixel> addedPixels = new ArrayList<>();
+
+        while(pixelsNeedAssigned.size() != 0) {
+            // Pick a random pixel to look at next
+            Pixel randomPixel = pixelsNeedAssigned.get(r.nextInt(pixelsNeedAssigned.size()));
+
+            double bestNeighborDistance = Double.MAX_VALUE;
+            Neighbor bestNeighbor;
+
+            for(Neighbor neighbor : randomPixel.getNeighbors()) {
+                if(neighbor.getDistance() < bestNeighborDistance) {
+                    bestNeighborDistance = neighbor.getDistance();
+                    bestNeighbor = neighbor;
+                }
+            }
+        }
     }
 
     public boolean dominates(Individual x) {
@@ -65,8 +93,46 @@ public class Individual {
         return individuals;
     }
 
-    public Position[] findBorders() {
-        return null;
+    /*
+     * Compares
+     */
+    public int compareDeviationTo(Individual other) {
+        double cmp = this.fitnessDeviation - other.fitnessDeviation;
+        if(cmp > 0){
+            return 1;
+        } else if(cmp == 0){
+            return 0;
+        }
+        return -1;
+    }
+
+    public int compareConnectivityTo(Individual other) {
+        double cmp = this.fitnessConnectivity - other.fitnessConnectivity;
+        if(cmp > 0){
+            return 1;
+        } else if(cmp == 0){
+            return 0;
+        }
+        return -1;
+    }
+
+    public int compareEdgeTo(Individual other) {
+        double cmp = this.fitnessEdge - other.fitnessEdge;
+        if(cmp > 0){
+            return 1;
+        } else if(cmp == 0){
+            return 0;
+        }
+        return -1;
+    }
+    public int compareCrowdTo(Individual other) {
+        double cmp = other.crowdingDistance - this.crowdingDistance;
+        if(cmp > 0){
+            return 1;
+        } else if(cmp == 0){
+            return 0;
+        }
+        return -1;
     }
 
     /*
@@ -149,44 +215,5 @@ public class Individual {
             this.crowdingDistance += crowdingDistance;
         else
             System.out.println("ERROR?");
-    }
-
-    public int compareDeviationTo(Individual other){
-        double cmp = this.fitnessDeviation - other.fitnessDeviation;
-        if(cmp > 0){
-            return 1;
-        } else if(cmp == 0){
-            return 0;
-        }
-        return -1;
-    }
-
-    public int compareConnectivityTo(Individual other){
-        double cmp = this.fitnessConnectivity - other.fitnessConnectivity;
-        if(cmp > 0){
-            return 1;
-        } else if(cmp == 0){
-            return 0;
-        }
-        return -1;
-    }
-
-    public int compareEdgeTo(Individual other){
-        double cmp = this.fitnessEdge - other.fitnessEdge;
-        if(cmp > 0){
-            return 1;
-        } else if(cmp == 0){
-            return 0;
-        }
-        return -1;
-    }
-    public int compareCrowdTo(Individual other){
-        double cmp = other.crowdingDistance - this.crowdingDistance;
-        if(cmp > 0){
-            return 1;
-        } else if(cmp == 0){
-            return 0;
-        }
-        return -1;
     }
 }

@@ -4,10 +4,10 @@ public class Position {
     protected int x = 0; // X coordinate
     protected int y = 0; // Y coordinate
 
-    public Position(){
+    public Position() {
 
     }
-    public Position(int x,int y){
+    public Position(int x,int y) {
         this.x = x;
         this.y = y;
     }
@@ -29,9 +29,9 @@ public class Position {
     }
 
     @Override
-    public boolean equals(Object obj){
-        if(obj instanceof Position){
-            if(this.x == ((Position)obj).x && this.y == ((Position)obj).y){
+    public boolean equals(Object obj) {
+        if(obj instanceof Position) {
+            if(this.x == ((Position)obj).x && this.y == ((Position)obj).y) {
                 return true;
             }
         }
