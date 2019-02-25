@@ -34,7 +34,7 @@ public class MOEA {
 
     public void run() {
         front = new LinkedList<>();
-        front.add(new Individual());
+        front.add(new Individual(true));
 
         ob.setOb(front);
         ob.changed.set(true);

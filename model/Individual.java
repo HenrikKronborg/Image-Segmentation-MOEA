@@ -3,6 +3,7 @@ package model;
 import controller.MOEA;
 import model.supportNodes.Neighbor;
 import model.supportNodes.Pixel;
+import model.supportNodes.Position;
 import model.utils.ImageLoader;
 
 import java.util.*;
@@ -20,8 +21,8 @@ public class Individual {
     public ArrayList<Individual> S = new ArrayList<>();
     Random r = new Random();
 
-    public Individual() {
-        initalize();
+    public Individual(boolean MST) {
+        if(MST) initalize();
     }
 
     public Individual(Chromosome chromosome){
@@ -118,28 +119,58 @@ public class Individual {
         return individuals;
     }
 
-    public Individual[] crossover(Individual mother, double mutateRate){
+    public Individual[] crossover(Individual mother){
 
         int crossoverPointX = (int) (Math.random()*ImageLoader.getWidth());
         int crossoverPointY = (int) (Math.random()*ImageLoader.getHeight());
-        Pixel[][] pixels = MOEA.getPixels();
-        boolean fromFather = true;
-        int unAssigned = ImageLoader.getHeight()*ImageLoader.getWidth();
-        for(int y = 0; y < ImageLoader.getHeight(); y++){
-            for(int x = 0; x< ImageLoader.getWidth(); x++){
-                for(Segment s : segments){
-                    if(s.contains(x,y)){
-                        if(s.contains(x+1,y)){
 
+        boolean change = true;
+        Individual[] children = {new Individual(false),new Individual(false)};
+
+        for(Individual child : children){
+            ArrayList<Segment> newSegments = new ArrayList<>();
+            boolean[][] placed = new boolean[ImageLoader.getHeight()][ImageLoader.getWidth()];
+
+            for(int y = 0; y < ImageLoader.getHeight(); y++){
+                for(int x = 0; x< ImageLoader.getWidth(); x++){
+                    if(y == crossoverPointY && x == crossoverPointX){
+                        change = !change;
+                    }
+
+                    if(!placed[y][x]){
+                        int segmentLength;
+                        if(change) {
+                            segmentLength = mother.segments.size();
+                        }else{
+                            segmentLength = segments.size();
+                        }
+                        for(int i= 0; i < segmentLength; i++){
+                            Segment s;
+
+                            if(change) {
+                                s = mother.segments.get(i);
+                            }else{
+                                s = segments.get(i);
+                            }
+
+                            if(s.contains(x,y)){
+                                Segment newSegment = new Segment();
+                                for(Position p : s.getPixels()){
+                                    if(!placed[p.getY()][p.getX()]){
+                                        newSegment.addTo(p);
+                                        placed[p.getY()][p.getX()] = true;
+                                    }
+                                    newSegments.add(newSegment);
+                                }
+                            }
                         }
                     }
                 }
             }
-
+            child.setSegments(newSegments);
         }
 
-
-        return null;
+        return children;
     }
 
 
