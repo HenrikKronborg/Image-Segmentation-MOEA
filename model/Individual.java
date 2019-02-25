@@ -107,10 +107,9 @@ public class Individual {
     }
 
     public Individual[] crossoverAndMutate(Individual mother, double mutateRate){
-        Chromosome[] children = chromosome.uniformCrossover(mother.chromosome);
+        Individual[] children = crossover(mother);
 
-        Individual[] individuals = new Individual[children.length];
-
+        /*
         for(int i = 0; i< children.length; i++){
 
             // Perform Mutate on children.
@@ -119,8 +118,9 @@ public class Individual {
             // Add to return array.
             individuals[i]= new Individual(children[i]);
         }
+        */
 
-        return individuals;
+        return children;
     }
 
     public Individual[] crossover(Individual mother){
