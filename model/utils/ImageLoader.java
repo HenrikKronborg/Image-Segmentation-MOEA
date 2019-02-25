@@ -1,10 +1,13 @@
 package model.utils;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.PixelReader;
-import javafx.scene.paint.Color;
+
+import java.awt.Color;
 import model.supportNodes.Position;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 
 public class ImageLoader {
     private Color[][] pixels;
@@ -15,20 +18,25 @@ public class ImageLoader {
 
     }
 
-    public Image loadImage(String name) {
-        Image image = new Image(new File("./src/img/" + name).toURI().toString());
+    public BufferedImage loadImage(String name) {
+        BufferedImage image = null;
 
-        width = (int) image.getWidth();
-        height = (int) image.getHeight();
+        try {
+            image = ImageIO.read(new File("./src/img/" + name));
 
-        PixelReader pixelReader = image.getPixelReader();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        width = image.getWidth();
+        height = image.getHeight();
 
         // Create 2D array of image
         pixels = new Color[height][width];
 
         for(int i = 0; i < height; i++) {
             for(int j = 0; j < width; j++) {
-                pixels[i][j] = pixelReader.getColor(j, i);
+                pixels[i][j] = new Color(image.getRGB(j, i));
             }
         }
 

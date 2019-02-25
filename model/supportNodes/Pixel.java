@@ -1,7 +1,6 @@
 package model.supportNodes;
 
-import javafx.scene.paint.Color;
-
+import java.awt.*;
 import java.util.ArrayList;
 
 public class Pixel extends Position{

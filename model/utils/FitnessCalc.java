@@ -4,7 +4,7 @@ import model.supportNodes.Position;
 import model.Segment;
 import model.Individual;
 
-import javafx.scene.paint.Color;
+import java.awt.*;
 import java.util.ArrayList;
 
 public class FitnessCalc {
