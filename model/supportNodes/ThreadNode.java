@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ThreadNode {
+    private int generation;
     private LinkedList<Individual> ob = new LinkedList<>();
 
     public AtomicBoolean changed = new AtomicBoolean(false);
@@ -15,7 +16,11 @@ public class ThreadNode {
     }
     public LinkedList<Individual> getOb(){
         return ob;
-
     }
-
+    public int getGeneration() {
+        return generation;
+    }
+    public void setGeneration(int generation) {
+        this.generation = generation;
+    }
 }

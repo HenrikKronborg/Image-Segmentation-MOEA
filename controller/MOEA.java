@@ -21,7 +21,7 @@ public class MOEA {
     private ThreadNode ob;
     private static ArrayList<Individual> population;
     private static LinkedList<Individual> front;
-    private AtomicInteger generation = new AtomicInteger(0);
+    private int generation;
 
 
     private ImageLoader image;
@@ -33,27 +33,6 @@ public class MOEA {
     }
 
     public void run() {
-        LinkedList<LinkedList<Individual>> frontiers = new LinkedList<>();
-        LinkedList<Individual> test = new LinkedList<>();
-
-        test.add(new Individual());
-
-        frontiers.add(test);
-
-        front = frontiers.get(0);
-        ob.setOb(front);
-        ob.changed.set(true);
-
-
-        /*
-        for(Pixel[] x: pixels) {
-            for(Pixel y : x) {
-                System.out.println(y.getNeighbors());
-            }
-        }
-        */
-
-        /*
         population = new ArrayList<>();
 
         while(population.size() < popSize) {
@@ -65,9 +44,8 @@ public class MOEA {
         // Calculate fitness value
         FitnessCalc fitness = new FitnessCalc();
         fitness.setImageLoader(image);
-        for(Individual solution : population) {
-            fitness.generateFitness(solution);
-            
+        for(Individual individual : population) {
+            fitness.generateFitness(individual);
         }
 
         LinkedList<LinkedList<Individual>> frontiers = fastNonDominatedSort();
@@ -75,7 +53,7 @@ public class MOEA {
             crowdingDistance(l);
         }
 
-        while(generation.get() < maxRuns) {
+        while(generation++ < maxRuns) {
             while (population.size() < popSize + numOffsprings) {
                 Individual father = NSGAIItournament();
                 Individual mother = NSGAIItournament();
@@ -112,13 +90,11 @@ public class MOEA {
 
             population = tempPopulation;
 
-
             front = frontiers.get(0);
             ob.setOb(front);
+            ob.setGeneration(generation);
             ob.changed.set(true);
 
-            System.out.println(generation.incrementAndGet());
-        */
             //If memory becomes a problem...
             /*
             population.sort((Individual a, Individual b)-> a.getRank()-b.getRank());// Sort on rank
@@ -130,7 +106,7 @@ public class MOEA {
                 if()
             }*/
 
-        //}
+        }
     }
 
     /*
@@ -332,7 +308,7 @@ public class MOEA {
     public static ArrayList<Individual> getPopulation() { return population; }
     public static LinkedList<Individual> getFront() { return front; }
     //public void loadObservableList(ArrayList<LinkedList<Individual>> ob) { this.ob = ob; }
-    public AtomicInteger getGeneration() { return generation; }
+    public int getGeneration() { return generation; }
 
     public static Pixel[][] getPixels() { return pixels; }
 }

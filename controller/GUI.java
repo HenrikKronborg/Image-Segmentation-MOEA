@@ -82,7 +82,7 @@ public class GUI implements Initializable {
         }
     }
     private void drawText(Individual s) {
-        generation.setText(algorithm.getGeneration().toString());
+        generation.setText(Integer.toString(listener.getGeneration()));
     }
 
     public void initListener(){
@@ -94,13 +94,6 @@ public class GUI implements Initializable {
                     listener.changed.set(false);
                     front = listener.getOb();
                     bestIndividual = front.get(r.nextInt(front.size()));
-/*
-                if(listenerList.size() > listenerListSize) {
-                    listenerListSize = listenerList.size();
-
-                    front = listenerList.get(listenerListSize-1);
-                    bestIndividual = front.get(r.nextInt(front.size()));
-*/
 
                     drawSegments(bestIndividual);
                     drawText(bestIndividual);

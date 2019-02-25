@@ -17,14 +17,12 @@ public class FitnessCalc {
     /*
      * Methods
      */
-    public double[] generateFitness(Individual individual) {
+    public void generateFitness(Individual individual) {
         double deviation = deviation(individual.getSegments());
         double connectivity = connectivity(individual.getSegments());
 
         individual.setFitnessDeviation(deviation);
         individual.setFitnessConnectivity(connectivity);
-
-        return new double[]{deviation,connectivity};
     }
 
     private double deviation(ArrayList<Segment> segments) {
