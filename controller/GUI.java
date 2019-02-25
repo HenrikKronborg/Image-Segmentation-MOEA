@@ -18,6 +18,7 @@ import model.utils.ImageLoader;
 
 import java.awt.*;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.ResourceBundle;
@@ -74,13 +75,22 @@ public class GUI implements Initializable {
 
     private void drawSegments(Individual individual) {
         gc2.clearRect(0,0,canvas2.getWidth(),canvas2.getHeight());
-        for(Segment segment : individual.getSegments()) {
-            gc2.setFill(javafx.scene.paint.Color.rgb(r.nextInt(255), r.nextInt(255), r.nextInt(255), 0.5));
-
-            for(Position position : segment.getPixels()) {
-                gc2.fillRect(position.getX(), position.getY(), 1, 1);
+        HashMap<Integer, Color> colorMap =  new HashMap<>();
+        short[][] board = individual.getShadow();
+        for (int y=0; y<board.length;y++) {
+            for (int x = 0; x < board[y].length; x++) {
+                int id = board[y][x];
+                if(colorMap.containsKey(id)){
+                    gc2.setFill(colorMap.get(id));
+                }else{
+                    Color c = javafx.scene.paint.Color.rgb(r.nextInt(255), r.nextInt(255), r.nextInt(255), 0.5);
+                    colorMap.put(id,c);
+                    gc2.setFill(c);
+                }
+                gc2.fillRect(x, y, 1, 1);
             }
         }
+
     }
     private void drawText() {
         generation.setText(Integer.toString(listener.getGeneration()));
@@ -99,7 +109,7 @@ public class GUI implements Initializable {
 
         gc2.setFill(javafx.scene.paint.Color.rgb(0,0,0));
 
-        int[][] shadow = bestIndividual.getShadow();
+        short[][] shadow = bestIndividual.getShadow();
 
         for(int y = 0; y < ImageLoader.getHeight(); y++) {
             for(int x = 0; x < ImageLoader.getWidth(); x++) {

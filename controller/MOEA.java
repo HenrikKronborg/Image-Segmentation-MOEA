@@ -11,11 +11,11 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MOEA {
-    private static int popSize = 5; // Population size
+    private static int popSize = 50; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.02; // Mutation rate
     private static double recombProbability = 0.8; // Used only for Generational. recombProbability of doing crossover, and 1-recombProbability of copying a parent
-    private static int maxRuns = 5; // Maximum number of runs before termination
+    private static int maxRuns = 50; // Maximum number of runs before termination
     private static int tournamentSize = 2; // Number of individuals to choose from population at random
 
     private ThreadNode ob;
@@ -33,14 +33,6 @@ public class MOEA {
     }
 
     public void run() {
-        /*
-        front = new LinkedList<>();
-        front.add(new Individual(true));
-
-        ob.setOb(front);
-        ob.changed.set(true);
-        */
-
         population = new ArrayList<>();
 
         while(population.size() < popSize) {
@@ -62,11 +54,12 @@ public class MOEA {
         }
 
         while(generation++ < maxRuns) {
+
             while (population.size() < popSize + numOffsprings) {
                 Individual father = NSGAIItournament();
                 Individual mother = NSGAIItournament();
 
-                for(Individual child : father.crossoverAndMutate(mother,mutationRate)) {
+                for(Individual child : father.crossover(mother)) {
                     population.add(child);
                 }
             }
@@ -102,17 +95,6 @@ public class MOEA {
             ob.setOb(front);
             ob.setGeneration(generation);
             ob.changed.set(true);
-
-            //If memory becomes a problem...
-            /*
-            population.sort((Individual a, Individual b)-> a.getRank()-b.getRank());// Sort on rank
-            int lastRank = 0;
-            for(int i = 0; i < popSize; i++) {
-                lastRank = population.get(i).getRank();
-            }
-            for(int i = popSize; i < population.size(); i++){
-                if()
-            }*/
 
        }
     }

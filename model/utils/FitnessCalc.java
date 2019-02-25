@@ -6,6 +6,7 @@ import model.Individual;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class FitnessCalc {
     private ImageLoader img;
@@ -18,112 +19,85 @@ public class FitnessCalc {
      * Methods
      */
     public void generateFitness(Individual individual) {
-        double deviation = deviation(individual.getSegments());
-        double connectivity = connectivity(individual.getSegments());
+        short[][] board = individual.getShadow();
 
-        individual.setFitnessDeviation(deviation);
-        individual.setFitnessConnectivity(connectivity);
-    }
-
-    private double deviation(ArrayList<Segment> segments) {
         double overallDev = 0.0;
-        for (Segment segment : segments) {
-            overallDev += segmentDeviation(segment);
-        }
-
-        return overallDev;
-    }
-
-    private double segmentDeviation(Segment segment) {
-        ArrayList<Position> pixels = segment.getPixels();
-        Color[] color = new Color[pixels.size()];
-        double red = 0.0;
-        double blue = 0.0;
-        double green = 0.0;
-
-        for(int i=0; i < color.length; i++){
-            Color temp = img.getPixelValue(pixels.get(i));
-            color[i] = temp;
-
-            red += temp.getRed();
-            blue += temp.getBlue();
-            green += temp.getGreen();
-        }
-        red   /= color.length;
-        green /= color.length;
-        blue  /= color.length;
-
-        double deviation = 0.0;
-        for(Color c : color){
-            deviation += Math.sqrt(Math.pow(c.getRed()-red,2)+Math.pow(c.getGreen()-green,2)+Math.pow(c.getBlue()-blue,2));
-        }
-
-        return deviation;
-    }
-
-    private double connectivity(ArrayList<Segment> segments) {
         double conn = 0.0;
-        for (Segment segment : segments) {
-            conn += segmentConnectivity(segment);
-        }
 
-        return conn;
-    }
+        HashMap<Integer,int[]> segments = new HashMap<>();
 
-    private double segmentConnectivity(Segment segment) {
-        ArrayList<Position> pixels = segment.getPixels();
-        double conn = 0.0;
-        for(int i = 0; i < pixels.size(); i++) {
-            Position pix = pixels.get(i);
+        for (int y=0; y < board.length; y++) {
+            for(int x=0;  x <board[y].length; x++){
+                int id = board[y][x];
+                Color c = img.getPixelValue(x,y);
 
-            if(pix.getX() != ImageLoader.getWidth()-1) {
-                if(!segment.contains(pix.getX()+1,pix.getY())) {
-                    conn += 1;
+                if(segments.containsKey(id)){
+                    int[] color =  segments.get(id);
+                    color[0] += 1;
+                    color[1] += c.getRed();
+                    color[2] += c.getGreen();
+                    color[3] += c.getBlue();
+                }else{
+                    segments.put(id,new int[]{1,c.getRed(),c.getGreen(),c.getBlue()});
                 }
 
-                if(pix.getY() != 0) {
-                    if(!segment.contains(pix.getX()+1,pix.getY()-1)) {
-                        conn += 0.2;
+                if(x != ImageLoader.getWidth()-1) {
+                    if(id != board[y][x+1])
+                        conn += 1;
+
+                    if(y != 0) {
+                        if(id != board[y-1][x+1])
+                            conn += 0.2;
+                    }
+
+                    if(y != ImageLoader.getHeight()-1) {
+                        if(id != board[y+1][x+1])
+                            conn += 0.166;
                     }
                 }
 
-                if(pix.getY() != ImageLoader.getHeight()-1) {
-                    if(!segment.contains(pix.getX()+1,pix.getY()+1)) {
-                        conn += 0.166;
+                if(x != 0) {
+                    if(id != board[y][x-1])
+                        conn += 0.5;
+                    if(y != 0) {
+                        if(id != board[y-1][x-1])
+                            conn += 0.143;
                     }
-                }
-            }
 
-            if(pix.getX() != 0) {
-                if(!segment.contains(pix.getX()-1,pix.getY())) {
-                    conn += 0.5;
-                }
-                if(pix.getY() != 0) {
-                    if(!segment.contains(pix.getX()-1,pix.getY()-1)) {
-                        conn += 0.143;
+                    if(y!= ImageLoader.getHeight()-1) {
+                        if(id != board[y+1][x-1])
+                            conn += 0.125;
                     }
                 }
 
-                if(pix.getY() != ImageLoader.getHeight()-1) {
-                    if(!segment.contains(pix.getX()-1,pix.getY()+1)) {
-                        conn += 0.125;
-                    }
+                if(y!= 0) {
+                    if(id != board[y-1][x])
+                        conn += 0.333;
                 }
-            }
 
-            if(pix.getY() != 0) {
-                if(!segment.contains(pix.getX(),pix.getY()-1)) {
-                    conn += 0.333;
-                }
-            }
-
-            if(pix.getY() != ImageLoader.getHeight()-1) {
-                if(!segment.contains(pix.getX(),pix.getY()+1)) {
-                    conn += 0.25;
+                if(y != ImageLoader.getHeight()-1) {
+                    if(id != board[y+1][x])
+                        conn += 0.25;
                 }
             }
         }
-        return conn;
+        for (int[] value : segments.values()) {
+
+            value[1] = value[1]/value[0];
+            value[2] = value[2]/value[0];
+            value[3] = value[3]/value[0];
+        }
+        for (int y=0; y<board.length;y++) {
+            for(int x=0; x<board[y].length;x++) {
+                Color color = img.getPixelValue(x,y);
+                int id =board[y][x];
+                int[] c =  segments.get(id);
+                overallDev += Math.sqrt(Math.pow(color.getRed() - c[1], 2) + Math.pow(color.getGreen() - c[2], 2) + Math.pow(color.getBlue() - c[3], 2));
+            }
+        }
+
+        individual.setFitnessDeviation(overallDev);
+        individual.setFitnessConnectivity(conn);
     }
 
     public void setImageLoader(ImageLoader img) {

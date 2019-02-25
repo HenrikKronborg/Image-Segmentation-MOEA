@@ -9,9 +9,7 @@ import model.utils.ImageLoader;
 import java.util.*;
 
 public class Individual {
-    private Chromosome chromosome;
-    private HashMap<Integer,Segment> segments;
-    private int[][] shadow;
+    private short[][] shadow;
     private int rank;
     private double fitnessDeviation;
     private double fitnessConnectivity;
@@ -23,7 +21,7 @@ public class Individual {
     Random r = new Random();
 
     public Individual(boolean MST) {
-        if(MST) initalize();
+        if (MST) initalize();
     }
 
 
@@ -42,49 +40,43 @@ public class Individual {
      */
     // Minimum Spanning Tree (MST)
     public void generateIndividual(double threshold) {
-        shadow = new int[ImageLoader.getHeight()][ImageLoader.getWidth()];
+        shadow = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
         // List of all pixels in the image
-        ArrayList<Pixel> pixelsNodes = new ArrayList<>(ImageLoader.getHeight()*ImageLoader.getWidth());
-        int unAssigned = ImageLoader.getHeight()*ImageLoader.getWidth();
+        ArrayList<Pixel> pixelsNodes = new ArrayList<>(ImageLoader.getHeight() * ImageLoader.getWidth());
+        int unAssigned = ImageLoader.getHeight() * ImageLoader.getWidth();
 
-        for(Pixel[] pixels : MOEA.getPixels()) {
-            for(Pixel pixel : pixels){
+        for (Pixel[] pixels : MOEA.getPixels()) {
+            for (Pixel pixel : pixels) {
                 pixelsNodes.add(pixel);
             }
         }
         Collections.shuffle(pixelsNodes);
-        segments = new HashMap<>();
 
-        int segmentId = 1;
-        for(Pixel root: pixelsNodes){
-            if(shadow[root.getY()][root.getX()] == 0){
-                Segment segment = new Segment();
-                segment.setId(segmentId);
-                segment.addTo(root);
+        short segmentId = 1;
+        for (Pixel root : pixelsNodes) {
+            if (shadow[root.getY()][root.getX()] == 0) {
                 shadow[root.getY()][root.getX()] = segmentId;
 
                 PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
-                for(Neighbor n : root.getNeighbors()){
+                for (Neighbor n : root.getNeighbors()) {
                     pQueue.add(n);
                 }
-                while (true){
+                while (true) {
                     Neighbor newNode = pQueue.poll();
-                    if(shadow[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0){
-                        if(newNode.getDistance() < threshold){
-                            segment.addTo(newNode.getNeighbor());
+                    if (shadow[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0) {
+                        if (newNode.getDistance() < threshold) {
                             shadow[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = segmentId;
-                            for(Neighbor n : newNode.getNeighbor().getNeighbors()){
+                            for (Neighbor n : newNode.getNeighbor().getNeighbors()) {
                                 pQueue.add(n);
                             }
-                        }else{
+                        } else {
                             break;
                         }
                     }
-                    if(pQueue.size() == 0){
+                    if (pQueue.size() == 0) {
                         break;
                     }
                 }
-                segments.put(segmentId,segment);
                 segmentId++;
             }
         }
@@ -102,10 +94,10 @@ public class Individual {
         return false;
     }
 
-    public Individual[] crossoverAndMutate(Individual mother, double mutateRate){
-        Individual[] children = crossover(mother);
+    public Individual[] crossoverAndMutate(Individual mother, double mutateRate) {
+        /*Individual[] children = crossover(mother);
 
-        /*
+
         for(int i = 0; i< children.length; i++){
 
             // Perform Mutate on children.
@@ -116,54 +108,43 @@ public class Individual {
         }
         */
 
-        return children;
+        return null;
     }
 
-    public Individual[] crossover(Individual mother){
+    public Individual[] crossover(Individual mother) {
 
-        int crossoverPointX = (int) (Math.random()*ImageLoader.getWidth());
-        int crossoverPointY = (int) (Math.random()*ImageLoader.getHeight());
+        int crossoverPointX = (int) (Math.random() * ImageLoader.getWidth());
+        int crossoverPointY = (int) (Math.random() * ImageLoader.getHeight());
 
-        boolean change = true;
-        Individual[] children = {new Individual(false),new Individual(false)};
+        Individual[] children = {new Individual(false), new Individual(false)};
 
-        for(Individual child : children){
-            HashMap<Integer,Segment> newSegments = new HashMap<>();
-            int[][] newShadow = new int[ImageLoader.getHeight()][ImageLoader.getWidth()];
-            int segmentId = 1;
+        boolean childe2 = true;
+        for (Individual child : children) {
+            boolean change = false;
+            short[][] newShadow = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
 
-            for(int y = 0; y < ImageLoader.getHeight(); y++){
-                for(int x = 0; x< ImageLoader.getWidth(); x++){
-                    if(y == crossoverPointY && x == crossoverPointX){
-                        change = !change;
+            for (int y = 0; y < ImageLoader.getHeight(); y++) {
+                for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                    if (y == crossoverPointY && x == crossoverPointX) {
+                        change = true;
+                    }
+                    short currentId;
+                    if (change) {
+                        currentId = mother.getShadow()[y][x];
+                    } else {
+                        currentId = shadow[y][x];
                     }
 
-                    if(newShadow[y][x] == 0){
-                        int currentId;
-                        Segment s;
-                        if(change) {
-                            currentId = mother.getShadow()[y][x];
-                            s = mother.segments.get(currentId);
-                        }else{
-                            currentId = shadow[y][x];
-                            s = segments.get(currentId);
-                        }
-                        Segment newSegment = new Segment();
-                        for(Position p : s.getPixels()){
-                            if(newShadow[p.getY()][p.getX()] == 0){
-                                newSegment.addTo(p);
-                                newShadow[p.getY()][p.getX()] = segmentId;
-                            }
-                            newSegments.put(segmentId,newSegment);
-                            segmentId++;
-                        }
-
+                    if (newShadow[y][x] == 0) {
+                        newShadow[y][x] = currentId;
                     }
                 }
+
+
             }
-            child.setSegments(newSegments);
             child.setShadow(newShadow);
         }
+
         return children;
     }
 
@@ -213,21 +194,6 @@ public class Individual {
     /*
      * Getters and Setters
      */
-    public Chromosome getChromosome() {
-        return chromosome;
-    }
-
-    public void setChromosome(Chromosome chromosome) {
-        this.chromosome = chromosome;
-    }
-
-    public ArrayList<Segment> getSegments() {
-        return new ArrayList<>(segments.values());
-    }
-
-    public void setSegments(HashMap<Integer,Segment> segments) {
-        this.segments = segments;
-    }
 
     public double getFitnessEdge() {
         return fitnessEdge;
@@ -292,11 +258,11 @@ public class Individual {
             System.out.println("ERROR?");
     }
 
-    public int[][] getShadow() {
+    public short[][] getShadow() {
         return shadow;
     }
 
-    public void setShadow(int[][] shadow) {
+    public void setShadow(short[][] shadow) {
         this.shadow = shadow;
     }
 }
