@@ -49,7 +49,7 @@ public class GUI implements Initializable {
         gc2 = canvas2.getGraphicsContext2D();
 
         image = new ImageLoader();
-        Image view = image.loadImage("353013.jpg");
+        Image view = image.loadImage("86016.jpg");
         gc1.drawImage(view, 0, 0);
 
         // Algorithm and calculations in threads
@@ -61,10 +61,6 @@ public class GUI implements Initializable {
     private void initCalculateThread() {
         calculateThread = new Thread(new Runnable() {
             public void run() {
-                /*algorithm = new MOEA();
-                algorithm.loadObservableList(listener);
-                algorithm.run(image);
-                */
                 algorithm = new MOEA(image);
                 algorithm.loadObservableList(listener);
                 algorithm.run();

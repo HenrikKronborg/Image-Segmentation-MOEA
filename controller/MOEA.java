@@ -33,7 +33,17 @@ public class MOEA {
     }
 
     public void run() {
-        //LinkedList<LinkedList<Individual>> frontiers = new LinkedList<>();
+        LinkedList<LinkedList<Individual>> frontiers = new LinkedList<>();
+        LinkedList<Individual> test = new LinkedList<>();
+
+        test.add(new Individual());
+
+        frontiers.add(test);
+
+        front = frontiers.get(0);
+        ob.setOb(front);
+        ob.changed.set(true);
+
 
         /*
         for(Pixel[] x: pixels) {
@@ -43,6 +53,7 @@ public class MOEA {
         }
         */
 
+        /*
         population = new ArrayList<>();
 
         while(population.size() < popSize) {
@@ -107,7 +118,7 @@ public class MOEA {
             ob.changed.set(true);
 
             System.out.println(generation.incrementAndGet());
-
+        */
             //If memory becomes a problem...
             /*
             population.sort((Individual a, Individual b)-> a.getRank()-b.getRank());// Sort on rank
@@ -119,7 +130,7 @@ public class MOEA {
                 if()
             }*/
 
-        }
+        //}
     }
 
     /*

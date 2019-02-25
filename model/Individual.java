@@ -30,9 +30,13 @@ public class Individual {
     }
 
     public void initalize() {
+        generateIndividual(10);
+
+        /*
         chromosome = new Chromosome();
         chromosome.generateRandomGene();
         segments = chromosome.generatePhenotype();
+        */
     }
 
     /*
@@ -57,6 +61,7 @@ public class Individual {
             if(!root.isPlaced()){
                 Segment segment = new Segment();
                 segment.addTo(root);
+                root.setPlaced(true);
                 PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
                 for(Neighbor n : root.getNeighbors()){
                     pQueue.add(n);
@@ -65,6 +70,7 @@ public class Individual {
                     Neighbor newNode = pQueue.poll();
                     if(!newNode.getNeighbor().isPlaced()){
                         if(newNode.getDistance() < threshold){
+                            newNode.getNeighbor().setPlaced(true);
                             segment.addTo(newNode.getNeighbor());
                             for(Neighbor n : newNode.getNeighbor().getNeighbors()){
                                 pQueue.add(n);
@@ -78,10 +84,7 @@ public class Individual {
                     }
                 }
                 segments.add(segment);
-
-
             }
-
         }
         /*
         while(unAssigned != 0) {
