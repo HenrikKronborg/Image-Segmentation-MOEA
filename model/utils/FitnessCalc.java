@@ -1,6 +1,6 @@
 package model.utils;
 
-import model.Position;
+import model.supportNodes.Position;
 import model.Segment;
 import model.Individual;
 

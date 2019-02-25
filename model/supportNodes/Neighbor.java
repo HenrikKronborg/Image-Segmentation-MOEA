@@ -1,6 +1,8 @@
-package model;
+package model.supportNodes;
 
-public class Neighbor {
+import model.supportNodes.Pixel;
+
+public class Neighbor implements Comparable<Neighbor> {
     private Pixel pixel;
     private Pixel neighbor;
     private double distance; // Euclidean distance between colors
@@ -14,10 +16,24 @@ public class Neighbor {
     public Pixel getPixel() {
         return pixel;
     }
+
     public Pixel getNeighbor() {
         return neighbor;
     }
+
     public double getDistance() {
         return distance;
     }
+
+    @Override
+    public int compareTo(Neighbor o) {
+        double cmp = this.distance - o.distance;
+        if(cmp > 0){
+            return 1;
+        } else if(cmp == 0){
+            return 0;
+        }
+        return -1;
+    }
 }
+

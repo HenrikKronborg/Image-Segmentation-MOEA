@@ -1,11 +1,11 @@
 package model;
 
 import controller.MOEA;
+import model.supportNodes.Neighbor;
+import model.supportNodes.Pixel;
+import model.utils.ImageLoader;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Individual {
     private Chromosome chromosome;
@@ -41,16 +41,43 @@ public class Individual {
     // Minimum Spanning Tree (MST)
     public void generateIndividual() {
         // List of all pixels in the image
-        ArrayList<Pixel> pixelsNeedAssigned = new ArrayList<>();
+        ArrayList<Pixel> pixelsNodes = new ArrayList<>(ImageLoader.getHeight()*ImageLoader.getWidth());
+        int unAssigned = ImageLoader.getHeight()*ImageLoader.getWidth();
+
         for(Pixel[] pixels : MOEA.getPixels()) {
-            pixelsNeedAssigned.addAll(Arrays.asList(pixels));
+            for(Pixel pixel : pixels){
+                pixel.setPlaced(false);
+                pixelsNodes.add(pixel);
+            }
         }
+        Collections.shuffle(pixelsNodes);
+        segments = new ArrayList<>();
 
-        ArrayList<Pixel> addedPixels = new ArrayList<>();
+        for(Pixel root: pixelsNodes){
+            if(!root.isPlaced()){
+                Segment segment = new Segment();
+                segment.addTo(root);
+                PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
+                for(Neighbor n : root.getNeighbors()){
+                    pQueue.add(n);
+                }
+                while (true){
+                    Pixel newNode = pQueue.poll().getNeighbor();
+                    if(!newNode.isPlaced()){
+                        segment.addTo(newNode);
+                        for(Neighbor n : newNode.getNeighbors()){
+                            pQueue.add(n);
+                        }
+                    }
+                }
 
-        while(pixelsNeedAssigned.size() != 0) {
+
+            }
+
+        }
+        /*
+        while(unAssigned != 0) {
             // Pick a random pixel to look at next
-            Pixel randomPixel = pixelsNeedAssigned.get(r.nextInt(pixelsNeedAssigned.size()));
 
             double bestNeighborDistance = Double.MAX_VALUE;
             Neighbor bestNeighbor;
@@ -61,7 +88,7 @@ public class Individual {
                     bestNeighbor = neighbor;
                 }
             }
-        }
+        }*/
     }
 
     public boolean dominates(Individual x) {

@@ -1,6 +1,7 @@
 package model;
 
 import model.supportNodes.Node;
+import model.supportNodes.Position;
 import model.utils.ImageLoader;
 
 import java.util.*;

@@ -9,13 +9,12 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import model.Individual;
-import model.Position;
+import model.supportNodes.Position;
 import model.Segment;
 import model.supportNodes.ThreadNode;
 import model.utils.ImageLoader;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.ResourceBundle;

@@ -1,4 +1,4 @@
-package model;
+package model.supportNodes;
 
 public class Position {
     protected int x = 0; // X coordinate

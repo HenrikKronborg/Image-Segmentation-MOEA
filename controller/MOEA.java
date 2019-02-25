@@ -2,8 +2,8 @@ package controller;
 
 import model.supportNodes.ThreadNode;
 import model.Individual;
-import model.Pixel;
-import model.Position;
+import model.supportNodes.Pixel;
+import model.supportNodes.Position;
 import model.utils.FitnessCalc;
 import model.utils.ImageLoader;
 
@@ -159,7 +159,7 @@ public class MOEA {
                 if(y - 1 >= 0) {
                     pixel.addNeighbor(pixels[x][y-1]);
                 }
-
+                /*
                 // Top right
                 if(y - 1 >= 0 && x + 1 < ImageLoader.getWidth()) {
                     pixel.addNeighbor(pixels[x+1][y-1]);
@@ -179,6 +179,7 @@ public class MOEA {
                 if(y + 1 < ImageLoader.getHeight() && x - 1 >= 0) {
                     pixel.addNeighbor(pixels[x-1][y+1]);
                 }
+                */
             }
         }
     }

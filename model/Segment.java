@@ -1,6 +1,7 @@
 package model;
 
 import model.supportNodes.Node;
+import model.supportNodes.Position;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -28,6 +29,10 @@ public class Segment {
             pixels.add(n.getPosition());
         }
     }
+    public void addTo(Position p){
+        pixels.add(p);
+    }
+
 
     public ArrayList<Position> getPixels() {
         return new ArrayList<>(pixels);

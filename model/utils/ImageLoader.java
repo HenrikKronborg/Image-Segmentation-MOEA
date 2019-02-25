@@ -3,7 +3,7 @@ package model.utils;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.paint.Color;
-import model.Position;
+import model.supportNodes.Position;
 import java.io.File;
 
 public class ImageLoader {
