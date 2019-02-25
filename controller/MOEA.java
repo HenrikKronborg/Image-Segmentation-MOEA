@@ -1,35 +1,52 @@
 package controller;
 
-import model.Chromosome;
-import model.Solution;
-import model.functions.FitnessCalc;
-import model.functions.ImageLoader;
-import model.functions.Validators;
 import model.supportNodes.ThreadNode;
+import model.Individual;
+import model.Pixel;
+import model.Position;
+import model.utils.FitnessCalc;
+import model.utils.ImageLoader;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MOEA {
     private static int popSize = 5; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.02; // Mutation rate
     private static double recombProbability = 0.8; // Used only for Generational. recombProbability of doing crossover, and 1-recombProbability of copying a parent
-    private static int maxRuns = 30; // Maximum number of runs before termination
+    private static int maxRuns = 5; // Maximum number of runs before termination
     private static int tournamentSize = 2; // Number of individuals to choose from population at random
 
-    private static ArrayList<Solution> population;
-    private static LinkedList<Solution> front;
     private ThreadNode ob;
+    private static ArrayList<Individual> population;
+    private static LinkedList<Individual> front;
+    private AtomicInteger generation = new AtomicInteger(0);
 
-    public MOEA() {
 
+    private ImageLoader image;
+    private static Pixel[][] pixels = new Pixel[ImageLoader.getWidth()][ImageLoader.getHeight()];
+
+    public MOEA(ImageLoader loader) {
+        this.image = loader;
+        generatePixels();
     }
 
-    public void run(ImageLoader image) {
+    public void run() {
+        //LinkedList<LinkedList<Individual>> frontiers = new LinkedList<>();
+
+        /*
+        for(Pixel[] x: pixels) {
+            for(Pixel y : x) {
+                System.out.println(y.getNeighbors());
+            }
+        }
+        */
+
         population = new ArrayList<>();
 
         while(population.size() < popSize) {
-            population.add(new Solution());
+            population.add(new Individual());
         }
 
         System.out.println("Initialize population done. " + popSize + " random solutions found");
@@ -37,46 +54,45 @@ public class MOEA {
         // Calculate fitness value
         FitnessCalc fitness = new FitnessCalc();
         fitness.setImageLoader(image);
-        for(Solution solution : population) {
+        for(Individual solution : population) {
             fitness.generateFitness(solution);
             
         }
 
-        LinkedList<LinkedList<Solution>> frontiers = fastNonDominatedSort();
-        for(LinkedList<Solution> l : frontiers) {
+        LinkedList<LinkedList<Individual>> frontiers = fastNonDominatedSort();
+        for(LinkedList<Individual> l : frontiers) {
             crowdingDistance(l);
         }
 
-        int generation = 0;
-        while(++generation <= maxRuns){
-            while (population.size() < popSize + numOffsprings){
-                Solution father = NSGAIItournament();
-                Solution mother = NSGAIItournament();
+        while(generation.get() < maxRuns) {
+            while (population.size() < popSize + numOffsprings) {
+                Individual father = NSGAIItournament();
+                Individual mother = NSGAIItournament();
 
-                for(Solution child : father.crossoverAndMutate(mother,mutationRate)) {
+                for(Individual child : father.crossoverAndMutate(mother,mutationRate)) {
                     population.add(child);
                 }
             }
 
             // Sort and calculate crowding distance
             frontiers = fastNonDominatedSort();
-            for(LinkedList<Solution> l : frontiers) {
+            for(LinkedList<Individual> l : frontiers) {
                 crowdingDistance(l);
             }
 
-            ArrayList<Solution> tempPopulation = new ArrayList<>(popSize);
-            for(LinkedList<Solution> l : frontiers){
-                if(tempPopulation.size() >= popSize){
+            ArrayList<Individual> tempPopulation = new ArrayList<>(popSize);
+            for(LinkedList<Individual> l : frontiers) {
+                if(tempPopulation.size() >= popSize) {
                     break;
                 }
-                if(l.size()+tempPopulation.size() <= popSize){
+                if(l.size()+tempPopulation.size() <= popSize) {
                     tempPopulation.addAll(l);
                 }else{
-                    l.sort((Solution a, Solution b)-> a.compareCrowdTo(b));
-                    for(Solution s : l){
-                        if(tempPopulation.size() <= popSize){
+                    l.sort((Individual a, Individual b)-> a.compareCrowdTo(b));
+                    for(Individual s : l) {
+                        if(tempPopulation.size() <= popSize) {
                             tempPopulation.add(s);
-                        }else{
+                        } else {
                             break;
                         }
                     }
@@ -85,15 +101,16 @@ public class MOEA {
 
             population = tempPopulation;
 
-            System.out.println(generation);
 
             front = frontiers.get(0);
             ob.setOb(front);
             ob.changed.set(true);
 
+            System.out.println(generation.incrementAndGet());
+
             //If memory becomes a problem...
             /*
-            population.sort((Solution a, Solution b)-> a.getRank()-b.getRank());// Sort on rank
+            population.sort((Individual a, Individual b)-> a.getRank()-b.getRank());// Sort on rank
             int lastRank = 0;
             for(int i = 0; i < popSize; i++) {
                 lastRank = population.get(i).getRank();
@@ -101,20 +118,81 @@ public class MOEA {
             for(int i = popSize; i < population.size(); i++){
                 if()
             }*/
+
         }
     }
 
     /*
      * Methods
      */
-    public LinkedList<LinkedList<Solution>> fastNonDominatedSort() {
-        LinkedList<LinkedList<Solution>> frontier = new LinkedList<>();
+    private void generatePixels() {
+        for(int x = 0; x < ImageLoader.getWidth(); x++) {
+            for(int y = 0; y < ImageLoader.getHeight(); y++) {
+                Pixel pixel = new Pixel(x, y, image.getPixelValue(new Position(x, y)));
+                pixels[x][y] = pixel;
+            }
+        }
+        findNeighbors();
+    }
 
-        for(Solution p : population) {
+    private void findNeighbors() {
+        for(int x = 0; x < ImageLoader.getWidth(); x++) {
+            for(int y = 0; y < ImageLoader.getHeight(); y++) {
+                Pixel pixel = pixels[x][y];
+
+                // Right
+                if(x + 1 < ImageLoader.getWidth()) {
+                    pixel.addNeighbor(pixels[x+1][y]);
+                }
+
+                // Left
+                if(x - 1 >= 0) {
+                    pixel.addNeighbor(pixels[x-1][y]);
+                }
+
+                // Bottom
+                if(y + 1 < ImageLoader.getHeight()) {
+                    pixel.addNeighbor(pixels[x][y+1]);
+                }
+
+                // Top
+                if(y - 1 >= 0) {
+                    pixel.addNeighbor(pixels[x][y-1]);
+                }
+
+                // Top right
+                if(y - 1 >= 0 && x + 1 < ImageLoader.getWidth()) {
+                    pixel.addNeighbor(pixels[x+1][y-1]);
+                }
+
+                // Top left
+                if(y - 1 >= 0 && x - 1 >= 0) {
+                    pixel.addNeighbor(pixels[x-1][y-1]);
+                }
+
+                // Bottom right
+                if(y + 1 < ImageLoader.getHeight() && x + 1 < ImageLoader.getHeight()) {
+                    pixel.addNeighbor(pixels[x+1][y+1]);
+                }
+
+                // Bottom left
+                if(y + 1 < ImageLoader.getHeight() && x - 1 >= 0) {
+                    pixel.addNeighbor(pixels[x-1][y+1]);
+                }
+            }
+        }
+    }
+
+
+
+    public LinkedList<LinkedList<Individual>> fastNonDominatedSort() {
+        LinkedList<LinkedList<Individual>> frontier = new LinkedList<>();
+
+        for(Individual p : population) {
             p.S = new ArrayList<>();
             p.n = 0;
 
-            for(Solution q : population) {
+            for(Individual q : population) {
                 if(p.dominates(q)) {
                     p.S.add(q);
                 }
@@ -136,9 +214,9 @@ public class MOEA {
 
         int i = 0;
         while(frontier.size() > i) {
-            LinkedList<Solution> Q = new LinkedList<>(); // Store members of the next
-            for(Solution p : frontier.get(i)) {
-                for(Solution q : p.S) {
+            LinkedList<Individual> Q = new LinkedList<>(); // Store members of the next
+            for(Individual p : frontier.get(i)) {
+                for(Individual q : p.S) {
                     q.n--;
                     if(q.n == 0) {
                         q.setRank(i+2);
@@ -157,12 +235,10 @@ public class MOEA {
         return frontier;
     }
 
-    public void crowdingDistance(LinkedList<Solution> I) {
-        int l = I.size();
-
-        I.sort((Solution a, Solution b)-> a.compareDeviationTo(b));
-        Solution first = I.getFirst();
-        Solution last = I.getLast();
+    public void crowdingDistance(LinkedList<Individual> I) {
+        I.sort((Individual a, Individual b)-> a.compareDeviationTo(b));
+        Individual first = I.getFirst();
+        Individual last = I.getLast();
 
         // If we Use 3D, be careful with MAX_Value, does not act as 
         first.setCrowdingDistance(Double.MAX_VALUE);
@@ -173,7 +249,7 @@ public class MOEA {
         }
 
 
-        I.sort((Solution a, Solution b)-> a.compareConnectivityTo(b));
+        I.sort((Individual a, Individual b)-> a.compareConnectivityTo(b));
         first = I.getFirst();
         last = I.getLast();
 
@@ -185,8 +261,8 @@ public class MOEA {
         }
     }
 
-    public Solution NSGAIItournament() {
-        Solution first, second;
+    public Individual NSGAIItournament() {
+        Individual first, second;
 
         int randomIndex = (int) (Math.random()*popSize);
         first = population.get(randomIndex);
@@ -199,25 +275,25 @@ public class MOEA {
             }
         }
 
-        if(first.getRank() < second.getRank()){
+        if(first.getRank() < second.getRank()) {
             return first;
-        }else if(first.getRank() > second.getRank()){
+        } else if(first.getRank() > second.getRank()) {
             return second;
         }
 
-        if(first.getCrowdingDistance() > second.getCrowdingDistance()){
+        if(first.getCrowdingDistance() > second.getCrowdingDistance()) {
             return first;
         }
 
         return second;
     }
 
-    public void printRank(LinkedList<LinkedList<Solution>> rankedPopulation){
+    public void printRank(LinkedList<LinkedList<Individual>> rankedPopulation) {
         int rankInt = 0;
-        for(List<Solution> rank : rankedPopulation) {
+        for(List<Individual> rank : rankedPopulation) {
             rankInt++;
             System.out.println("\nRank: "+rankInt);
-            for (Solution ind : rank) {
+            for (Individual ind : rank) {
                 System.out.println("<"+ind.getFitnessDeviation()+", "+ind.getFitnessConnectivity()+">");
             }
         }
@@ -239,7 +315,12 @@ public class MOEA {
     public static int getTournamentSize() { return tournamentSize; }
     public void setTournamentSize(int tournamentSize) { this.tournamentSize = tournamentSize; }
 
-    public static ArrayList<Solution> getPopulation() { return population; }
-    public static LinkedList<Solution> getFront() { return front; }
     public void loadObservableList(ThreadNode ob) { this.ob = ob; }
+
+    public static ArrayList<Individual> getPopulation() { return population; }
+    public static LinkedList<Individual> getFront() { return front; }
+    //public void loadObservableList(ArrayList<LinkedList<Individual>> ob) { this.ob = ob; }
+    public AtomicInteger getGeneration() { return generation; }
+
+    public static Pixel[][] getPixels() { return pixels; }
 }

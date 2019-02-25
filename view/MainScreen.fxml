@@ -2,10 +2,14 @@
 
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
 
-<SplitPane dividerPositions="0.2543859649122807" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.GUI">
+<SplitPane dividerPositions="0.7468671679197995" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.GUI">
    <items>
       <StackPane prefHeight="150.0" prefWidth="200.0">
          <children>
@@ -13,6 +17,25 @@
             <Canvas fx:id="canvas2" height="321.0" width="481.0" />
          </children>
       </StackPane>
-      <Button mnemonicParsing="false" text="Button" />
+      <AnchorPane minWidth="100.0" prefHeight="200.0" prefWidth="100.0">
+         <children>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" AnchorPane.leftAnchor="10.0">
+               <children>
+                  <Label prefHeight="35.0" prefWidth="268.0" text="Generation:">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="generation" prefHeight="35.0" prefWidth="201.0" text="1">
+                     <font>
+                        <Font name="System Bold" size="24.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+            <Button layoutX="144.0" layoutY="349.0" mnemonicParsing="false" text="Start" />
+            <Button layoutX="14.0" layoutY="349.0" mnemonicParsing="false" text="Save to file" />
+         </children>
+      </AnchorPane>
    </items>
 </SplitPane>

@@ -1,20 +1,14 @@
 package model;
 
-import model.functions.ImageLoader;
 import model.supportNodes.Node;
+import model.utils.ImageLoader;
 
 import java.util.*;
 
 public class Chromosome {
     private int[] gene;
-
     private int width, height;
-
     private Random randGenerator = new Random();
-
-    /*
-     * Methods
-     */
 
     public Chromosome() {
         this.width = ImageLoader.getWidth();
@@ -27,6 +21,10 @@ public class Chromosome {
         this.width = ImageLoader.getWidth();
         this.height = ImageLoader.getHeight();
     }
+
+    /*
+     * Methods
+     */
 
     /*
     Debug only
@@ -98,7 +96,7 @@ public class Chromosome {
         return null;
     }
 
-    public void generateGenFromImage(ImageLoader img){
+    public void generateGenFromImage(ImageLoader img) {
 
 
     }
@@ -107,11 +105,11 @@ public class Chromosome {
      *  Below this point: Evolutionary algorithm methods
      *
      */
-    public void mutateFlip(double mutationRate){
+    public void mutateFlip(double mutationRate) {
         int x = 0;
         int y = 0;
         for(int i = 0; i < gene.length; i++) {
-            if(x == width){
+            if(x == width) {
                 x = 0;
                 y++;
             }
@@ -125,7 +123,7 @@ public class Chromosome {
 
 
     public Chromosome[] uniformCrossover(Chromosome mother) {
-        if(mother.gene.length != gene.length){
+        if(mother.gene.length != gene.length) {
             System.out.println("ERROR");
             return null;
         }
@@ -136,8 +134,7 @@ public class Chromosome {
             if(Math.random() < 0.5) {
                 offsprings[0].gene[i]= gene[i];
                 offsprings[1].gene[i]= mother.gene[i];
-            }
-            else {
+            } else {
                 offsprings[0].gene[i]= mother.gene[i];
                 offsprings[1].gene[i]= gene[i];
             }
@@ -147,7 +144,7 @@ public class Chromosome {
     }
 
     public Chromosome[] singlePointCrossover(Chromosome mother) {
-        if(mother.gene.length != gene.length){
+        if(mother.gene.length != gene.length) {
             System.out.println("ERROR");
             return null;
         }
@@ -160,8 +157,7 @@ public class Chromosome {
             if(i <= crossoverPoint) {
                 offsprings[0].gene[i]= gene[i];
                 offsprings[1].gene[i]= mother.gene[i];
-            }
-            else {
+            } else {
                 offsprings[0].gene[i]= mother.gene[i];
                 offsprings[1].gene[i]= gene[i];
             }
@@ -174,7 +170,6 @@ public class Chromosome {
      *  Private methods for intern logic.
      *
      */
-
     /**
         Available nodes to link explained:
         Method returns an int where the int represents a neighboring Node.
@@ -188,63 +183,62 @@ public class Chromosome {
      */
     private int getRandomAvailableNode(int x, int y){
         int select = 0;
-        if(x == 0){
-            if(y == 0){
+        if(x == 0) {
+            if(y == 0) {
                 int rnd = randGenerator.nextInt(3); // 0,1 and 4 available.
-                if(rnd == 2){
+                if(rnd == 2) {
                     rnd = 4;
                 }
                 select = rnd;
 
-            }else if(y == height -1){
+            } else if(y == height -1) {
                 int rnd = randGenerator.nextInt(3); // 0,1 and 3 available.
-                if(rnd == 2){
+                if(rnd == 2) {
                     rnd = 3;
                 }
                 select = rnd;
 
-            }else{
+            } else {
                 int rnd = randGenerator.nextInt(4); // 0,1,3 and 4 available.
-                if(rnd == 2){
+                if(rnd == 2) {
                     rnd = 4;
                 }
                 select = rnd;
             }
-
-        } else if(x == width -1){
-            if(y == 0){
+        } else if(x == width -1) {
+            if(y == 0) {
                 int rnd = randGenerator.nextInt(3); // 0,2 and 4 available.
-                if(rnd == 1){
+                if(rnd == 1) {
                     rnd = 4;
                 }
                 select = rnd;
 
-            }else if(y == height -1){
+            } else if(y == height -1) {
                 int rnd = randGenerator.nextInt(3); // 0,2 and 3 available.
                 if(rnd == 1){
                     rnd = 3;
                 }
                 select = rnd;
 
-            }else{
+            } else {
                 int rnd = randGenerator.nextInt(4); // 0,2,3 and 4 available.
-                if(rnd == 1){
+                if(rnd == 1) {
                     rnd = 4;
                 }
                 select = rnd;
             }
-        }else{
-            if(y == 0){
+        } else {
+            if(y == 0) {
                 int rnd = randGenerator.nextInt(4); // 0,1,2 and 4 available.
-                if(rnd == 3){
+                if(rnd == 3) {
                     rnd = 4;
                 }
                 select = rnd;
 
-            }else if(y == height -1){
+            } else if(y == height -1) {
                 select = randGenerator.nextInt(4); // 0,1,2 and 3 available.
 
-            }else {
+            } else {
                 select = randGenerator.nextInt(5);// 0,1,2,3 and 4 available.
             }
         }
@@ -252,7 +246,7 @@ public class Chromosome {
         return select;
     }
 
-    private void setSelectedGene(int select, int index){
+    private void setSelectedGene(int select, int index) {
         switch (select) {
             case 0: // links to itself.
                 gene[index] = index;
@@ -269,7 +263,6 @@ public class Chromosome {
             case 4:
                 gene[index] = index + width; // links to the bottom node (Y dir.)
                 break;
-
         }
     }
 }

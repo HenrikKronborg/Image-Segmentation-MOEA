@@ -10,13 +10,13 @@ public class Segment {
 
     private HashSet<Position> pixels;
 
-    public Segment(){
+    public Segment() {
         pixels = new HashSet<>();
     }
 
-    public Segment(Color[][] list){
-        for(int i = 0; i < list.length; i++){
-            for(int j = 0; j < list[i].length; j++){
+    public Segment(Color[][] list) {
+        for(int i = 0; i < list.length; i++) {
+            for(int j = 0; j < list[i].length; j++) {
                 pixels.add(new Position(j,i));
             }
         }

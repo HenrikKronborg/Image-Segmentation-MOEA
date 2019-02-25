@@ -9,14 +9,6 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
     public static void main(String[] args) {
-        /*
-        ImageLoader image = new ImageLoader();
-        image.loadImage("test4x4multiColor.jpg");
-
-        MOEA algorithm = new MOEA();
-        algorithm.run(image);
-        */
-
         launch(args);
 
         /*

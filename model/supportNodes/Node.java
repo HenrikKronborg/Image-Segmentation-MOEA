@@ -1,7 +1,7 @@
 package model.supportNodes;
 
 import model.Position;
-import model.functions.ImageLoader;
+import model.utils.ImageLoader;
 
 import java.util.LinkedList;
 
@@ -37,7 +37,6 @@ public class Node {
             x++;
         }
     }
-
 
     public Node getChild() {
         return child;

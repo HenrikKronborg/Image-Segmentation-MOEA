@@ -1,8 +1,8 @@
-package model.functions;
+package model.utils;
 
 import model.Position;
 import model.Segment;
-import model.Solution;
+import model.Individual;
 
 import javafx.scene.paint.Color;
 import java.util.ArrayList;
@@ -17,12 +17,12 @@ public class FitnessCalc {
     /*
      * Methods
      */
-    public double[] generateFitness(Solution solution) {
-        double deviation = deviation(solution.getSegments());
-        double connectivity = connectivity(solution.getSegments());
+    public double[] generateFitness(Individual individual) {
+        double deviation = deviation(individual.getSegments());
+        double connectivity = connectivity(individual.getSegments());
 
-        solution.setFitnessDeviation(deviation);
-        solution.setFitnessConnectivity(connectivity);
+        individual.setFitnessDeviation(deviation);
+        individual.setFitnessConnectivity(connectivity);
 
         return new double[]{deviation,connectivity};
     }
@@ -55,12 +55,10 @@ public class FitnessCalc {
         green /= color.length;
         blue  /= color.length;
 
-
         double deviation = 0.0;
         for(Color c : color){
             deviation += Math.sqrt(Math.pow(c.getRed()-red,2)+Math.pow(c.getGreen()-green,2)+Math.pow(c.getBlue()-blue,2));
         }
-
 
         return deviation;
     }
@@ -77,64 +75,57 @@ public class FitnessCalc {
     private double segmentConnectivity(Segment segment) {
         ArrayList<Position> pixels = segment.getPixels();
         double conn = 0.0;
-        for(int i = 0; i < pixels.size(); i++){
+        for(int i = 0; i < pixels.size(); i++) {
             Position pix = pixels.get(i);
 
-            if(pix.getX() != ImageLoader.getWidth()-1){
-                if(!segment.contains(pix.getX()+1,pix.getY())){
+            if(pix.getX() != ImageLoader.getWidth()-1) {
+                if(!segment.contains(pix.getX()+1,pix.getY())) {
                     conn += 1;
                 }
 
-                if(pix.getY() != 0){
-                    if(!segment.contains(pix.getX()+1,pix.getY()-1)){
+                if(pix.getY() != 0) {
+                    if(!segment.contains(pix.getX()+1,pix.getY()-1)) {
                         conn += 0.2;
                     }
                 }
 
-                if(pix.getY() != ImageLoader.getHeight()-1){
-                    if(!segment.contains(pix.getX()+1,pix.getY()+1)){
+                if(pix.getY() != ImageLoader.getHeight()-1) {
+                    if(!segment.contains(pix.getX()+1,pix.getY()+1)) {
                         conn += 0.166;
                     }
                 }
             }
 
-            if(pix.getX() != 0){
-                if(!segment.contains(pix.getX()-1,pix.getY())){
+            if(pix.getX() != 0) {
+                if(!segment.contains(pix.getX()-1,pix.getY())) {
                     conn += 0.5;
                 }
-                if(pix.getY() != 0){
-                    if(!segment.contains(pix.getX()-1,pix.getY()-1)){
+                if(pix.getY() != 0) {
+                    if(!segment.contains(pix.getX()-1,pix.getY()-1)) {
                         conn += 0.143;
                     }
                 }
 
-                if(pix.getY() != ImageLoader.getHeight()-1){
-                    if(!segment.contains(pix.getX()-1,pix.getY()+1)){
+                if(pix.getY() != ImageLoader.getHeight()-1) {
+                    if(!segment.contains(pix.getX()-1,pix.getY()+1)) {
                         conn += 0.125;
                     }
                 }
             }
 
-            if(pix.getY() != 0){
-                if(!segment.contains(pix.getX(),pix.getY()-1)){
+            if(pix.getY() != 0) {
+                if(!segment.contains(pix.getX(),pix.getY()-1)) {
                     conn += 0.333;
                 }
             }
 
-            if(pix.getY() != ImageLoader.getHeight()-1){
-                if(!segment.contains(pix.getX(),pix.getY()+1)){
+            if(pix.getY() != ImageLoader.getHeight()-1) {
+                if(!segment.contains(pix.getX(),pix.getY()+1)) {
                     conn += 0.25;
                 }
             }
-
-
         }
         return conn;
-    }
-
-
-    private void edge() {
-
     }
 
     public void setImageLoader(ImageLoader img) {
