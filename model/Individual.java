@@ -87,20 +87,6 @@ public class Individual {
                 segments.add(segment);
             }
         }
-        /*
-        while(unAssigned != 0) {
-            // Pick a random pixel to look at next
-
-            double bestNeighborDistance = Double.MAX_VALUE;
-            Neighbor bestNeighbor;
-
-            for(Neighbor neighbor : randomPixel.getNeighbors()) {
-                if(neighbor.getDistance() < bestNeighborDistance) {
-                    bestNeighborDistance = neighbor.getDistance();
-                    bestNeighbor = neighbor;
-                }
-            }
-        }*/
     }
 
     public boolean dominates(Individual x) {
@@ -134,7 +120,24 @@ public class Individual {
 
     public Individual[] crossover(Individual mother, double mutateRate){
 
-        int crossoverPoint = (int) (Math.random()*(ImageLoader.getWidth()*ImageLoader.getHeight()));
+        int crossoverPointX = (int) (Math.random()*ImageLoader.getWidth());
+        int crossoverPointY = (int) (Math.random()*ImageLoader.getHeight());
+        Pixel[][] pixels = MOEA.getPixels();
+        boolean fromFather = true;
+        int unAssigned = ImageLoader.getHeight()*ImageLoader.getWidth();
+        for(int y = 0; y < ImageLoader.getHeight(); y++){
+            for(int x = 0; x< ImageLoader.getWidth(); x++){
+                for(Segment s : segments){
+                    if(s.contains(x,y)){
+                        if(s.contains(x+1,y)){
+
+                        }
+                    }
+                }
+            }
+
+        }
+
 
         return null;
     }

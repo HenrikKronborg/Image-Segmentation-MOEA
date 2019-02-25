@@ -41,4 +41,8 @@ public class Segment {
     public boolean contains(int x, int y) {
         return pixels.contains(new Position(x,y));
     }
+
+    public boolean contains(Position p) {
+        return pixels.contains(p);
+    }
 }
