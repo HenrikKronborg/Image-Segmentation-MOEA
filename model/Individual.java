@@ -117,6 +117,7 @@ public class Individual {
             }
         }
     }
+
     public Individual[] crossover(Individual mother) {
 
         int crossoverPointX = (int) (Math.random() * ImageLoader.getWidth());
@@ -126,36 +127,49 @@ public class Individual {
 
         for (int i = 0; i < children.length;i++) {
             boolean change = false;
+            HashMap<Integer,Integer> table1 = new HashMap<>();
+            int segmentId = 1;
             short[][] newShadow = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
             for (int y = 0; y < ImageLoader.getHeight(); y++) {
                 for (int x = 0; x < ImageLoader.getWidth(); x++) {
                     if (y == crossoverPointY && x == crossoverPointX) {
                         change = true;
                     }
-                    short currentId;
+                    int currentId;
+                    boolean toPlace = true;
                     if (i == 1) {
-                        currentId = (short)(mother.getShadow()[y][x]);
+                        currentId = mother.getShadow()[y][x];
                     } else {
                         currentId = shadow[y][x];
                     }
-                    newShadow[y][x] = currentId;
+
+                    currentId = translate(table1,change,currentId,segmentId);
+                    segmentId = table1.size();
+
+                    if(toPlace){
+                        newShadow[y][x] = (short)currentId;
+                    }
 
                 }
             }
+            HashMap<Integer,Integer> table2 = new HashMap<>();
             for (int y = 0; y < ImageLoader.getHeight(); y++) {
                 for (int x = 0; x < ImageLoader.getWidth(); x++) {
                     if (y == crossoverPointY && x == crossoverPointX) {
                         change = true;
                     }
-                    short currentId;
+                    int currentId;
                     if (i == 0) {
-                        currentId = (short)(mother.getShadow()[y][x]);
+                        currentId = (mother.getShadow()[y][x]);
                     } else {
                         currentId = shadow[y][x];
                     }
 
+                    currentId = translate(table2,change,currentId,segmentId);
+                    segmentId = table1.size()+table1.size();;
+
                     if (newShadow[y][x] == 0) {
-                        newShadow[y][x] = currentId;
+                        newShadow[y][x] = (short)currentId;
                     }
                 }
             }
@@ -166,6 +180,24 @@ public class Individual {
     }
 
 
+    private int translate(HashMap<Integer,Integer> translate, boolean change,int currentId, int segmentId){
+        if(change){
+            if(translate.containsKey(currentId)){
+                currentId = translate.get(currentId);
+            }else {
+                return 0;
+            }
+        }else{
+            if(translate.containsKey(currentId)){
+                currentId = translate.get(currentId);
+            }else{
+                translate.put(currentId, segmentId);
+                currentId = translate.get(currentId);
+            }
+        }
+        return currentId;
+
+    }
         /*
      * Compares
      */
