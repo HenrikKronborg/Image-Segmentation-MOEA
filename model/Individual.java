@@ -58,27 +58,23 @@ public class Individual {
         }
         Collections.shuffle(pixelsNodes);
         segments = new ArrayList<>();
-        boolean[][] placed = new boolean[ImageLoader.getHeight()][ImageLoader.getWidth()];
 
-
-        int segmentId = 0;
+        int segmentId = 1;
         for(Pixel root: pixelsNodes){
-            if(!placed[root.getY()][root.getX()]){
+            if(shadow[root.getY()][root.getX()] == 0){
                 Segment segment = new Segment();
                 segment.setId(segmentId);
                 segment.addTo(root);
                 shadow[root.getY()][root.getX()] = segmentId;
 
-                placed[root.getY()][root.getX()] = true;
                 PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
                 for(Neighbor n : root.getNeighbors()){
                     pQueue.add(n);
                 }
                 while (true){
                     Neighbor newNode = pQueue.poll();
-                    if(!placed[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()]){
+                    if(shadow[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0){
                         if(newNode.getDistance() < threshold){
-                            placed[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = true;
                             segment.addTo(newNode.getNeighbor());
                             shadow[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = segmentId;
                             for(Neighbor n : newNode.getNeighbor().getNeighbors()){
@@ -137,7 +133,8 @@ public class Individual {
 
         for(Individual child : children){
             ArrayList<Segment> newSegments = new ArrayList<>();
-            boolean[][] placed = new boolean[ImageLoader.getHeight()][ImageLoader.getWidth()];
+            int[][] newShadow = new int[ImageLoader.getHeight()][ImageLoader.getWidth()];
+            int segmentId = 1;
 
             for(int y = 0; y < ImageLoader.getHeight(); y++){
                 for(int x = 0; x< ImageLoader.getWidth(); x++){
@@ -145,7 +142,7 @@ public class Individual {
                         change = !change;
                     }
 
-                    if(!placed[y][x]){
+                    if(newShadow[y][x] == 0){
                         int segmentLength;
                         if(change) {
                             segmentLength = mother.segments.size();
@@ -164,11 +161,12 @@ public class Individual {
                             if(s.contains(x,y)){
                                 Segment newSegment = new Segment();
                                 for(Position p : s.getPixels()){
-                                    if(!placed[p.getY()][p.getX()]){
+                                    if(newShadow[p.getY()][p.getX()] == 0){
                                         newSegment.addTo(p);
-                                        placed[p.getY()][p.getX()] = true;
+                                        newShadow[p.getY()][p.getX()] = segmentId;
                                     }
                                     newSegments.add(newSegment);
+                                    segmentId++;
                                 }
                             }
                         }
@@ -176,8 +174,8 @@ public class Individual {
                 }
             }
             child.setSegments(newSegments);
+            child.setShadow(newShadow);
         }
-
         return children;
     }
 
