@@ -33,17 +33,18 @@ public class MOEA {
     }
 
     public void run() {
+        /*
         front = new LinkedList<>();
         front.add(new Individual(true));
 
         ob.setOb(front);
         ob.changed.set(true);
+        */
 
-        /*
         population = new ArrayList<>();
 
         while(population.size() < popSize) {
-            population.add(new Individual());
+            population.add(new Individual(true));
         }
 
         System.out.println("Initialize population done. " + popSize + " random solutions found");
@@ -101,7 +102,7 @@ public class MOEA {
             ob.setOb(front);
             ob.setGeneration(generation);
             ob.changed.set(true);
-*/
+
             //If memory becomes a problem...
             /*
             population.sort((Individual a, Individual b)-> a.getRank()-b.getRank());// Sort on rank
@@ -113,7 +114,7 @@ public class MOEA {
                 if()
             }*/
 
-       //}
+       }
     }
 
     /*
