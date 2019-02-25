@@ -8,6 +8,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 import model.Individual;
 import model.supportNodes.Pixel;
 import model.supportNodes.Position;
@@ -51,9 +52,8 @@ public class GUI implements Initializable {
         gc2 = canvas2.getGraphicsContext2D();
 
         image = new ImageLoader();
-        Image view = SwingFXUtils.toFXImage(image.loadImage("176035.jpg"), null );
+        Image view = SwingFXUtils.toFXImage(image.loadImage("353013.jpg"), null );
         gc1.drawImage(view, 0, 0);
-
 
         // Algorithm and calculations in threads
         initListener();
@@ -90,18 +90,23 @@ public class GUI implements Initializable {
     public void drawResult() {
         gc1.clearRect(0,0, ImageLoader.getWidth(), ImageLoader.getHeight());
 
-        gc2.setFill(javafx.scene.paint.Color.rgb(255,255,255));
+        gc2.setFill(javafx.scene.paint.Color.rgb(0,0,0));
         gc2.fillRect(0, 0, ImageLoader.getWidth(), ImageLoader.getHeight());
+
+        // Draw border
+        gc2.setFill(javafx.scene.paint.Color.rgb(255,255,255));
+        gc2.fillRect(1, 1, ImageLoader.getWidth()-2, ImageLoader.getHeight()-2);
 
         gc2.setFill(javafx.scene.paint.Color.rgb(0,0,0));
 
+        int[][] shadow = bestIndividual.getShadow();
+
         for(int y = 0; y < ImageLoader.getHeight(); y++) {
             for(int x = 0; x < ImageLoader.getWidth(); x++) {
-                for(Segment segment : bestIndividual.getSegments()) {
-                    if(segment.contains(x, y)) {
-                        if(!segment.contains(x+1, y) || !segment.contains(x, y+1)) {
-                            gc2.fillRect(x, y, 1, 1);
-                        }
+                int current = shadow[y][x];
+                if(x < shadow[0].length-1 && y < shadow.length-1) {
+                    if (current != shadow[y][x + 1] || current != shadow[y + 1][x]) {
+                        gc2.fillRect(x, y, 1, 1);
                     }
                 }
             }
