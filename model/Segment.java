@@ -54,5 +54,25 @@ public class Segment {
     public void setId(int id) {
         this.id = id;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Segment) {
+            if(this.id == ((Segment)obj).id) {
+                return true;
+            }
+        }
+        if(obj instanceof Integer) {
+            if(this.id == ((Integer)obj)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id);
+    }
 }
 

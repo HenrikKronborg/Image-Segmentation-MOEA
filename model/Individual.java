@@ -10,7 +10,7 @@ import java.util.*;
 
 public class Individual {
     private Chromosome chromosome;
-    private ArrayList<Segment> segments;
+    private HashMap<Integer,Segment> segments;
     private int[][] shadow;
     private int rank;
     private double fitnessDeviation;
@@ -26,10 +26,6 @@ public class Individual {
         if(MST) initalize();
     }
 
-    public Individual(Chromosome chromosome){
-        this.chromosome = chromosome;
-        segments = chromosome.generatePhenotype();
-    }
 
     public void initalize() {
         generateIndividual(10);
@@ -57,7 +53,7 @@ public class Individual {
             }
         }
         Collections.shuffle(pixelsNodes);
-        segments = new ArrayList<>();
+        segments = new HashMap<>();
 
         int segmentId = 1;
         for(Pixel root: pixelsNodes){
@@ -88,8 +84,8 @@ public class Individual {
                         break;
                     }
                 }
+                segments.put(segmentId,segment);
                 segmentId++;
-                segments.add(segment);
             }
         }
     }
@@ -132,7 +128,7 @@ public class Individual {
         Individual[] children = {new Individual(false),new Individual(false)};
 
         for(Individual child : children){
-            ArrayList<Segment> newSegments = new ArrayList<>();
+            HashMap<Integer,Segment> newSegments = new HashMap<>();
             int[][] newShadow = new int[ImageLoader.getHeight()][ImageLoader.getWidth()];
             int segmentId = 1;
 
@@ -144,36 +140,24 @@ public class Individual {
 
                     if(newShadow[y][x] == 0){
                         int currentId;
-                        int segmentLength;
+                        Segment s;
                         if(change) {
-                            segmentLength = mother.segments.size();
                             currentId = mother.getShadow()[y][x];
+                            s = mother.segments.get(currentId);
                         }else{
-                            segmentLength = segments.size();
                             currentId = shadow[y][x];
+                            s = segments.get(currentId);
+                        }
+                        Segment newSegment = new Segment();
+                        for(Position p : s.getPixels()){
+                            if(newShadow[p.getY()][p.getX()] == 0){
+                                newSegment.addTo(p);
+                                newShadow[p.getY()][p.getX()] = segmentId;
+                            }
+                            newSegments.put(segmentId,newSegment);
+                            segmentId++;
                         }
 
-                        for(int i= 0; i < segmentLength; i++){
-                            Segment s;
-                            if(change) {
-                                s = mother.segments.get(currentId-1);
-                            }else{
-                                s = segments.get(currentId-1);
-                            }
-
-                            if(s.getId() == currentId){
-                                Segment newSegment = new Segment();
-                                for(Position p : s.getPixels()){
-                                    if(newShadow[p.getY()][p.getX()] == 0){
-                                        newSegment.addTo(p);
-                                        newShadow[p.getY()][p.getX()] = segmentId;
-                                    }
-                                    newSegments.add(newSegment);
-                                    segmentId++;
-                                }
-                                break;
-                            }
-                        }
                     }
                 }
             }
@@ -238,10 +222,10 @@ public class Individual {
     }
 
     public ArrayList<Segment> getSegments() {
-        return segments;
+        return new ArrayList<>(segments.values());
     }
 
-    public void setSegments(ArrayList<Segment> segments) {
+    public void setSegments(HashMap<Integer,Segment> segments) {
         this.segments = segments;
     }
 
