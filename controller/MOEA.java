@@ -25,7 +25,7 @@ public class MOEA {
 
 
     private ImageLoader image;
-    private static Pixel[][] pixels = new Pixel[ImageLoader.getWidth()][ImageLoader.getHeight()];
+    private static Pixel[][] pixels = new Pixel[ImageLoader.getHeight()][ImageLoader.getWidth()];
 
     public MOEA(ImageLoader loader) {
         this.image = loader;
@@ -120,38 +120,38 @@ public class MOEA {
      * Methods
      */
     private void generatePixels() {
-        for(int x = 0; x < ImageLoader.getWidth(); x++) {
-            for(int y = 0; y < ImageLoader.getHeight(); y++) {
+        for(int y = 0; y < ImageLoader.getHeight(); y++) {
+            for(int x = 0; x < ImageLoader.getWidth(); x++) {
                 Pixel pixel = new Pixel(x, y, image.getPixelValue(new Position(x, y)));
-                pixels[x][y] = pixel;
+                pixels[y][x] = pixel;
             }
         }
         findNeighbors();
     }
 
     private void findNeighbors() {
-        for(int x = 0; x < ImageLoader.getWidth(); x++) {
-            for(int y = 0; y < ImageLoader.getHeight(); y++) {
-                Pixel pixel = pixels[x][y];
+        for(int y = 0; y < ImageLoader.getHeight(); y++) {
+            for(int x = 0; x < ImageLoader.getWidth(); x++) {
+                Pixel pixel = pixels[y][x];
 
                 // Right
-                if(x + 1 < ImageLoader.getWidth()) {
-                    pixel.addNeighbor(pixels[x+1][y]);
+                if(y + 1 < ImageLoader.getHeight()) {
+                    pixel.addNeighbor(pixels[y+1][x]);
                 }
 
                 // Left
-                if(x - 1 >= 0) {
-                    pixel.addNeighbor(pixels[x-1][y]);
+                if(y - 1 >= 0) {
+                    pixel.addNeighbor(pixels[y-1][x]);
                 }
 
                 // Bottom
-                if(y + 1 < ImageLoader.getHeight()) {
-                    pixel.addNeighbor(pixels[x][y+1]);
+                if(x + 1 < ImageLoader.getWidth()) {
+                    pixel.addNeighbor(pixels[y][x+1]);
                 }
 
                 // Top
-                if(y - 1 >= 0) {
-                    pixel.addNeighbor(pixels[x][y-1]);
+                if(x - 1 >= 0) {
+                    pixel.addNeighbor(pixels[y][x-1]);
                 }
                 /*
                 // Top right

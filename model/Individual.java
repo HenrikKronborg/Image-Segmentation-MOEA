@@ -55,7 +55,7 @@ public class Individual {
         }
         Collections.shuffle(pixelsNodes);
         segments = new ArrayList<>();
-        Boolean[][] placed = new Boolean[ImageLoader.getHeight()][ImageLoader.getWidth()];
+        boolean[][] placed = new boolean[ImageLoader.getHeight()][ImageLoader.getWidth()];
 
         for(Pixel root: pixelsNodes){
             if(!placed[root.getY()][root.getX()]){
