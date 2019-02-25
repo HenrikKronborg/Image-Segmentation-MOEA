@@ -39,7 +39,7 @@ public class Individual {
      * Methods
      */
     // Minimum Spanning Tree (MST)
-    public void generateIndividual() {
+    public void generateIndividual(double threshold) {
         // List of all pixels in the image
         ArrayList<Pixel> pixelsNodes = new ArrayList<>(ImageLoader.getHeight()*ImageLoader.getWidth());
         int unAssigned = ImageLoader.getHeight()*ImageLoader.getWidth();
@@ -62,14 +62,22 @@ public class Individual {
                     pQueue.add(n);
                 }
                 while (true){
-                    Pixel newNode = pQueue.poll().getNeighbor();
-                    if(!newNode.isPlaced()){
-                        segment.addTo(newNode);
-                        for(Neighbor n : newNode.getNeighbors()){
-                            pQueue.add(n);
+                    Neighbor newNode = pQueue.poll();
+                    if(!newNode.getNeighbor().isPlaced()){
+                        if(newNode.getDistance() < threshold){
+                            segment.addTo(newNode.getNeighbor());
+                            for(Neighbor n : newNode.getNeighbor().getNeighbors()){
+                                pQueue.add(n);
+                            }
+                        }else{
+                            break;
                         }
                     }
+                    if(pQueue.size() == 0){
+                        break;
+                    }
                 }
+                segments.add(segment);
 
 
             }
