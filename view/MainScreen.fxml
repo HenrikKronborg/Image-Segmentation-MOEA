@@ -34,7 +34,7 @@
                </children>
             </HBox>
             <Button layoutX="144.0" layoutY="349.0" mnemonicParsing="false" text="Start" />
-            <Button layoutX="14.0" layoutY="349.0" mnemonicParsing="false" text="Save to file" />
+            <Button layoutX="14.0" layoutY="349.0" mnemonicParsing="false" text="Save to file" onAction="#drawResult" />
          </children>
       </AnchorPane>
    </items>

@@ -9,6 +9,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import model.Individual;
+import model.supportNodes.Pixel;
 import model.supportNodes.Position;
 import model.Segment;
 import model.supportNodes.ThreadNode;
@@ -81,12 +82,30 @@ public class GUI implements Initializable {
             }
         }
     }
-    private void drawText(Individual s) {
+    private void drawText() {
         generation.setText(Integer.toString(listener.getGeneration()));
     }
 
-    private void drawResult() {
+    @FXML
+    public void drawResult() {
+        gc1.clearRect(0,0, ImageLoader.getWidth(), ImageLoader.getHeight());
 
+        gc2.setFill(javafx.scene.paint.Color.rgb(255,255,255));
+        gc2.fillRect(0, 0, ImageLoader.getWidth(), ImageLoader.getHeight());
+
+        gc2.setFill(javafx.scene.paint.Color.rgb(0,0,0));
+
+        for(int y = 0; y < ImageLoader.getHeight(); y++) {
+            for(int x = 0; x < ImageLoader.getWidth(); x++) {
+                for(Segment segment : bestIndividual.getSegments()) {
+                    if(segment.contains(x, y)) {
+                        if(!segment.contains(x+1, y) || !segment.contains(x, y+1)) {
+                            gc2.fillRect(x, y, 1, 1);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void initListener(){
@@ -100,7 +119,7 @@ public class GUI implements Initializable {
                     bestIndividual = front.get(r.nextInt(front.size()));
 
                     drawSegments(bestIndividual);
-                    drawText(bestIndividual);
+                    drawText();
                 }
             }
         }.start();
