@@ -53,7 +53,7 @@ public class GUI implements Initializable {
         gc2 = canvas2.getGraphicsContext2D();
 
         image = new ImageLoader();
-        Image view = SwingFXUtils.toFXImage(image.loadImage("353013.jpg"), null );
+        Image view = SwingFXUtils.toFXImage(image.loadImage("176035.jpg"), null );
         gc1.drawImage(view, 0, 0);
 
         // Algorithm and calculations in threads

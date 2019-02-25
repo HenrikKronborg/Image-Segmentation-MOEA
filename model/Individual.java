@@ -3,7 +3,6 @@ package model;
 import controller.MOEA;
 import model.supportNodes.Neighbor;
 import model.supportNodes.Pixel;
-import model.supportNodes.Position;
 import model.utils.ImageLoader;
 
 import java.util.*;
@@ -15,24 +14,20 @@ public class Individual {
     private double fitnessConnectivity;
     private double fitnessEdge;
     private double crowdingDistance;
+    private int segments;
 
     public int n; // Number of dominating elements.
     public ArrayList<Individual> S = new ArrayList<>();
     Random r = new Random();
 
-    public Individual(boolean MST) {
-        if (MST) initalize();
+    public Individual(double threshold) {
+        initialize(threshold);
+    }
+    public Individual() {
     }
 
-
-    public void initalize() {
-        generateIndividual(10);
-
-        /*
-        chromosome = new Chromosome();
-        chromosome.generateRandomGene();
-        segments = chromosome.generatePhenotype();
-        */
+    public void initialize(double threshold) {
+        generateIndividual(threshold);
     }
 
     /*
@@ -43,7 +38,6 @@ public class Individual {
         shadow = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
         // List of all pixels in the image
         ArrayList<Pixel> pixelsNodes = new ArrayList<>(ImageLoader.getHeight() * ImageLoader.getWidth());
-        int unAssigned = ImageLoader.getHeight() * ImageLoader.getWidth();
 
         for (Pixel[] pixels : MOEA.getPixels()) {
             for (Pixel pixel : pixels) {
@@ -80,6 +74,8 @@ public class Individual {
                 segmentId++;
             }
         }
+        segments = segmentId-1;
+
     }
 
     public boolean dominates(Individual x) {
@@ -116,21 +112,34 @@ public class Individual {
         int crossoverPointX = (int) (Math.random() * ImageLoader.getWidth());
         int crossoverPointY = (int) (Math.random() * ImageLoader.getHeight());
 
-        Individual[] children = {new Individual(false), new Individual(false)};
+        Individual[] children = {new Individual(), new Individual()};
 
-        boolean childe2 = true;
-        for (Individual child : children) {
+        for (int i = 0; i < children.length;i++) {
             boolean change = false;
             short[][] newShadow = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
-
             for (int y = 0; y < ImageLoader.getHeight(); y++) {
                 for (int x = 0; x < ImageLoader.getWidth(); x++) {
                     if (y == crossoverPointY && x == crossoverPointX) {
                         change = true;
                     }
                     short currentId;
-                    if (change) {
-                        currentId = mother.getShadow()[y][x];
+                    if (i == 1) {
+                        currentId = (short)(mother.getShadow()[y][x]);
+                    } else {
+                        currentId = shadow[y][x];
+                    }
+                    newShadow[y][x] = currentId;
+
+                }
+            }
+            for (int y = 0; y < ImageLoader.getHeight(); y++) {
+                for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                    if (y == crossoverPointY && x == crossoverPointX) {
+                        change = true;
+                    }
+                    short currentId;
+                    if (i == 0) {
+                        currentId = (short)(mother.getShadow()[y][x]);
                     } else {
                         currentId = shadow[y][x];
                     }
@@ -139,10 +148,8 @@ public class Individual {
                         newShadow[y][x] = currentId;
                     }
                 }
-
-
             }
-            child.setShadow(newShadow);
+            children[i].setShadow(newShadow);
         }
 
         return children;
@@ -264,5 +271,9 @@ public class Individual {
 
     public void setShadow(short[][] shadow) {
         this.shadow = shadow;
+    }
+
+    public int getSegments() {
+        return segments;
     }
 }

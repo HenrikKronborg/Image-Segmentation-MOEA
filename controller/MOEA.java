@@ -11,11 +11,11 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MOEA {
-    private static int popSize = 50; // Population size
+    private static int popSize = 200; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.02; // Mutation rate
     private static double recombProbability = 0.8; // Used only for Generational. recombProbability of doing crossover, and 1-recombProbability of copying a parent
-    private static int maxRuns = 50; // Maximum number of runs before termination
+    private static int maxRuns = 500; // Maximum number of runs before termination
     private static int tournamentSize = 2; // Number of individuals to choose from population at random
 
     private ThreadNode ob;
@@ -34,9 +34,27 @@ public class MOEA {
 
     public void run() {
         population = new ArrayList<>();
+        int lastSegments = 0;
+        int deltaSegements = 0;
+        double step = 0.2;
 
         while(population.size() < popSize) {
-            population.add(new Individual(true));
+            double threshold = 20;
+            if(deltaSegements < 5 ){
+                threshold = 15 + Math.random()*10;
+            }else if(lastSegments < 10){
+                threshold += step;
+            }else if (lastSegments > 150){
+                threshold += step;
+            }
+            if(threshold < 0){
+                System.out.println("ERROR");
+            }
+
+            Individual indv = new Individual(threshold);
+            deltaSegements = Math.abs(lastSegments - indv.getSegments());
+            lastSegments = indv.getSegments();
+            population.add(indv);
         }
 
         System.out.println("Initialize population done. " + popSize + " random solutions found");
