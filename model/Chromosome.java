@@ -1,7 +1,7 @@
 package model;
 
 import model.functions.ImageLoader;
-import model.segmentGeneration.Node;
+import model.supportNodes.Node;
 
 import java.util.*;
 

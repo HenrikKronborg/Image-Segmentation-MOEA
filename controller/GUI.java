@@ -13,6 +13,7 @@ import model.Position;
 import model.Segment;
 import model.Solution;
 import model.functions.ImageLoader;
+import model.supportNodes.ThreadNode;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -34,8 +35,9 @@ public class GUI implements Initializable {
     private ImageLoader image;
     private Thread calculateThread;
 
-    private ArrayList<LinkedList<Solution>> listenerList;
+    private ThreadNode listener;
     private LinkedList<Solution> front;
+
     Solution bestSolution;
     int listenerListSize = 0;
     Random r = new Random();
@@ -60,7 +62,7 @@ public class GUI implements Initializable {
         calculateThread = new Thread(new Runnable() {
             public void run() {
                 algorithm = new MOEA();
-                algorithm.loadObservableList(listenerList);
+                algorithm.loadObservableList(listener);
                 algorithm.run(image);
             }
         });
@@ -78,14 +80,13 @@ public class GUI implements Initializable {
     }
 
     public void initListener(){
-        listenerList = new ArrayList<>();
+        listener = new ThreadNode();
 
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
-                if(listenerList.size() > listenerListSize) {
-                    listenerListSize = listenerList.size();
-
-                    front = listenerList.get(listenerListSize-1);
+                if(listener.changed.get()) {
+                    listener.changed.set(false);
+                    front = listener.getOb();
                     bestSolution = front.get(r.nextInt(front.size()));
 
                     drawSegments(bestSolution);

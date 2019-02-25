@@ -5,6 +5,7 @@ import model.Solution;
 import model.functions.FitnessCalc;
 import model.functions.ImageLoader;
 import model.functions.Validators;
+import model.supportNodes.ThreadNode;
 
 import java.util.*;
 
@@ -18,7 +19,7 @@ public class MOEA {
 
     private static ArrayList<Solution> population;
     private static LinkedList<Solution> front;
-    private ArrayList<LinkedList<Solution>> ob;
+    private ThreadNode ob;
 
     public MOEA() {
 
@@ -46,8 +47,8 @@ public class MOEA {
             crowdingDistance(l);
         }
 
-        int generation = 1;
-        while(generation++ <= maxRuns){
+        int generation = 0;
+        while(++generation <= maxRuns){
             while (population.size() < popSize + numOffsprings){
                 Solution father = NSGAIItournament();
                 Solution mother = NSGAIItournament();
@@ -87,7 +88,8 @@ public class MOEA {
             System.out.println(generation);
 
             front = frontiers.get(0);
-            ob.add(front);
+            ob.setOb(front);
+            ob.changed.set(true);
 
             //If memory becomes a problem...
             /*
@@ -239,5 +241,5 @@ public class MOEA {
 
     public static ArrayList<Solution> getPopulation() { return population; }
     public static LinkedList<Solution> getFront() { return front; }
-    public void loadObservableList(ArrayList<LinkedList<Solution>> ob) { this.ob = ob; }
+    public void loadObservableList(ThreadNode ob) { this.ob = ob; }
 }

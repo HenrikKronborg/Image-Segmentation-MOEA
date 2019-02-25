@@ -1,11 +1,9 @@
-package model.segmentGeneration;
+package model.supportNodes;
 
 import model.Position;
 import model.functions.ImageLoader;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 public class Node {
     private LinkedList<Node> parents = new LinkedList<>();

@@ -1,6 +1,6 @@
 package model;
 
-import model.segmentGeneration.Node;
+import model.supportNodes.Node;
 
 import java.awt.*;
 import java.util.ArrayList;
