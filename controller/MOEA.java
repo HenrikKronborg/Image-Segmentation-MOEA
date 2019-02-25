@@ -33,6 +33,13 @@ public class MOEA {
     }
 
     public void run() {
+        front = new LinkedList<>();
+        front.add(new Individual());
+
+        ob.setOb(front);
+        ob.changed.set(true);
+
+        /*
         population = new ArrayList<>();
 
         while(population.size() < popSize) {
@@ -94,7 +101,7 @@ public class MOEA {
             ob.setOb(front);
             ob.setGeneration(generation);
             ob.changed.set(true);
-
+*/
             //If memory becomes a problem...
             /*
             population.sort((Individual a, Individual b)-> a.getRank()-b.getRank());// Sort on rank
@@ -106,7 +113,7 @@ public class MOEA {
                 if()
             }*/
 
-        }
+       //}
     }
 
     /*

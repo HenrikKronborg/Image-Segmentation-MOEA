@@ -85,6 +85,10 @@ public class GUI implements Initializable {
         generation.setText(Integer.toString(listener.getGeneration()));
     }
 
+    private void drawResult() {
+
+    }
+
     public void initListener(){
         listener = new ThreadNode();
 
