@@ -11,11 +11,10 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MOEA {
-    private static int popSize = 200; // Population size
+    private static int popSize = 150; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.02; // Mutation rate
-    private static double recombProbability = 0.8; // Used only for Generational. recombProbability of doing crossover, and 1-recombProbability of copying a parent
-    private static int maxRuns = 500; // Maximum number of runs before termination
+    private static int maxRuns = 200; // Maximum number of runs before termination
     private static int tournamentSize = 2; // Number of individuals to choose from population at random
 
     private ThreadNode ob;
@@ -78,6 +77,7 @@ public class MOEA {
                 Individual mother = NSGAIItournament();
 
                 for(Individual child : father.crossover(mother)) {
+                    child.mutate(mutationRate);
                     population.add(child);
                 }
             }
@@ -304,8 +304,6 @@ public class MOEA {
     public void setNumOffsprings(int numOffsprings) { this.numOffsprings = numOffsprings; }
     public static double getMutationRate() { return mutationRate; }
     public void setMutationRate(double mutationRate) { this.mutationRate = mutationRate; }
-    public static double getRecombProbability() { return recombProbability; }
-    public void setRecombProbability(double recombProbability) { this.recombProbability = recombProbability; }
     public static int getMaxRuns() { return maxRuns; }
     public void setMaxRuns(int maxRuns) { this.maxRuns = maxRuns; }
     public static int getTournamentSize() { return tournamentSize; }
