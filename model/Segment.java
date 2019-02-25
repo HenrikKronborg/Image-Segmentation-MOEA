@@ -10,6 +10,7 @@ import java.util.HashSet;
 public class Segment {
 
     private HashSet<Position> pixels;
+    private int id;
 
     public Segment() {
         pixels = new HashSet<>();
@@ -45,4 +46,13 @@ public class Segment {
     public boolean contains(Position p) {
         return pixels.contains(p);
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }
+

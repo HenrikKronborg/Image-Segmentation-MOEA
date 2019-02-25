@@ -11,6 +11,7 @@ import java.util.*;
 public class Individual {
     private Chromosome chromosome;
     private ArrayList<Segment> segments;
+    private int[][] shadow;
     private int rank;
     private double fitnessDeviation;
     private double fitnessConnectivity;
@@ -45,6 +46,7 @@ public class Individual {
      */
     // Minimum Spanning Tree (MST)
     public void generateIndividual(double threshold) {
+        shadow = new int[ImageLoader.getHeight()][ImageLoader.getWidth()];
         // List of all pixels in the image
         ArrayList<Pixel> pixelsNodes = new ArrayList<>(ImageLoader.getHeight()*ImageLoader.getWidth());
         int unAssigned = ImageLoader.getHeight()*ImageLoader.getWidth();
@@ -58,10 +60,14 @@ public class Individual {
         segments = new ArrayList<>();
         boolean[][] placed = new boolean[ImageLoader.getHeight()][ImageLoader.getWidth()];
 
+
+        int segmentId = 0;
         for(Pixel root: pixelsNodes){
             if(!placed[root.getY()][root.getX()]){
                 Segment segment = new Segment();
+                segment.setId(segmentId);
                 segment.addTo(root);
+                shadow[root.getY()][root.getX()] = segmentId;
 
                 placed[root.getY()][root.getX()] = true;
                 PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
@@ -74,6 +80,7 @@ public class Individual {
                         if(newNode.getDistance() < threshold){
                             placed[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = true;
                             segment.addTo(newNode.getNeighbor());
+                            shadow[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = segmentId;
                             for(Neighbor n : newNode.getNeighbor().getNeighbors()){
                                 pQueue.add(n);
                             }
@@ -85,6 +92,7 @@ public class Individual {
                         break;
                     }
                 }
+                segmentId++;
                 segments.add(segment);
             }
         }
@@ -296,5 +304,13 @@ public class Individual {
             this.crowdingDistance += crowdingDistance;
         else
             System.out.println("ERROR?");
+    }
+
+    public int[][] getShadow() {
+        return shadow;
+    }
+
+    public void setShadow(int[][] shadow) {
+        this.shadow = shadow;
     }
 }
