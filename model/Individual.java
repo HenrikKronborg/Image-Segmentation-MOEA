@@ -152,13 +152,13 @@ public class Individual {
                             segmentLength = segments.size();
                             currentId = shadow[y][x];
                         }
+
                         for(int i= 0; i < segmentLength; i++){
                             Segment s;
-
                             if(change) {
-                                s = mother.segments.get(i);
+                                s = mother.segments.get(currentId-1);
                             }else{
-                                s = segments.get(i);
+                                s = segments.get(currentId-1);
                             }
 
                             if(s.getId() == currentId){
@@ -171,6 +171,7 @@ public class Individual {
                                     newSegments.add(newSegment);
                                     segmentId++;
                                 }
+                                break;
                             }
                         }
                     }
