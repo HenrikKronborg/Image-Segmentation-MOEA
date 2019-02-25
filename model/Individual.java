@@ -50,27 +50,28 @@ public class Individual {
 
         for(Pixel[] pixels : MOEA.getPixels()) {
             for(Pixel pixel : pixels){
-                pixel.setPlaced(false);
                 pixelsNodes.add(pixel);
             }
         }
         Collections.shuffle(pixelsNodes);
         segments = new ArrayList<>();
+        Boolean[][] placed = new Boolean[ImageLoader.getHeight()][ImageLoader.getWidth()];
 
         for(Pixel root: pixelsNodes){
-            if(!root.isPlaced()){
+            if(!placed[root.getY()][root.getX()]){
                 Segment segment = new Segment();
                 segment.addTo(root);
-                root.setPlaced(true);
+
+                placed[root.getY()][root.getX()] = true;
                 PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
                 for(Neighbor n : root.getNeighbors()){
                     pQueue.add(n);
                 }
                 while (true){
                     Neighbor newNode = pQueue.poll();
-                    if(!newNode.getNeighbor().isPlaced()){
+                    if(!placed[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()]){
                         if(newNode.getDistance() < threshold){
-                            newNode.getNeighbor().setPlaced(true);
+                            placed[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = true;
                             segment.addTo(newNode.getNeighbor());
                             for(Neighbor n : newNode.getNeighbor().getNeighbors()){
                                 pQueue.add(n);
@@ -131,7 +132,15 @@ public class Individual {
         return individuals;
     }
 
-    /*
+    public Individual[] crossover(Individual mother, double mutateRate){
+
+        int crossoverPoint = (int) (Math.random()*(ImageLoader.getWidth()*ImageLoader.getHeight()));
+
+        return null;
+    }
+
+
+        /*
      * Compares
      */
     public int compareDeviationTo(Individual other) {

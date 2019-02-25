@@ -6,7 +6,6 @@ import java.util.ArrayList;
 public class Pixel extends Position{
     private Color color;
     private ArrayList<Neighbor> neighbors = new ArrayList<>();
-    private boolean isPlaced = false;
 
     public Pixel(int x, int y, Color color) {
         this.x = x;
@@ -29,11 +28,4 @@ public class Pixel extends Position{
         this.neighbors.add(new Neighbor(this, neighbor, distance));
     }
 
-    public boolean isPlaced() {
-        return isPlaced;
-    }
-
-    public void setPlaced(boolean placed) {
-        isPlaced = placed;
-    }
 }
