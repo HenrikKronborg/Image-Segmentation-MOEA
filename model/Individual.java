@@ -143,11 +143,14 @@ public class Individual {
                     }
 
                     if(newShadow[y][x] == 0){
+                        int currentId;
                         int segmentLength;
                         if(change) {
                             segmentLength = mother.segments.size();
+                            currentId = mother.getShadow()[y][x];
                         }else{
                             segmentLength = segments.size();
+                            currentId = shadow[y][x];
                         }
                         for(int i= 0; i < segmentLength; i++){
                             Segment s;
@@ -158,7 +161,7 @@ public class Individual {
                                 s = segments.get(i);
                             }
 
-                            if(s.contains(x,y)){
+                            if(s.getId() == currentId){
                                 Segment newSegment = new Segment();
                                 for(Position p : s.getPixels()){
                                     if(newShadow[p.getY()][p.getX()] == 0){
