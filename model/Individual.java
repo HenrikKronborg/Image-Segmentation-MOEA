@@ -21,21 +21,21 @@ public class Individual {
     public ArrayList<Individual> S = new ArrayList<>();
     Random r = new Random();
 
-    public Individual(double threshold) {
-        initialize(threshold);
+    public Individual(int segments) {
+        initialize(segments);
     }
     public Individual() {
     }
 
-    public void initialize(double threshold) {
-        generateIndividual(threshold);
+    public void initialize(int segments) {
+        generateIndividual(segments);
     }
 
     /*
      * Methods
      */
     // Minimum Spanning Tree (MST)
-    public void generateIndividual(double threshold) {
+    public void generateIndividual(int segments) {
         chromosone = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
         // List of all pixels in the image
         ArrayList<Pixel> pixelsNodes = new ArrayList<>(ImageLoader.getHeight() * ImageLoader.getWidth());
@@ -46,36 +46,24 @@ public class Individual {
             }
         }
         Collections.shuffle(pixelsNodes);
+        Pixel[] roots =  new Pixel[segments];
+        PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
 
-        short segmentId = 1;
-        for (Pixel root : pixelsNodes) {
-            if (chromosone[root.getY()][root.getX()] == 0) {
-                chromosone[root.getY()][root.getX()] = segmentId;
-
-                PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
-                for (Neighbor n : root.getNeighbors()) {
-                    pQueue.add(n);
-                }
-                while (true) {
-                    Neighbor newNode = pQueue.poll();
-                    if (chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0) {
-                        if (newNode.getDistance() < threshold) {
-                            chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = segmentId;
-                            for (Neighbor n : newNode.getNeighbor().getNeighbors()) {
-                                pQueue.add(n);
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                    if (pQueue.size() == 0) {
-                        break;
-                    }
-                }
-                segmentId++;
+        for(int i = 0; i < roots.length; i++){
+            Pixel root = pixelsNodes.get(i);
+            roots[i] = root;
+            chromosone[root.getY()][root.getX()] = (short) (i+1);
+            pQueue.addAll(root.getNeighbors());
+        }
+        while (pQueue.size() != 0){
+            Neighbor newNode = pQueue.poll();
+            if (chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0) {
+                chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = chromosone[newNode.getPixel().getY()][newNode.getPixel().getX()];
+                pQueue.addAll(newNode.getNeighbor().getNeighbors());
             }
         }
-        nrSegments = segmentId-1;
+
+        nrSegments = segments;
 
     }
 
