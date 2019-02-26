@@ -1,11 +1,8 @@
 package model.utils;
 
-import model.supportNodes.Position;
-import model.Segment;
 import model.Individual;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class FitnessCalc {
@@ -19,7 +16,7 @@ public class FitnessCalc {
      * Methods
      */
     public void generateFitness(Individual individual) {
-        short[][] board = individual.getShadow();
+        short[][] board = individual.getChromosone();
 
         double overallDev = 0.0;
         double conn = 0.0;

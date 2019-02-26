@@ -8,20 +8,19 @@ import model.utils.FitnessCalc;
 import model.utils.ImageLoader;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class MOEA {
-    private static int popSize = 150; // Population size
+    private static int popSize = 100; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
-    private static double mutationRate = 0.02; // Mutation rate
-    private static int maxRuns = 200; // Maximum number of runs before termination
+    private static double mutationRate = 0.01; // Mutation rate
+    private static int maxRuns = 150; // Maximum number of runs before termination
     private static int tournamentSize = 2; // Number of individuals to choose from population at random
 
     private ThreadNode ob;
     private static ArrayList<Individual> population;
     private static LinkedList<Individual> front;
     private int generation;
-
+    private final int MINSEGMENTS = 3;
 
     private ImageLoader image;
     private static Pixel[][] pixels = new Pixel[ImageLoader.getHeight()][ImageLoader.getWidth()];
@@ -37,8 +36,8 @@ public class MOEA {
         int deltaSegements = 0;
         double step = 0.2;
 
+        double threshold = 20;
         while(population.size() < popSize) {
-            double threshold = 20;
             if(deltaSegements < 5 ){
                 threshold = 15 + Math.random()*10;
             }else if(lastSegments < 10){
@@ -51,9 +50,11 @@ public class MOEA {
             }
 
             Individual indv = new Individual(threshold);
-            deltaSegements = Math.abs(lastSegments - indv.getSegments());
-            lastSegments = indv.getSegments();
-            population.add(indv);
+            deltaSegements = Math.abs(lastSegments - indv.getNrSegments());
+            lastSegments = indv.getNrSegments();
+
+            if(lastSegments > MINSEGMENTS)
+                population.add(indv);
         }
 
         System.out.println("Initialize population done. " + popSize + " random solutions found");
@@ -78,7 +79,8 @@ public class MOEA {
 
                 for(Individual child : father.crossover(mother)) {
                     child.mutate(mutationRate);
-                    population.add(child);
+                    if(child.getNrSegments() > MINSEGMENTS)
+                        population.add(child);
                 }
             }
 

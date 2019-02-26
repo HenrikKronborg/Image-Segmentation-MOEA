@@ -10,13 +10,9 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import model.Individual;
-import model.supportNodes.Pixel;
-import model.supportNodes.Position;
-import model.Segment;
 import model.supportNodes.ThreadNode;
 import model.utils.ImageLoader;
 
-import java.awt.*;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -76,7 +72,7 @@ public class GUI implements Initializable {
     private void drawSegments(Individual individual) {
         gc2.clearRect(0,0,canvas2.getWidth(),canvas2.getHeight());
         HashMap<Integer, Color> colorMap =  new HashMap<>();
-        short[][] board = individual.getShadow();
+        short[][] board = individual.getChromosone();
         for (int y=0; y<board.length;y++) {
             for (int x = 0; x < board[y].length; x++) {
                 int id = board[y][x];
@@ -109,7 +105,7 @@ public class GUI implements Initializable {
 
         gc2.setFill(javafx.scene.paint.Color.rgb(0,0,0));
 
-        short[][] shadow = bestIndividual.getShadow();
+        short[][] shadow = bestIndividual.getChromosone();
 
         for(int y = 0; y < ImageLoader.getHeight(); y++) {
             for(int x = 0; x < ImageLoader.getWidth(); x++) {
@@ -131,7 +127,13 @@ public class GUI implements Initializable {
                 if(listener.changed.get()) {
                     listener.changed.set(false);
                     front = listener.getOb();
-                    bestIndividual = front.get(r.nextInt(front.size()));
+                    bestIndividual = front.get(0);
+                    for(int i = 1; i< front.size();i++){
+                        if(front.get(i).getFitnessDeviation() < bestIndividual.getFitnessDeviation()){
+                            bestIndividual = front.get(i);
+                        }
+                    }
+
 
                     drawSegments(bestIndividual);
                     drawText();

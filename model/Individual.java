@@ -8,13 +8,14 @@ import model.utils.ImageLoader;
 import java.util.*;
 
 public class Individual {
-    private short[][] shadow;
+    private short[][] chromosone;
+    private int nrSegments;
+
     private int rank;
     private double fitnessDeviation;
     private double fitnessConnectivity;
     private double fitnessEdge;
     private double crowdingDistance;
-    private int segments;
 
     public int n; // Number of dominating elements.
     public ArrayList<Individual> S = new ArrayList<>();
@@ -35,7 +36,7 @@ public class Individual {
      */
     // Minimum Spanning Tree (MST)
     public void generateIndividual(double threshold) {
-        shadow = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
+        chromosone = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
         // List of all pixels in the image
         ArrayList<Pixel> pixelsNodes = new ArrayList<>(ImageLoader.getHeight() * ImageLoader.getWidth());
 
@@ -48,8 +49,8 @@ public class Individual {
 
         short segmentId = 1;
         for (Pixel root : pixelsNodes) {
-            if (shadow[root.getY()][root.getX()] == 0) {
-                shadow[root.getY()][root.getX()] = segmentId;
+            if (chromosone[root.getY()][root.getX()] == 0) {
+                chromosone[root.getY()][root.getX()] = segmentId;
 
                 PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
                 for (Neighbor n : root.getNeighbors()) {
@@ -57,9 +58,9 @@ public class Individual {
                 }
                 while (true) {
                     Neighbor newNode = pQueue.poll();
-                    if (shadow[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0) {
+                    if (chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0) {
                         if (newNode.getDistance() < threshold) {
-                            shadow[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = segmentId;
+                            chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = segmentId;
                             for (Neighbor n : newNode.getNeighbor().getNeighbors()) {
                                 pQueue.add(n);
                             }
@@ -74,7 +75,7 @@ public class Individual {
                 segmentId++;
             }
         }
-        segments = segmentId-1;
+        nrSegments = segmentId-1;
 
     }
 
@@ -101,16 +102,16 @@ public class Individual {
                         case 0: // links to itself.
                             break;
                         case 1:
-                            shadow[y][x] = shadow[y][x+1]; // links to the next node (X dir.)
+                            chromosone[y][x] = chromosone[y][x+1]; // links to the next node (X dir.)
                             break;
                         case 2:
-                            shadow[y][x] = shadow[y][x-1]; // links to the previous node (X dir.)
+                            chromosone[y][x] = chromosone[y][x-1]; // links to the previous node (X dir.)
                             break;
                         case 3:
-                            shadow[y][x]= shadow[y-1][x]; // links to the upper node (Y dir.)
+                            chromosone[y][x]= chromosone[y-1][x]; // links to the upper node (Y dir.)
                             break;
                         case 4:
-                            shadow[y][x] = shadow[y+1][x]; // links to the bottom node (Y dir.)
+                            chromosone[y][x] = chromosone[y+1][x]; // links to the bottom node (Y dir.)
                             break;
                     }
                 }
@@ -137,10 +138,10 @@ public class Individual {
                     }
                     int currentId;
                     boolean toPlace = true;
-                    if (i == 1) {
-                        currentId = mother.getShadow()[y][x];
+                    if (i == 0) {
+                        currentId = chromosone[y][x];
                     } else {
-                        currentId = shadow[y][x];
+                        currentId = mother.getChromosone()[y][x];
                     }
 
                     currentId = translate(table1,change,currentId,segmentId);
@@ -152,28 +153,27 @@ public class Individual {
 
                 }
             }
+            change = false;
             HashMap<Integer,Integer> table2 = new HashMap<>();
             for (int y = 0; y < ImageLoader.getHeight(); y++) {
                 for (int x = 0; x < ImageLoader.getWidth(); x++) {
-                    if (y == crossoverPointY && x == crossoverPointX) {
-                        change = true;
-                    }
-                    int currentId;
-                    if (i == 0) {
-                        currentId = (mother.getShadow()[y][x]);
-                    } else {
-                        currentId = shadow[y][x];
-                    }
-
-                    currentId = translate(table2,change,currentId,segmentId);
-                    segmentId = table1.size()+table1.size();;
-
                     if (newShadow[y][x] == 0) {
+                        int currentId;
+                        if (i == 0) {
+                            currentId = mother.getChromosone()[y][x];
+                        } else {
+                            currentId = chromosone[y][x];
+                        }
+
+                        currentId = translate(table2,change,currentId,segmentId);
+                        segmentId = table1.size()+table1.size();
+
                         newShadow[y][x] = (short)currentId;
                     }
                 }
             }
-            children[i].setShadow(newShadow);
+            children[i].nrSegments = table1.size()+table1.size();
+            children[i].setChromosone(newShadow);
         }
 
         return children;
@@ -198,6 +198,7 @@ public class Individual {
         return currentId;
 
     }
+
         /*
      * Compares
      */
@@ -259,7 +260,7 @@ public class Individual {
                 }
                 select = rnd;
 
-            } else if(y == shadow.length -1) {
+            } else if(y == chromosone.length -1) {
                 int rnd = r.nextInt(3); // 0,1 and 3 available.
                 if(rnd == 2) {
                     rnd = 3;
@@ -273,7 +274,7 @@ public class Individual {
                 }
                 select = rnd;
             }
-        } else if(x == shadow[0].length -1) {
+        } else if(x == chromosone[0].length -1) {
             if(y == 0) {
                 int rnd = r.nextInt(3); // 0,2 and 4 available.
                 if(rnd == 1) {
@@ -281,7 +282,7 @@ public class Individual {
                 }
                 select = rnd;
 
-            } else if(y == shadow.length -1) {
+            } else if(y == chromosone.length -1) {
                 int rnd = r.nextInt(3); // 0,2 and 3 available.
                 if(rnd == 1){
                     rnd = 3;
@@ -303,7 +304,7 @@ public class Individual {
                 }
                 select = rnd;
 
-            } else if(y == shadow.length -1) {
+            } else if(y == chromosone.length -1) {
                 select = r.nextInt(4); // 0,1,2 and 3 available.
 
             } else {
@@ -381,15 +382,15 @@ public class Individual {
             System.out.println("ERROR?");
     }
 
-    public short[][] getShadow() {
-        return shadow;
+    public short[][] getChromosone() {
+        return chromosone;
     }
 
-    public void setShadow(short[][] shadow) {
-        this.shadow = shadow;
+    public void setChromosone(short[][] chromosone) {
+        this.chromosone = chromosone;
     }
 
-    public int getSegments() {
-        return segments;
+    public int getNrSegments() {
+        return nrSegments;
     }
 }
