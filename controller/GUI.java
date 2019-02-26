@@ -6,8 +6,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import model.Individual;
 import model.supportNodes.ThreadNode;
@@ -26,6 +28,12 @@ public class GUI implements Initializable {
     private Canvas canvas2;
     @FXML
     private Label generation;
+    @FXML
+    private Button nextIndividual;
+    @FXML
+    private Label individualNumber;
+    @FXML
+    private HBox individualNumberHBox;
 
     private GraphicsContext gc1;
     private GraphicsContext gc2;
@@ -33,13 +41,11 @@ public class GUI implements Initializable {
     private MOEA algorithm;
     private ImageLoader image;
     private Thread calculateThread;
-
     private ThreadNode listener;
 
-    //private ArrayList<LinkedList<Individual>> listenerList;
     private LinkedList<Individual> front;
+    private int frontNumber;
     Individual bestIndividual;
-    int listenerListSize = 0;
     Random r = new Random();
 
     @Override
@@ -73,12 +79,13 @@ public class GUI implements Initializable {
         gc2.clearRect(0,0,canvas2.getWidth(),canvas2.getHeight());
         HashMap<Integer, Color> colorMap =  new HashMap<>();
         short[][] board = individual.getChromosone();
-        for (int y=0; y<board.length;y++) {
+
+        for (int y = 0; y < board.length; y++) {
             for (int x = 0; x < board[y].length; x++) {
                 int id = board[y][x];
-                if(colorMap.containsKey(id)){
+                if(colorMap.containsKey(id)) {
                     gc2.setFill(colorMap.get(id));
-                }else{
+                } else {
                     Color c = javafx.scene.paint.Color.rgb(r.nextInt(255), r.nextInt(255), r.nextInt(255), 0.5);
                     colorMap.put(id,c);
                     gc2.setFill(c);
@@ -86,7 +93,6 @@ public class GUI implements Initializable {
                 gc2.fillRect(x, y, 1, 1);
             }
         }
-
     }
     private void drawText() {
         generation.setText(Integer.toString(listener.getGeneration()));
@@ -119,6 +125,18 @@ public class GUI implements Initializable {
         }
     }
 
+    @FXML
+    public void showIndividual() {
+        if(frontNumber == front.size()) {
+            frontNumber = 0;
+        }
+
+        individualNumber.setText((frontNumber + 1) + " out of " + front.size());
+        drawSegments(front.get(frontNumber));
+
+        frontNumber++;
+    }
+
     public void initListener(){
         listener = new ThreadNode();
 
@@ -127,19 +145,16 @@ public class GUI implements Initializable {
                 if(listener.changed.get()) {
                     listener.changed.set(false);
                     front = listener.getOb();
-                    /*bestIndividual = front.get(0);
-                    for(int i = 1; i< front.size();i++){
-                        if(front.get(i).getFitnessDeviation() < bestIndividual.getFitnessDeviation()){
-                            bestIndividual = front.get(i);
-                        }
-                    }*/
-
-                    front = listener.getOb();
                     bestIndividual = front.get(r.nextInt(front.size()));
-
 
                     drawSegments(bestIndividual);
                     drawText();
+
+                    if(listener.getGeneration() == MOEA.getMaxRuns()) {
+                        nextIndividual.setDisable(false);
+                        individualNumberHBox.setVisible(true);
+                        individualNumber.setText((frontNumber + 1) + " out of " + front.size());
+                    }
                 }
             }
         }.start();

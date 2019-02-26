@@ -7,6 +7,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <SplitPane dividerPositions="0.7468671679197995" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.GUI">
@@ -19,22 +20,33 @@
       </StackPane>
       <AnchorPane minWidth="100.0" prefHeight="200.0" prefWidth="100.0">
          <children>
-            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" AnchorPane.leftAnchor="10.0">
+            <VBox layoutX="13.0" layoutY="21.0" prefHeight="179.0" prefWidth="186.0">
                <children>
-                  <Label prefHeight="35.0" prefWidth="268.0" text="Generation:">
-                     <font>
-                        <Font size="24.0" />
-                     </font>
-                  </Label>
-                  <Label fx:id="generation" prefHeight="35.0" prefWidth="201.0" text="1">
-                     <font>
-                        <Font name="System Bold" size="24.0" />
-                     </font>
-                  </Label>
+                  <HBox prefHeight="53.0" prefWidth="199.0">
+                     <children>
+                        <Label prefHeight="35.0" prefWidth="268.0" text="Generation:">
+                           <font>
+                              <Font size="24.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="generation" prefHeight="35.0" prefWidth="201.0" text="1">
+                           <font>
+                              <Font name="System Bold" size="24.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <HBox fx:id="individualNumberHBox" layoutX="14.0" layoutY="286.0" prefHeight="25.0" prefWidth="186.0" visible="false">
+               <children>
+                  <Label text="Showing individiual " />
+                  <Label fx:id="individualNumber" text="1 out of 1" />
                </children>
             </HBox>
             <Button layoutX="144.0" layoutY="349.0" mnemonicParsing="false" text="Start" />
-            <Button layoutX="14.0" layoutY="349.0" mnemonicParsing="false" text="Save to file" onAction="#drawResult" />
+            <Button layoutX="14.0" layoutY="349.0" mnemonicParsing="false" onAction="#drawResult" text="Save to file" />
+            <Button fx:id="nextIndividual" disable="true" layoutX="14.0" layoutY="311.0" mnemonicParsing="false" onAction="#showIndividual" text="Next individual" />
          </children>
       </AnchorPane>
    </items>

@@ -121,7 +121,6 @@ public class MOEA {
             ob.setOb(front);
             ob.setGeneration(generation);
             ob.changed.set(true);
-
        }
     }
 
