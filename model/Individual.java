@@ -379,7 +379,7 @@ public class Individual {
         if(this.crowdingDistance != Double.MAX_VALUE)
             this.crowdingDistance += crowdingDistance;
         else
-            System.out.println("ERROR?");
+            System.out.println("ERROR? crowding");
     }
 
     public short[][] getChromosone() {
