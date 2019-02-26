@@ -21,7 +21,8 @@ public class MOEA {
     private static ArrayList<Individual> population;
     private static LinkedList<Individual> front;
     private int generation;
-    private final int MINSEGMENTS = 3;
+    private final int MINSEGMENTS = 6;
+    private final int MAXSEGMENTS = 30;
 
     private ImageLoader image;
     private static Pixel[][] pixels = new Pixel[ImageLoader.getHeight()][ImageLoader.getWidth()];
@@ -33,29 +34,11 @@ public class MOEA {
 
     public void run() {
         population = new ArrayList<>();
-        int lastSegments = 0;
-        int deltaSegements = 0;
-        double step = 0.2;
 
-        double threshold = 20;
         while(population.size() < popSize) {
-            if(deltaSegements < 5 ){
-                threshold = 15 + Math.random()*10;
-            }else if(lastSegments < 10){
-                threshold += step;
-            }else if (lastSegments > 150){
-                threshold += step;
-            }
-            if(threshold < 0){
-                System.out.println("ERROR");
-            }
+            int segments = (int)(Math.random()*(MAXSEGMENTS-MINSEGMENTS))+MINSEGMENTS+1;
 
-            Individual indv = new Individual(threshold);
-            deltaSegements = Math.abs(lastSegments - indv.getNrSegments());
-            lastSegments = indv.getNrSegments();
-
-            if(lastSegments > MINSEGMENTS)
-                population.add(indv);
+            population.add(new Individual(segments));
         }
 
         System.out.println("Initialize population done. " + popSize + " random solutions found");
@@ -79,7 +62,7 @@ public class MOEA {
                 Individual mother = NSGAIItournament();
 
                 for(Individual child : father.crossover(mother)) {
-                    child.mutate(mutationRate);
+                    //child.mutate(mutationRate);
                     if(child.getNrSegments() > MINSEGMENTS)
                         population.add(child);
                 }
