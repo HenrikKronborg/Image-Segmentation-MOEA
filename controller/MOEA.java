@@ -6,11 +6,12 @@ import model.supportNodes.Pixel;
 import model.supportNodes.Position;
 import model.utils.FitnessCalc;
 import model.utils.ImageLoader;
+import model.utils.Validators;
 
 import java.util.*;
 
 public class MOEA {
-    private static int popSize = 100; // Population size
+    private static int popSize = 25; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.01; // Mutation rate
     private static int maxRuns = 150; // Maximum number of runs before termination
@@ -85,7 +86,13 @@ public class MOEA {
             }
 
             // Sort and calculate crowding distance
+
+            for(int i = popSize; i < population.size(); i++) {
+                fitness.generateFitness(population.get(i));
+            }
+
             frontiers = fastNonDominatedSort();
+            System.out.println(Validators.validateRank(frontiers));
             for(LinkedList<Individual> l : frontiers) {
                 crowdingDistance(l);
             }

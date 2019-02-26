@@ -127,12 +127,15 @@ public class GUI implements Initializable {
                 if(listener.changed.get()) {
                     listener.changed.set(false);
                     front = listener.getOb();
-                    bestIndividual = front.get(0);
+                    /*bestIndividual = front.get(0);
                     for(int i = 1; i< front.size();i++){
                         if(front.get(i).getFitnessDeviation() < bestIndividual.getFitnessDeviation()){
                             bestIndividual = front.get(i);
                         }
-                    }
+                    }*/
+
+                    front = listener.getOb();
+                    bestIndividual = front.get(r.nextInt(front.size()));
 
 
                     drawSegments(bestIndividual);
