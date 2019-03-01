@@ -22,14 +22,11 @@ public class Individual {
     Random r = new Random();
 
     public Individual(int segments) {
-        initialize(segments);
+        generateIndividual(segments);
     }
     public Individual() {
     }
 
-    public void initialize(int segments) {
-        generateIndividual(segments);
-    }
 
     /*
      * Methods

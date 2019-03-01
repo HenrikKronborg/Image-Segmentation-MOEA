@@ -11,10 +11,10 @@ import model.utils.Validators;
 import java.util.*;
 
 public class MOEA {
-    private static int popSize = 100; // Population size
+    private static int popSize = 50; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.01; // Mutation rate
-    private static int maxRuns = 150; // Maximum number of runs before termination
+    private static int maxRuns = 20; // Maximum number of runs before termination
     private static int tournamentSize = 2; // Number of individuals to choose from population at random
 
     private ThreadNode ob;
@@ -69,7 +69,6 @@ public class MOEA {
             }
 
             // Sort and calculate crowding distance
-
             for(int i = popSize; i < population.size(); i++) {
                 fitness.generateFitness(population.get(i));
             }
@@ -144,27 +143,6 @@ public class MOEA {
                 if(x - 1 >= 0) {
                     pixel.addNeighbor(pixels[y][x-1]);
                 }
-                /*
-                // Top right
-                if(y - 1 >= 0 && x + 1 < ImageLoader.getWidth()) {
-                    pixel.addNeighbor(pixels[x+1][y-1]);
-                }
-
-                // Top left
-                if(y - 1 >= 0 && x - 1 >= 0) {
-                    pixel.addNeighbor(pixels[x-1][y-1]);
-                }
-
-                // Bottom right
-                if(y + 1 < ImageLoader.getHeight() && x + 1 < ImageLoader.getHeight()) {
-                    pixel.addNeighbor(pixels[x+1][y+1]);
-                }
-
-                // Bottom left
-                if(y + 1 < ImageLoader.getHeight() && x - 1 >= 0) {
-                    pixel.addNeighbor(pixels[x-1][y+1]);
-                }
-                */
             }
         }
     }

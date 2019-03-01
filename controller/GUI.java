@@ -27,7 +27,11 @@ public class GUI implements Initializable {
     @FXML
     private Canvas canvas2;
     @FXML
+    private Canvas canvasBlackWhite;
+    @FXML
     private Label generation;
+    @FXML
+    private Label segments;
     @FXML
     private Button nextIndividual;
     @FXML
@@ -37,6 +41,7 @@ public class GUI implements Initializable {
 
     private GraphicsContext gc1;
     private GraphicsContext gc2;
+    private GraphicsContext gcBlackWhite;
 
     private MOEA algorithm;
     private ImageLoader image;
@@ -53,9 +58,10 @@ public class GUI implements Initializable {
         // Load image and draw onto canvas
         gc1 = canvas1.getGraphicsContext2D();
         gc2 = canvas2.getGraphicsContext2D();
+        gcBlackWhite = canvasBlackWhite.getGraphicsContext2D();
 
         image = new ImageLoader();
-        Image view = SwingFXUtils.toFXImage(image.loadImage("86016.jpg"), null );
+        Image view = SwingFXUtils.toFXImage(image.loadImage("176035.jpg"), null );
         gc1.drawImage(view, 0, 0);
 
         // Algorithm and calculations in threads
@@ -73,6 +79,11 @@ public class GUI implements Initializable {
 
             }
         });
+    }
+
+    private void drawText() {
+        generation.setText(Integer.toString(listener.getGeneration()));
+        segments.setText(Integer.toString(bestIndividual.getNrSegments()));
     }
 
     private void drawSegments(Individual individual) {
@@ -94,31 +105,25 @@ public class GUI implements Initializable {
             }
         }
     }
-    private void drawText() {
-        generation.setText(Integer.toString(listener.getGeneration()));
-    }
 
-    @FXML
-    public void drawResult() {
-        gc1.clearRect(0,0, ImageLoader.getWidth(), ImageLoader.getHeight());
-
-        gc2.setFill(javafx.scene.paint.Color.rgb(0,0,0));
-        gc2.fillRect(0, 0, ImageLoader.getWidth(), ImageLoader.getHeight());
+    public void drawResult(Individual individual) {
+        gcBlackWhite.setFill(javafx.scene.paint.Color.rgb(0,0,0));
+        gcBlackWhite.fillRect(0, 0, ImageLoader.getWidth(), ImageLoader.getHeight());
 
         // Draw border
-        gc2.setFill(javafx.scene.paint.Color.rgb(255,255,255));
-        gc2.fillRect(1, 1, ImageLoader.getWidth()-2, ImageLoader.getHeight()-2);
+        gcBlackWhite.setFill(javafx.scene.paint.Color.rgb(255,255,255));
+        gcBlackWhite.fillRect(1, 1, ImageLoader.getWidth()-2, ImageLoader.getHeight()-2);
 
-        gc2.setFill(javafx.scene.paint.Color.rgb(0,0,0));
+        gcBlackWhite.setFill(javafx.scene.paint.Color.rgb(0,0,0));
 
-        short[][] shadow = bestIndividual.getChromosone();
+        short[][] shadow = individual.getChromosone();
 
         for(int y = 0; y < ImageLoader.getHeight(); y++) {
             for(int x = 0; x < ImageLoader.getWidth(); x++) {
                 int current = shadow[y][x];
                 if(x < shadow[0].length-1 && y < shadow.length-1) {
                     if (current != shadow[y][x + 1] || current != shadow[y + 1][x]) {
-                        gc2.fillRect(x, y, 1, 1);
+                        gcBlackWhite.fillRect(x, y, 1, 1);
                     }
                 }
             }
@@ -131,8 +136,12 @@ public class GUI implements Initializable {
             frontNumber = 0;
         }
 
+        // Update text
         individualNumber.setText((frontNumber + 1) + " out of " + front.size());
+        segments.setText(Integer.toString(front.get(frontNumber).getNrSegments()));
+
         drawSegments(front.get(frontNumber));
+        drawResult(front.get(frontNumber));
 
         frontNumber++;
     }
@@ -148,6 +157,7 @@ public class GUI implements Initializable {
                     bestIndividual = front.get(r.nextInt(front.size()));
 
                     drawSegments(bestIndividual);
+                    drawResult(bestIndividual);
                     drawText();
 
                     if(listener.getGeneration() == MOEA.getMaxRuns()) {
