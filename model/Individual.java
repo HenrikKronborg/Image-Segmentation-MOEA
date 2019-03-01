@@ -154,7 +154,7 @@ public class Individual {
                         }
 
                         currentId = translate(table2,change,currentId,segmentId);
-                        segmentId = table1.size()+table1.size();
+                        segmentId = table1.size()+table2.size();
 
                         newShadow[y][x] = (short)currentId;
                     }else{
@@ -164,7 +164,7 @@ public class Individual {
 
                 }
             }
-            children[i].nrSegments = table1.size()+table1.size();
+            children[i].nrSegments = table1.size()+table2.size();
             for(int repairId : checkForRepair){
                 if(table2.containsKey(repairId)){
                     repairId = table2.get(repairId);
@@ -208,8 +208,9 @@ public class Individual {
                                             posQ.add(new Position(pos.getX(),pos.getY()-1));
 
                                 }
+                                segmentId++;
+
                             }
-                            segmentId++;
                         }
                     }
                 }
