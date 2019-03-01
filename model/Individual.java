@@ -166,7 +166,6 @@ public class Individual {
             }
             children[i].nrSegments = table1.size()+table2.size();
             for(int repairId : checkForRepair){
-                minY
                 if(table2.containsKey(repairId)){
                     repairId = table2.get(repairId);
                     for (int y = crossoverPointY; y < ImageLoader.getHeight(); y++) {
