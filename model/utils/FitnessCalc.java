@@ -79,7 +79,6 @@ public class FitnessCalc {
             }
         }
         for (int[] value : segments.values()) {
-
             value[1] = value[1]/value[0];
             value[2] = value[2]/value[0];
             value[3] = value[3]/value[0];
@@ -89,7 +88,7 @@ public class FitnessCalc {
                 Color color = img.getPixelValue(x,y);
                 int id =board[y][x];
                 int[] c =  segments.get(id);
-                overallDev += Math.sqrt(Math.pow(color.getRed() - c[1], 2) + Math.pow(color.getGreen() - c[2], 2) + Math.pow(color.getBlue() - c[3], 2));
+                overallDev += Math.sqrt(Math.pow(color.getRed() - c[1], 2) + Math.pow(color.getGreen() - c[2], 2) + Math.pow(color.getBlue() - c[3], 2))/1000;
             }
         }
 

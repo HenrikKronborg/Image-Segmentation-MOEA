@@ -11,10 +11,10 @@ import model.utils.Validators;
 import java.util.*;
 
 public class MOEA {
-    private static int popSize = 100; // Population size
+    private static int popSize = 50; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.01; // Mutation rate
-    private static int maxRuns = 150; // Maximum number of runs before termination
+    private static int maxRuns = 50; // Maximum number of runs before termination
     private static int tournamentSize = 2; // Number of individuals to choose from population at random
 
     private ThreadNode ob;
@@ -50,6 +50,7 @@ public class MOEA {
             fitness.generateFitness(individual);
         }
 
+
         LinkedList<LinkedList<Individual>> frontiers = fastNonDominatedSort();
         for(LinkedList<Individual> l : frontiers) {
             crowdingDistance(l);
@@ -77,6 +78,12 @@ public class MOEA {
             frontiers = fastNonDominatedSort();
             for(LinkedList<Individual> l : frontiers) {
                 crowdingDistance(l);
+                for(Individual indv: l){
+                    if(indv.getCrowdingDistance() == -1){
+                        l.remove(l);
+                    }
+
+                }
             }
 
             ArrayList<Individual> tempPopulation = new ArrayList<>(popSize);
