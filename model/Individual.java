@@ -143,8 +143,8 @@ public class Individual {
             HashMap<Integer,Integer> table2 = new HashMap<>();
             ArrayList<Integer> checkForRepair = new ArrayList<>();
 
-            for (int y = crossoverPointY; y < ImageLoader.getHeight(); y++) {
-                for (int x = crossoverPointX; x < ImageLoader.getWidth(); x++) {
+            for (int y = 0; y < ImageLoader.getHeight(); y++) {
+                for (int x = 0; x < ImageLoader.getWidth(); x++) {
                     if (newShadow[y][x] == 0) {
                         int currentId;
                         if (i == 0) {
@@ -164,6 +164,7 @@ public class Individual {
 
                 }
             }
+
             children[i].nrSegments = table1.size()+table2.size();
 
             for(int j = 0; j <checkForRepair.size();j++){
@@ -174,8 +175,8 @@ public class Individual {
                 }
             }
             boolean repair = false;
-            for (int y = crossoverPointY; y < ImageLoader.getHeight(); y++) {
-                for (int x = crossoverPointX; x < ImageLoader.getWidth(); x++) {
+            for (int y = 0; y < ImageLoader.getHeight(); y++) {
+                for (int x = 0; x < ImageLoader.getWidth(); x++) {
                     int temp = newShadow[y][x];
                     if(checkForRepair.contains(temp)){
                         newShadow[y][x] = 0;
@@ -198,8 +199,8 @@ public class Individual {
                 }
 
 
-                for (int y = repairPointY; y < ImageLoader.getHeight(); y++) {
-                    for (int x = repairPointX; x < ImageLoader.getWidth(); x++) {
+                for (int y = 0; y < ImageLoader.getHeight(); y++) {
+                    for (int x = 0; x < ImageLoader.getWidth(); x++) {
                         if(newShadow[y][x] != 0){
                             for(Neighbor p :pixels[y][x].getNeighbors()){
                                 if(newShadow[p.getPixel().getY()][p.getPixel().getX()] == 0){
@@ -209,6 +210,7 @@ public class Individual {
                         }
                     }
                 }
+
                 while (pQueue.size() != 0){
                     Neighbor newNode = pQueue.poll();
                     if (newShadow[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0) {
