@@ -165,57 +165,59 @@ public class Individual {
                 }
             }
             children[i].nrSegments = table1.size()+table2.size();
-            for(int repairId : checkForRepair){
-                if(table2.containsKey(repairId)){
-                    repairId = table2.get(repairId);
-                    for (int y = crossoverPointY; y < ImageLoader.getHeight(); y++) {
-                        for (int x = crossoverPointX; x < ImageLoader.getWidth(); x++) {
-                            if(newShadow[y][x] == repairId){
-                                newShadow[y][x] = (short)(segmentId + 1);
-                                LinkedList<Position> posQ = new LinkedList<>();
 
-                                if(x < newShadow[y].length-1)
-                                    if(newShadow[y][x+1] == repairId)
-                                        posQ.add(new Position(x+1,y));
-                                if(x > 0)
-                                    if(newShadow[y][x-1] == repairId)
-                                        posQ.add(new Position(x-1,y));
+            for(int j = 0; j <checkForRepair.size();j++){
+                if(table2.containsKey(checkForRepair.get(j))){
+                    checkForRepair.set(j, table2.get(checkForRepair.get(j)));
+                }else{
+                    checkForRepair.set(j,0);
+                }
+            }
+            boolean repair = false;
+            for (int y = crossoverPointY; y < ImageLoader.getHeight(); y++) {
+                for (int x = crossoverPointX; x < ImageLoader.getWidth(); x++) {
+                    int temp = newShadow[y][x];
+                    if(checkForRepair.contains(temp)){
+                        newShadow[y][x] = 0;
+                        repair = true;
+                    }
+                }
+            }
 
-                                if(y < newShadow.length-1)
-                                    if(newShadow[y+1][x] == repairId)
-                                        posQ.add(new Position(x,y+1));
+            if(repair){
+                Pixel[][] pixels = MOEA.getPixels();
+                PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
 
-                                if(y > 0)
-                                    if(newShadow[y-1][x] == repairId)
-                                        posQ.add(new Position(x,y-1));
+                int repairPointY = crossoverPointY-1;
+                if(repairPointY == -1){
+                    repairPointY = 0;
+                }
+                int repairPointX = crossoverPointX-1;
+                if(repairPointX == -1){
+                    repairPointX = 0;
+                }
 
-                                while(!posQ.isEmpty()){
-                                    Position pos = posQ.pop();
-                                    newShadow[pos.getY()][pos.getX()] = (short)(segmentId + 1);
-                                    if(pos.getX() < newShadow[pos.getY()].length-1)
-                                        if(newShadow[pos.getY()][pos.getX()+1] == repairId)
-                                            posQ.add(new Position(pos.getX()+1,pos.getY()));
-                                    if(x > 0)
-                                        if(newShadow[pos.getY()][pos.getX()-1] == repairId)
-                                            posQ.add(new Position(pos.getX()-1,pos.getY()));
 
-                                    if(pos.getY() < newShadow.length-1)
-                                            if(newShadow[pos.getY()+1][pos.getX()] == repairId)
-                                                posQ.add(new Position(pos.getX(),pos.getY()+1));
-
-                                    if(pos.getY() > 0)
-                                        if(newShadow[pos.getY()-1][pos.getX()] == repairId)
-                                            posQ.add(new Position(pos.getX(),pos.getY()-1));
-
+                for (int y = repairPointY; y < ImageLoader.getHeight(); y++) {
+                    for (int x = repairPointX; x < ImageLoader.getWidth(); x++) {
+                        if(newShadow[y][x] != 0){
+                            for(Neighbor p :pixels[y][x].getNeighbors()){
+                                if(newShadow[p.getPixel().getY()][p.getPixel().getX()] == 0){
+                                    pQueue.add(p);
                                 }
-                                segmentId++;
-
                             }
                         }
                     }
                 }
+                while (pQueue.size() != 0){
+                    Neighbor newNode = pQueue.poll();
+                    if (newShadow[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0) {
+                        newShadow[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = newShadow[newNode.getPixel().getY()][newNode.getPixel().getX()];
+                        pQueue.addAll(newNode.getNeighbor().getNeighbors());
+                    }
+                }
+
             }
-            System.out.println("child");
             children[i].setChromosone(newShadow);
         }
 
