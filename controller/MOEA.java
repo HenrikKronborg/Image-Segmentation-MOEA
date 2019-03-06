@@ -13,7 +13,7 @@ import java.util.*;
 public class MOEA {
     private static int popSize = 50; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
-    private static double mutationRate = 0.01; // Mutation rate
+    private static double mutationRate = 0.18; // Mutation rate
     private static int maxRuns = 20; // Maximum number of runs before termination
     private static int tournamentSize = 2; // Number of individuals to choose from population at random
 
@@ -63,7 +63,7 @@ public class MOEA {
                 Individual mother = NSGAIItournament();
 
                 for(Individual child : father.crossover(mother)) {
-                    //child.mutate(mutationRate);
+                    child.mutateMerge(mutationRate);
                     if(child.getNrSegments() > MINSEGMENTS)
                         population.add(child);
                 }

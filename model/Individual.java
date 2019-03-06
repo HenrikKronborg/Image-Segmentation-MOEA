@@ -104,6 +104,30 @@ public class Individual {
             }
         }
     }
+    public void mutateMerge(double mutateProb){
+        ArrayList<Integer> toMerge = new ArrayList<>();
+        for(int i = 1; i <= nrSegments; i++){
+            if(mutateProb > Math.random()){
+                toMerge.add(i);
+            }
+        }
+
+        for (int y = 0; y < ImageLoader.getHeight(); y++) {
+            for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                int id = chromosone[y][x];
+                if(toMerge.contains(id)){
+                    chromosone[y][x] = 0;
+                }
+            }
+        }
+        if(toMerge.size() > 0)
+            nrSegments = repair(chromosone);
+
+    }
+
+    public void mutateSplit(double mutateProb){
+
+    }
 
     public Individual[] crossover(Individual mother) {
 
@@ -170,7 +194,6 @@ public class Individual {
             for(int j = 0; j <checkForRepair.size();j++){
                 if(table2.containsKey(checkForRepair.get(j))){
                     checkForRepair.set(j, table2.get(checkForRepair.get(j)));
-                    children[i].nrSegments--;
                 }else{
                     checkForRepair.set(j,0);
                 }
@@ -187,39 +210,7 @@ public class Individual {
             }
 
             if(repair){
-                Pixel[][] pixels = MOEA.getPixels();
-                PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
-
-                int repairPointY = crossoverPointY-1;
-                if(repairPointY == -1){
-                    repairPointY = 0;
-                }
-                int repairPointX = crossoverPointX-1;
-                if(repairPointX == -1){
-                    repairPointX = 0;
-                }
-
-
-                for (int y = 0; y < ImageLoader.getHeight(); y++) {
-                    for (int x = 0; x < ImageLoader.getWidth(); x++) {
-                        if(newShadow[y][x] != 0){
-                            for(Neighbor p :pixels[y][x].getNeighbors()){
-                                if(newShadow[p.getPixel().getY()][p.getPixel().getX()] == 0){
-                                    pQueue.add(p);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                while (pQueue.size() != 0){
-                    Neighbor newNode = pQueue.poll();
-                    if (newShadow[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0) {
-                        newShadow[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = newShadow[newNode.getPixel().getY()][newNode.getPixel().getX()];
-                        pQueue.addAll(newNode.getNeighbor().getNeighbors());
-                    }
-                }
-
+                children[i].nrSegments = repair(newShadow); // Corrects and returns nr of segments.
             }
             children[i].setChromosone(newShadow);
         }
@@ -227,6 +218,35 @@ public class Individual {
         return children;
     }
 
+    private int repair(short[][]  shadow){
+        Pixel[][] pixels = MOEA.getPixels();
+        PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
+        ArrayList<Integer> segments = new ArrayList<>();
+
+        for (int y = 0; y < ImageLoader.getHeight(); y++) {
+            for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                if(shadow[y][x] != 0){
+                    for(Neighbor p :pixels[y][x].getNeighbors()){
+                        if(shadow[p.getPixel().getY()][p.getPixel().getX()] == 0){
+                            pQueue.add(p);
+                        }
+                    }
+                    if(!segments.contains((int)shadow[y][x])){
+                        segments.add((int)shadow[y][x]);
+                    }
+                }
+            }
+        }
+
+        while (pQueue.size() != 0){
+            Neighbor newNode = pQueue.poll();
+            if (shadow[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0) {
+                shadow[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = shadow[newNode.getPixel().getY()][newNode.getPixel().getX()];
+                pQueue.addAll(newNode.getNeighbor().getNeighbors());
+            }
+        }
+        return segments.size();
+    }
 
     private int translate(HashMap<Integer,Integer> translate, boolean change,int currentId, int segmentId){
         if(change){
