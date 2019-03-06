@@ -170,6 +170,7 @@ public class Individual {
             for(int j = 0; j <checkForRepair.size();j++){
                 if(table2.containsKey(checkForRepair.get(j))){
                     checkForRepair.set(j, table2.get(checkForRepair.get(j)));
+                    children[i].nrSegments--;
                 }else{
                     checkForRepair.set(j,0);
                 }
