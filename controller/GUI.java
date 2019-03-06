@@ -16,10 +16,7 @@ import model.supportNodes.ThreadNode;
 import model.utils.ImageLoader;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Random;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class GUI implements Initializable {
     @FXML
@@ -94,12 +91,18 @@ public class GUI implements Initializable {
         for (int y = 0; y < board.length; y++) {
             for (int x = 0; x < board[y].length; x++) {
                 int id = board[y][x];
-                if(colorMap.containsKey(id)) {
-                    gc2.setFill(colorMap.get(id));
-                } else {
-                    Color c = javafx.scene.paint.Color.rgb(r.nextInt(255), r.nextInt(255), r.nextInt(255), 0.5);
-                    colorMap.put(id,c);
+                if(id == 0){
+
+                    Color c = Color.BLACK;
                     gc2.setFill(c);
+                }else{
+                    if(colorMap.containsKey(id)) {
+                        gc2.setFill(colorMap.get(id));
+                    } else {
+                        Color c = javafx.scene.paint.Color.rgb(r.nextInt(255), r.nextInt(255), r.nextInt(255), 0.5);
+                        colorMap.put(id,c);
+                        gc2.setFill(c);
+                    }
                 }
                 gc2.fillRect(x, y, 1, 1);
             }
@@ -135,7 +138,7 @@ public class GUI implements Initializable {
         if(frontNumber == front.size()) {
             frontNumber = 0;
         }
-
+        front.sort((Individual a, Individual b)-> a.compareCrowdTo(b));
         // Update text
         individualNumber.setText((frontNumber + 1) + " out of " + front.size());
         segments.setText(Integer.toString(front.get(frontNumber).getNrSegments()));

@@ -6,6 +6,7 @@ import model.supportNodes.Pixel;
 import model.supportNodes.Position;
 import model.utils.ImageLoader;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class Individual {
@@ -23,7 +24,7 @@ public class Individual {
     Random r = new Random();
 
     public Individual(int segments) {
-        generateIndividual(segments);
+        generateIndividualSmart(segments);
     }
     public Individual() {
     }
@@ -65,6 +66,65 @@ public class Individual {
 
     }
 
+    public void generateIndividualSmart(int segments) {
+        int[] pixelsInSegment = new int[segments+1];
+        chromosone = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
+        // List of all pixels in the image
+        ArrayList<Pixel> pixelsNodes = new ArrayList<>(ImageLoader.getHeight() * ImageLoader.getWidth());
+
+        for (Pixel[] pixels : MOEA.getPixels()) {
+            for (Pixel pixel : pixels) {
+                pixelsNodes.add(pixel);
+            }
+        }
+        Collections.shuffle(pixelsNodes);
+        Pixel[] roots =  new Pixel[segments];
+        PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
+
+        for(int i = 0; i < roots.length; i++){
+            Pixel root = pixelsNodes.get(i);
+            roots[i] = root;
+            chromosone[root.getY()][root.getX()] = (short) (i+1);
+            pixelsInSegment[(i+1)] = 1;
+            pQueue.addAll(root.getNeighbors());
+        }
+        while (pQueue.size() != 0){
+            Neighbor newNode = pQueue.poll();
+            if (chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0) {
+                short segment = chromosone[newNode.getPixel().getY()][newNode.getPixel().getX()];
+                chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = segment;
+                pQueue.addAll(newNode.getNeighbor().getNeighbors());
+                pixelsInSegment[(segment)] += 1;
+            }
+        }
+        int max = -1;
+        for(int value : pixelsInSegment){
+            if(value > max){
+                max = value;
+            }
+        }
+        boolean repair = false;
+        ArrayList<Integer> toMerge = new ArrayList<>();
+        for(int i = 1; i < pixelsInSegment.length; i++){
+            if(pixelsInSegment[i] < (int)(max*0.05)){
+                toMerge.add(i);
+            }
+        }
+        if(toMerge.size() != 0) {
+            for (int y = 0; y < ImageLoader.getHeight(); y++) {
+                for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                    int id = chromosone[y][x];
+                    if (toMerge.contains(id)) {
+                        chromosone[y][x] = 0;
+                    }
+                }
+            }
+            nrSegments = repair(chromosone);
+        }else{
+            nrSegments = segments;
+        }
+
+    }
     public boolean dominates(Individual x) {
         // Check if the Solutions have the same fitness value
         if (!(fitnessDeviation == x.getFitnessDeviation() && fitnessConnectivity == x.getFitnessConnectivity())) {
@@ -126,6 +186,25 @@ public class Individual {
     }
 
     public void mutateSplit(double mutateProb){
+        ArrayList<Integer> toSplit = new ArrayList<>();
+        for(int i = 1; i <= nrSegments; i++){
+            if(mutateProb > Math.random()){
+                toSplit.add(i);
+            }
+        }
+
+        for (int y = 0; y < ImageLoader.getHeight(); y++) {
+            for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                int id = chromosone[y][x];
+                if(toSplit.contains(id)){
+                    chromosone[y][x] = 0;
+                }
+            }
+        }
+
+        if(toSplit.size() > 0)
+            nrSegments = repair(chromosone);
+
 
     }
 
@@ -227,7 +306,7 @@ public class Individual {
             for (int x = 0; x < ImageLoader.getWidth(); x++) {
                 if(shadow[y][x] != 0){
                     for(Neighbor p :pixels[y][x].getNeighbors()){
-                        if(shadow[p.getPixel().getY()][p.getPixel().getX()] == 0){
+                        if(shadow[p.getNeighbor().getY()][p.getNeighbor().getX()] == 0){
                             pQueue.add(p);
                         }
                     }
@@ -248,6 +327,44 @@ public class Individual {
         return segments.size();
     }
 
+    private int repairSplit(short[][]  shadow){
+        Pixel[][] pixels = MOEA.getPixels();
+        PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
+        ArrayList<Pixel> segmentsSplit = new ArrayList<>();
+
+        ArrayList<Integer> segments = new ArrayList<>();
+
+
+        for (int y = 0; y < ImageLoader.getHeight(); y++) {
+            for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                if(shadow[y][x] != 0){
+                    for(Neighbor p :pixels[y][x].getNeighbors()){
+                        if(shadow[p.getPixel().getY()][p.getPixel().getX()] == 0){
+                            pQueue.add(p);
+                        }
+                    }
+                    if(!segments.contains((int)shadow[y][x])){
+                        segments.add((int)shadow[y][x]);
+                    }
+                }else{
+                    segmentsSplit.add(pixels[y][x]);
+                }
+            }
+        }
+        Collections.shuffle(segmentsSplit);
+        if(segmentsSplit.size()>2) {
+            pQueue.addAll(segmentsSplit.get(0).getNeighbors());
+            pQueue.addAll(segmentsSplit.get(1).getNeighbors());
+        }
+        while (pQueue.size() != 0){
+            Neighbor newNode = pQueue.poll();
+            if (shadow[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0) {
+                shadow[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = shadow[newNode.getPixel().getY()][newNode.getPixel().getX()];
+                pQueue.addAll(newNode.getNeighbor().getNeighbors());
+            }
+        }
+        return segments.size()+2;
+    }
     private int translate(HashMap<Integer,Integer> translate, boolean change,int currentId, int segmentId){
         if(change){
             if(translate.containsKey(currentId)){

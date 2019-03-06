@@ -13,7 +13,7 @@ import java.util.*;
 public class MOEA {
     private static int popSize = 50; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
-    private static double mutationRate = 0.18; // Mutation rate
+    private static double mutationRate = 0.08; // Mutation rate
     private static int maxRuns = 20; // Maximum number of runs before termination
     private static int tournamentSize = 2; // Number of individuals to choose from population at random
 
@@ -34,11 +34,17 @@ public class MOEA {
 
     public void run() {
         population = new ArrayList<>();
-
+        int counter = 0;
         while(population.size() < popSize) {
             int segments = (int)(Math.random()*(MAXSEGMENTS-MINSEGMENTS))+MINSEGMENTS+1;
-
-            population.add(new Individual(segments));
+            Individual indv = new Individual(segments);
+            if(indv.getNrSegments()  > MINSEGMENTS && indv.getNrSegments() < MAXSEGMENTS)
+                population.add(indv);
+            counter++;
+            if(counter > popSize*3){
+                System.out.println("Mayor problem in init pop");
+                break;
+            }
         }
 
         System.out.println("Initialize population done. " + popSize + " random solutions found");
@@ -63,8 +69,18 @@ public class MOEA {
                 Individual mother = NSGAIItournament();
 
                 for(Individual child : father.crossover(mother)) {
-                    child.mutateMerge(mutationRate);
-                    if(child.getNrSegments() > MINSEGMENTS)
+                    if(child.getNrSegments() >= MAXSEGMENTS-1){
+                        child.mutateMerge(mutationRate);
+                    }else if(child.getNrSegments() > MINSEGMENTS){
+                        child.mutateSplit(mutationRate);
+                    } else{
+                        if(Math.random() >= 0.5){
+                            child.mutateSplit(mutationRate);
+                        }else{
+                            child.mutateMerge(mutationRate);
+                        }
+                    }
+                    if(child.getNrSegments() > MINSEGMENTS && child.getNrSegments() < MAXSEGMENTS)
                         population.add(child);
                 }
             }
