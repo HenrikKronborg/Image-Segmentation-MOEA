@@ -45,8 +45,13 @@ public class MOEA {
                     int added = 0;
                     int counter = 0;
                     while(added < popSize/threads.length) {
+
                         int segments = (int)(Math.random()*(MAXSEGMENTS-MINSEGMENTS))+MINSEGMENTS+1;
                         Individual indv = new Individual(segments);
+                        indv.generateIndividual(20.5);
+                        while(indv.getNrSegments() < MAXSEGMENTS){
+                            indv.mutateMerge(1,fitness);
+                        }
                         if(indv.getNrSegments() >= MINSEGMENTS && indv.getNrSegments() <= MAXSEGMENTS) {
                             population.add(indv);
                             added++;

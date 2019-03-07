@@ -214,6 +214,7 @@ public class Individual {
                     }
                 }
             }
+
             nrSegments = repair(chromosone);
         }
 
