@@ -36,7 +36,7 @@ public class MOEA {
         generatePixels();
     }
 
-    private void initialPopulationThreads() {
+    private void initialPopulationThreads(String msg) {
         for(int i = 0; i < threads.length; i++) {
             threads[i] = new Thread(new Runnable() {
                 public void run() {
@@ -60,9 +60,10 @@ public class MOEA {
             });
             threads[i].start();
         }
+        joinThreads(msg);
     }
 
-    private void crossoverThreads() {
+    private void crossoverThreads(String msg) {
         for(int i = 0; i < threads.length; i++) {
             threads[i] = new Thread(new Runnable() {
                 public void run() {
@@ -94,12 +95,12 @@ public class MOEA {
 
             threads[i].start();
         }
+        joinThreads(msg);
     }
 
     public void run() {
         population = new ArrayList<>();
-        initialPopulationThreads();
-        joinThreads("Thread crash initial population");
+        initialPopulationThreads("Thread crash initial population");
 
         System.out.println("Initialize population done. " + population.size() + " random solutions found");
 
@@ -117,9 +118,7 @@ public class MOEA {
         }
 
         while(generation++ < maxRuns) {
-            crossoverThreads();
-
-            joinThreads("Thread crash crossover");
+            crossoverThreads("Thread crash crossover");
 
             // Sort and calculate crowding distance
             for(int i = popSize; i < population.size(); i++) {
@@ -165,15 +164,7 @@ public class MOEA {
        }
     }
 
-    private void joinThreads(String msg){
-        for(int i = 0; i < threads.length; i++) {
-            try {
-                threads[i].join();
-            } catch (InterruptedException e) {
-                System.out.println(msg);
-            }
-        }
-    }
+
     /*
      * Methods
      */
@@ -185,6 +176,16 @@ public class MOEA {
             }
         }
         findNeighbors();
+    }
+
+    private void joinThreads(String msg){
+        for(int i = 0; i < threads.length; i++) {
+            try {
+                threads[i].join();
+            } catch (InterruptedException e) {
+                System.out.println(msg);
+            }
+        }
     }
 
     private void findNeighbors() {
