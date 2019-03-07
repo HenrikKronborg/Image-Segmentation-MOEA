@@ -34,6 +34,50 @@ public class Individual {
      * Methods
      */
     // Minimum Spanning Tree (MST)
+    public void generateIndividual(double threshold) {
+        chromosone = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
+        // List of all pixels in the image
+        ArrayList<Pixel> pixelsNodes = new ArrayList<>(ImageLoader.getHeight() * ImageLoader.getWidth());
+
+        for (Pixel[] pixels : MOEA.getPixels()) {
+            for (Pixel pixel : pixels) {
+                pixelsNodes.add(pixel);
+            }
+        }
+        Collections.shuffle(pixelsNodes);
+
+        short segmentId = 1;
+        for (Pixel root : pixelsNodes) {
+            if (chromosone[root.getY()][root.getX()] == 0) {
+                chromosone[root.getY()][root.getX()] = segmentId;
+
+                PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
+                for (Neighbor n : root.getNeighbors()) {
+                    pQueue.add(n);
+                }
+                while (true) {
+                    Neighbor newNode = pQueue.poll();
+                    if (chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0) {
+                        if (newNode.getDistance() < threshold) {
+                            chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = segmentId;
+                            for (Neighbor n : newNode.getNeighbor().getNeighbors()) {
+                                pQueue.add(n);
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                    if (pQueue.size() == 0) {
+                        break;
+                    }
+                }
+                segmentId++;
+            }
+        }
+        nrSegments = segmentId-1;
+
+    }
+
     public void generateIndividual(int segments) {
         chromosone = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
         // List of all pixels in the image
