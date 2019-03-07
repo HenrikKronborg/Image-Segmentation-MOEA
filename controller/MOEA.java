@@ -9,9 +9,10 @@ import model.utils.ImageLoader;
 import model.utils.Validators;
 
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 public class MOEA {
-    private static int popSize = 50; // Population size
+    private static int popSize = 80; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.08; // Mutation rate
     private static int maxRuns = 20; // Maximum number of runs before termination
@@ -27,7 +28,8 @@ public class MOEA {
     private ImageLoader image;
     private static Pixel[][] pixels = new Pixel[ImageLoader.getHeight()][ImageLoader.getWidth()];
 
-    private Thread[] threads = new Thread[4];
+    private final int N = 4;
+    private Thread[] threads = new Thread[N];
 
     public MOEA(ImageLoader loader) {
         this.image = loader;
@@ -53,8 +55,10 @@ public class MOEA {
                             break;
                         }
                     }
+                    System.out.println("thread done");
                 }
             });
+            threads[i].start();
         }
     }
 
@@ -102,22 +106,7 @@ public class MOEA {
                 System.out.println("Thread crash initial population");
             }
         }
-        /*
-        int counter = 0;
-        while(population.size() < popSize) {
-            int segments = (int)(Math.random()*(MAXSEGMENTS-MINSEGMENTS))+MINSEGMENTS+1;
-            Individual indv = new Individual(segments);
-            if(indv.getNrSegments()  > MINSEGMENTS && indv.getNrSegments() < MAXSEGMENTS)
-                population.add(indv);
-            counter++;
-            if(counter > popSize*3){
-                System.out.println("Mayor problem in init pop");
-                break;
-            }
-        }
-        */
-
-        System.out.println("Initialize population done. " + popSize + " random solutions found");
+        System.out.println("Initialize population done. " + population.size() + " random solutions found");
 
         // Calculate fitness value
         FitnessCalc fitness = new FitnessCalc();
