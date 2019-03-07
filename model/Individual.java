@@ -76,6 +76,9 @@ public class Individual {
                     }
                 }
                 segmentId++;
+                if(segmentId == Short.MAX_VALUE -5){
+                    break;
+                }
             }
         }
         int max = -1;
