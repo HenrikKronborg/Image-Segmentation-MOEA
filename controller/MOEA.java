@@ -22,7 +22,7 @@ public class MOEA {
     private static ArrayList<Individual> population;
     private static LinkedList<Individual> front;
     private int generation;
-    private final int MINSEGMENTS = 2;
+    private final int MINSEGMENTS = 3;
     private final int MAXSEGMENTS = 20;
 
     private ImageLoader image;
@@ -83,7 +83,7 @@ public class MOEA {
                                     child.mutateMerge(mutationRate);
                                 }
                             }
-                            if(child.getNrSegments() > MINSEGMENTS && child.getNrSegments() < MAXSEGMENTS)
+                            if(child.getNrSegments() >= MINSEGMENTS && child.getNrSegments() <= MAXSEGMENTS)
                                 population.add(child);
                         }
                         prod++;
@@ -99,13 +99,8 @@ public class MOEA {
     public void run() {
         population = new ArrayList<>();
         initialPopulationThreads();
-        for(int i = 0; i < threads.length; i++) {
-            try {
-                threads[i].join();
-            } catch (InterruptedException e) {
-                System.out.println("Thread crash initial population");
-            }
-        }
+        joinThreads("Thread crash initial population");
+
         System.out.println("Initialize population done. " + population.size() + " random solutions found");
 
         // Calculate fitness value
@@ -124,13 +119,7 @@ public class MOEA {
         while(generation++ < maxRuns) {
             crossoverThreads();
 
-            for(int i = 0; i < threads.length; i++) {
-                try {
-                    threads[i].join();
-                } catch (InterruptedException e) {
-                    System.out.println("Thread crash crossover");
-                }
-            }
+            joinThreads("Thread crash crossover");
 
             // Sort and calculate crowding distance
             for(int i = popSize; i < population.size(); i++) {
@@ -176,6 +165,15 @@ public class MOEA {
        }
     }
 
+    private void joinThreads(String msg){
+        for(int i = 0; i < threads.length; i++) {
+            try {
+                threads[i].join();
+            } catch (InterruptedException e) {
+                System.out.println(msg);
+            }
+        }
+    }
     /*
      * Methods
      */
