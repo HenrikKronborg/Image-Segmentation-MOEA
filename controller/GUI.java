@@ -58,13 +58,24 @@ public class GUI implements Initializable {
         gcBlackWhite = canvasBlackWhite.getGraphicsContext2D();
 
         image = new ImageLoader();
-        Image view = SwingFXUtils.toFXImage(image.loadImage("tiger.jpg"), null );
+    }
+
+    @FXML
+    private void startAlgorithm() {
+        Image view = SwingFXUtils.toFXImage(image.loadImage("lake.jpg"), null );
         gc1.drawImage(view, 0, 0);
 
         // Algorithm and calculations in threads
         initListener();
         initCalculateThread();
         calculateThread.start();
+
+        // Draw border for black and white result
+        gcBlackWhite.setFill(javafx.scene.paint.Color.rgb(0,0,0));
+        gcBlackWhite.fillRect(0, 0, ImageLoader.getWidth(), ImageLoader.getHeight());
+
+        gcBlackWhite.setFill(javafx.scene.paint.Color.rgb(255,255,255));
+        gcBlackWhite.fillRect(1, 1, ImageLoader.getWidth()-2, ImageLoader.getHeight()-2);
     }
 
     private void initCalculateThread() {
@@ -110,10 +121,6 @@ public class GUI implements Initializable {
     }
 
     public void drawResult(Individual individual) {
-        gcBlackWhite.setFill(javafx.scene.paint.Color.rgb(0,0,0));
-        gcBlackWhite.fillRect(0, 0, ImageLoader.getWidth(), ImageLoader.getHeight());
-
-        // Draw border
         gcBlackWhite.setFill(javafx.scene.paint.Color.rgb(255,255,255));
         gcBlackWhite.fillRect(1, 1, ImageLoader.getWidth()-2, ImageLoader.getHeight()-2);
 

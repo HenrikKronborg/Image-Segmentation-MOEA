@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 public class MOEA {
-    private static int popSize = 40; // Population size
+    private static int popSize = 10; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.20; // Mutation rate
     private static int maxRuns = 0; // Maximum number of runs before termination
