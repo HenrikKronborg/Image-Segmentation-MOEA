@@ -56,7 +56,6 @@ public class MOEA {
                             break;
                         }
                     }
-                    System.out.println("thread done");
                     doneSignal.countDown();
                 }
             });
@@ -130,7 +129,6 @@ public class MOEA {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            System.out.println("loop");
             // Sort and calculate crowding distance
             for(int i = popSize; i < population.size(); i++) {
                 fitness.generateFitness(population.get(i));
