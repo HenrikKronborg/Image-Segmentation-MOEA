@@ -42,20 +42,23 @@ public class MOEA {
         for(int i = 0; i < threads.length; i++) {
             threads[i] = new Thread(new Runnable() {
                 public void run() {
+                    int threshold = 0;
                     int added = 0;
                     int counter = 0;
                     while(added < popSize/threads.length) {
 
                         int segments = (int)(Math.random()*(MAXSEGMENTS-MINSEGMENTS))+MINSEGMENTS+1;
                         Individual indv = new Individual(segments);
-                        indv.generateIndividual(20.5);
+                        indv.generateIndividual(threshold + 0.1);
+                        /*
                         while(indv.getNrSegments() < MAXSEGMENTS){
                             indv.mutateMerge(1,fitness);
                         }
-                        if(indv.getNrSegments() >= MINSEGMENTS && indv.getNrSegments() <= MAXSEGMENTS) {
-                            population.add(indv);
-                            added++;
-                        }
+                        */
+                        population.add(indv);
+                        threshold += 5;
+                        added++;
+
                         counter++;
                         if(counter > popSize*3){
                             System.out.println("Mayor problem in init pop");
