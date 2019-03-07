@@ -4,7 +4,6 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class SegmentNode {
-    int id;
 
     int nrPixels;
     double avgRed;
@@ -29,13 +28,6 @@ public class SegmentNode {
 
     public void addNeighbor(Integer add){
         neighbors.add(add);
-    }
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public double getAvgRed() {

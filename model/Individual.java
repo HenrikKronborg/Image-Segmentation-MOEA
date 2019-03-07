@@ -3,12 +3,10 @@ package model;
 import controller.MOEA;
 import model.supportNodes.Neighbor;
 import model.supportNodes.Pixel;
-import model.supportNodes.Position;
 import model.supportNodes.SegmentNode;
 import model.utils.FitnessCalc;
 import model.utils.ImageLoader;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class Individual {
@@ -138,37 +136,9 @@ public class Individual {
         return false;
     }
 
-    public void mutate(double mutateProb){
-
-        for (int y = 0; y < ImageLoader.getHeight(); y++) {
-            for (int x = 0; x < ImageLoader.getWidth(); x++) {
-                if(Math.random() < mutateProb){
-                    int dir = getRandomAvailableNode(x,y);
-
-                    switch (dir) {
-                        case 0: // links to itself.
-                            break;
-                        case 1:
-                            chromosone[y][x] = chromosone[y][x+1]; // links to the next node (X dir.)
-                            break;
-                        case 2:
-                            chromosone[y][x] = chromosone[y][x-1]; // links to the previous node (X dir.)
-                            break;
-                        case 3:
-                            chromosone[y][x]= chromosone[y-1][x]; // links to the upper node (Y dir.)
-                            break;
-                        case 4:
-                            chromosone[y][x] = chromosone[y+1][x]; // links to the bottom node (Y dir.)
-                            break;
-                    }
-                }
-            }
-        }
-    }
-
     public void mutateMerge(double mutateProb, FitnessCalc f){
         if(mutateProb > Math.random()){
-            HashMap<Integer, SegmentNode> avgColor = f.generateAverageValue(this);// N, R, G, B, Neighbors
+            HashMap<Integer, SegmentNode> avgColor = f.generateAverageColor(this);// N, R, G, B, Neighbors
             Double smallestDiff = Double.MAX_VALUE;
             int toMerge = 0;
             for(int key : avgColor.keySet()){
@@ -184,12 +154,14 @@ public class Individual {
                                     toMerge = key;
                                 else
                                     toMerge = key2;
+                                smallestDiff = diff;
                             }
                         }
                     }
                 }
 
             }
+
             for (int y = 0; y < ImageLoader.getHeight(); y++) {
                 for (int x = 0; x < ImageLoader.getWidth(); x++) {
                     int id = chromosone[y][x];

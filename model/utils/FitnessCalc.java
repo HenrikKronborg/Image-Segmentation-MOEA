@@ -101,6 +101,7 @@ public class FitnessCalc {
     public void setImageLoader(ImageLoader img) {
         this.img = img;
     }
+
     public HashMap<Integer,Double> generateAverageDeviation(Individual individual){
         short[][] board = individual.getChromosone();
 
@@ -151,7 +152,8 @@ public class FitnessCalc {
         }
         return avgSegmentDeviation;
     }
-    public HashMap<Integer,SegmentNode> generateAverageValue(Individual individual){
+
+    public HashMap<Integer,SegmentNode> generateAverageColor(Individual individual){
         short[][] board = individual.getChromosone();
 
         HashMap<Integer,SegmentNode> segments = new HashMap<>();
