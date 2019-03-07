@@ -1,7 +1,6 @@
 package model.utils;
 
 import model.Individual;
-import model.Segment;
 import model.supportNodes.SegmentNode;
 
 import java.awt.*;
