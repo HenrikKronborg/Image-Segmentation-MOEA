@@ -1,12 +1,15 @@
 package controller;
 
 import javafx.animation.AnimationTimer;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
@@ -15,6 +18,7 @@ import model.Individual;
 import model.supportNodes.ThreadNode;
 import model.utils.ImageLoader;
 
+import java.io.File;
 import java.net.URL;
 import java.util.*;
 
@@ -35,6 +39,8 @@ public class GUI implements Initializable {
     private Label individualNumber;
     @FXML
     private HBox individualNumberHBox;
+    @FXML
+    private ChoiceBox cBox;
 
     private GraphicsContext gc1;
     private GraphicsContext gc2;
@@ -58,17 +64,42 @@ public class GUI implements Initializable {
         gcBlackWhite = canvasBlackWhite.getGraphicsContext2D();
 
         image = new ImageLoader();
+
+        initChoiceBox();
+    }
+
+    private void initChoiceBox() {
+        File folder = new File("./src/img/");
+        File[] listOfFiles = folder.listFiles();
+
+        ObservableList<String> objects = FXCollections.observableArrayList();
+
+        for (int i = 0; i < listOfFiles.length; i++) {
+            if (listOfFiles[i].isFile()) {
+                objects.add(listOfFiles[i].getName());
+            }
+        }
+        cBox.setItems(objects.sorted());
+        cBox.setValue(cBox.getItems().get(0));
     }
 
     @FXML
     private void startAlgorithm() {
-        Image view = SwingFXUtils.toFXImage(image.loadImage("lake.jpg"), null );
+        Image view = SwingFXUtils.toFXImage(image.loadImage((String) cBox.getValue()), null );
         gc1.drawImage(view, 0, 0);
 
         // Algorithm and calculations in threads
         initListener();
         initCalculateThread();
         calculateThread.start();
+
+        // Hide controllers
+        frontNumber = 0;
+        nextIndividual.setDisable(true);
+        individualNumberHBox.setVisible(false);
+
+        // Clear the segment drawings
+        gc2.clearRect(0, 0, ImageLoader.getWidth(), ImageLoader.getHeight());
 
         // Draw border for black and white result
         gcBlackWhite.setFill(javafx.scene.paint.Color.rgb(0,0,0));
@@ -142,10 +173,15 @@ public class GUI implements Initializable {
 
     @FXML
     public void showIndividual() {
+        if(!individualNumberHBox.isVisible()) {
+            individualNumberHBox.setVisible(true);
+        }
+
         if(frontNumber == front.size()) {
             frontNumber = 0;
         }
         front.sort((Individual a, Individual b)-> a.compareCrowdTo(b));
+
         // Update text
         individualNumber.setText((frontNumber + 1) + " out of " + front.size());
         segments.setText(Integer.toString(front.get(frontNumber).getNrSegments()));
@@ -172,8 +208,6 @@ public class GUI implements Initializable {
 
                     if(listener.getGeneration() == MOEA.getMaxRuns()) {
                         nextIndividual.setDisable(false);
-                        individualNumberHBox.setVisible(true);
-                        individualNumber.setText((frontNumber + 1) + " out of " + front.size());
                     }
                 }
             }
