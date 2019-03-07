@@ -6,19 +6,25 @@ import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import model.Individual;
 import model.supportNodes.ThreadNode;
 import model.utils.ImageLoader;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -68,21 +74,6 @@ public class GUI implements Initializable {
         initChoiceBox();
     }
 
-    private void initChoiceBox() {
-        File folder = new File("./src/img/");
-        File[] listOfFiles = folder.listFiles();
-
-        ObservableList<String> objects = FXCollections.observableArrayList();
-
-        for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isFile()) {
-                objects.add(listOfFiles[i].getName());
-            }
-        }
-        cBox.setItems(objects.sorted());
-        cBox.setValue(cBox.getItems().get(0));
-    }
-
     @FXML
     private void startAlgorithm() {
         Image view = SwingFXUtils.toFXImage(image.loadImage((String) cBox.getValue()), null );
@@ -109,6 +100,20 @@ public class GUI implements Initializable {
         gcBlackWhite.fillRect(1, 1, ImageLoader.getWidth()-2, ImageLoader.getHeight()-2);
     }
 
+    private void initChoiceBox() {
+        File folder = new File("./src/img/");
+        File[] listOfFiles = folder.listFiles();
+
+        ObservableList<String> objects = FXCollections.observableArrayList();
+
+        for (int i = 0; i < listOfFiles.length; i++) {
+            if (listOfFiles[i].isFile()) {
+                objects.add(listOfFiles[i].getName());
+            }
+        }
+        cBox.setItems(objects.sorted());
+        cBox.setValue(cBox.getItems().get(0));
+    }
     private void initCalculateThread() {
         calculateThread = new Thread(new Runnable() {
             public void run() {
@@ -120,11 +125,43 @@ public class GUI implements Initializable {
         });
     }
 
+    @FXML
+    public void saveToFile() throws IOException {
+        WritableImage image = new WritableImage(ImageLoader.getWidth(), ImageLoader.getHeight());
+        canvasBlackWhite.snapshot(null, image);
+
+        String filename = "GT_" + bestIndividual.getNrSegments();
+        // Funker ikke med formatName = jpg, jpeg, JPG, JPEG..???
+        ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", new File("./src/output/" + filename + ".jpg"));
+    }
+
+    @FXML
+    public void showIndividual() {
+        if(!individualNumberHBox.isVisible()) {
+            individualNumberHBox.setVisible(true);
+        }
+
+        if(frontNumber == front.size()) {
+            frontNumber = 0;
+        }
+        front.sort((Individual a, Individual b)-> a.compareCrowdTo(b));
+
+        bestIndividual = front.get(frontNumber);
+
+        // Update text
+        individualNumber.setText((frontNumber + 1) + " out of " + front.size());
+        segments.setText(Integer.toString(bestIndividual.getNrSegments()));
+
+        drawSegments(bestIndividual);
+        drawResult(bestIndividual);
+
+        frontNumber++;
+    }
+
     private void drawText() {
         generation.setText(Integer.toString(listener.getGeneration()));
         segments.setText(Integer.toString(bestIndividual.getNrSegments()));
     }
-
     private void drawSegments(Individual individual) {
         gc2.clearRect(0,0,canvas2.getWidth(),canvas2.getHeight());
         HashMap<Integer, Color> colorMap =  new HashMap<>();
@@ -150,7 +187,6 @@ public class GUI implements Initializable {
             }
         }
     }
-
     public void drawResult(Individual individual) {
         gcBlackWhite.setFill(javafx.scene.paint.Color.rgb(255,255,255));
         gcBlackWhite.fillRect(1, 1, ImageLoader.getWidth()-2, ImageLoader.getHeight()-2);
@@ -169,27 +205,6 @@ public class GUI implements Initializable {
                 }
             }
         }
-    }
-
-    @FXML
-    public void showIndividual() {
-        if(!individualNumberHBox.isVisible()) {
-            individualNumberHBox.setVisible(true);
-        }
-
-        if(frontNumber == front.size()) {
-            frontNumber = 0;
-        }
-        front.sort((Individual a, Individual b)-> a.compareCrowdTo(b));
-
-        // Update text
-        individualNumber.setText((frontNumber + 1) + " out of " + front.size());
-        segments.setText(Integer.toString(front.get(frontNumber).getNrSegments()));
-
-        drawSegments(front.get(frontNumber));
-        drawResult(front.get(frontNumber));
-
-        frontNumber++;
     }
 
     public void initListener(){

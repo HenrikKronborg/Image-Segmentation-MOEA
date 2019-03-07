@@ -28,7 +28,7 @@
       <AnchorPane minWidth="250.0" prefHeight="200.0" prefWidth="250.0">
          <children>
             <ChoiceBox fx:id="cBox" layoutX="14.0" layoutY="14.0" prefHeight="25.0" prefWidth="222.0" />
-            <Button layoutX="14.0" layoutY="54.0" mnemonicParsing="false" text="Save to file">
+            <Button layoutX="14.0" layoutY="54.0" mnemonicParsing="false" onAction="#saveToFile" text="Save to file">
                <padding>
                   <Insets bottom="10.0" left="30.0" right="30.0" top="10.0" />
                </padding></Button>
