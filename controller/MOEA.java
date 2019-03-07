@@ -14,7 +14,7 @@ import java.util.concurrent.CountDownLatch;
 public class MOEA {
     private static int popSize = 80; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
-    private static double mutationRate = 0.08; // Mutation rate
+    private static double mutationRate = 0.20; // Mutation rate
     private static int maxRuns = 20; // Maximum number of runs before termination
     private static int tournamentSize = 2; // Number of individuals to choose from population at random
 
@@ -24,6 +24,7 @@ public class MOEA {
     private int generation;
     private final int MINSEGMENTS = 3;
     private final int MAXSEGMENTS = 20;
+    private FitnessCalc fitness;
 
     private ImageLoader image;
     private static Pixel[][] pixels = new Pixel[ImageLoader.getHeight()][ImageLoader.getWidth()];
@@ -74,14 +75,14 @@ public class MOEA {
 
                         for(Individual child : father.crossover(mother)) {
                             if(child.getNrSegments() >= MAXSEGMENTS-1){
-                                child.mutateMerge(mutationRate);
+                                child.mutateMerge(mutationRate,fitness);
                             }else if(child.getNrSegments() > MINSEGMENTS){
-                                child.mutateSplit(mutationRate);
+                                child.mutateSplit(mutationRate,fitness);
                             } else{
                                 if(Math.random() >= 0.5){
-                                    child.mutateSplit(mutationRate);
+                                    child.mutateSplit(mutationRate,fitness);
                                 }else{
-                                    child.mutateMerge(mutationRate);
+                                    child.mutateMerge(mutationRate,fitness);
                                 }
                             }
                             if(child.getNrSegments() >= MINSEGMENTS && child.getNrSegments() <= MAXSEGMENTS)
@@ -109,7 +110,7 @@ public class MOEA {
         System.out.println("Initialize population done. " + population.size() + " random solutions found");
 
         // Calculate fitness value
-        FitnessCalc fitness = new FitnessCalc();
+        fitness = new FitnessCalc();
         fitness.setImageLoader(image);
         for(Individual individual : population) {
             fitness.generateFitness(individual);

@@ -4,6 +4,8 @@ import controller.MOEA;
 import model.supportNodes.Neighbor;
 import model.supportNodes.Pixel;
 import model.supportNodes.Position;
+import model.supportNodes.SegmentNode;
+import model.utils.FitnessCalc;
 import model.utils.ImageLoader;
 
 import java.lang.reflect.Array;
@@ -103,7 +105,6 @@ public class Individual {
                 max = value;
             }
         }
-        boolean repair = false;
         ArrayList<Integer> toMerge = new ArrayList<>();
         for(int i = 1; i < pixelsInSegment.length; i++){
             if(pixelsInSegment[i] < (int)(max*0.05)){
@@ -164,46 +165,69 @@ public class Individual {
             }
         }
     }
-    public void mutateMerge(double mutateProb){
-        ArrayList<Integer> toMerge = new ArrayList<>();
-        for(int i = 1; i <= nrSegments; i++){
-            if(mutateProb > Math.random()){
-                toMerge.add(i);
-            }
-        }
 
-        for (int y = 0; y < ImageLoader.getHeight(); y++) {
-            for (int x = 0; x < ImageLoader.getWidth(); x++) {
-                int id = chromosone[y][x];
-                if(toMerge.contains(id)){
-                    chromosone[y][x] = 0;
+    public void mutateMerge(double mutateProb, FitnessCalc f){
+        if(mutateProb > Math.random()){
+            HashMap<Integer, SegmentNode> avgColor = f.generateAverageValue(this);// N, R, G, B, Neighbors
+            Double smallestDiff = Double.MAX_VALUE;
+            int toMerge = 0;
+            for(int key : avgColor.keySet()){
+                for(int key2 : avgColor.keySet()){
+                    if(key != key2){
+                        SegmentNode node1 = avgColor.get(key);
+                        if(node1.getNeighbors().contains(key2)){
+                            SegmentNode node2 = avgColor.get(key2);
+                            double diff = Math.sqrt(Math.pow(node1.getAvgRed() - node2.getAvgRed(), 2) + Math.pow(node1.getAvgGreen() - node2.getAvgGreen(), 2) + Math.pow(node1.getAvgBlue() - node2.getAvgBlue(), 2));
+                            if(diff < smallestDiff){
+                                //Merg the smallest segment in to the other.
+                                if(node1.getNrPixels() < node2.getNrPixels())
+                                    toMerge = key;
+                                else
+                                    toMerge = key2;
+                            }
+                        }
+                    }
+                }
+
+            }
+            for (int y = 0; y < ImageLoader.getHeight(); y++) {
+                for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                    int id = chromosone[y][x];
+                    if(id == toMerge){
+                        chromosone[y][x] = 0;
+                    }
                 }
             }
-        }
-        if(toMerge.size() > 0)
             nrSegments = repair(chromosone);
+        }
 
     }
 
-    public void mutateSplit(double mutateProb){
-        ArrayList<Integer> toSplit = new ArrayList<>();
-        for(int i = 1; i <= nrSegments; i++){
-            if(mutateProb > Math.random()){
-                toSplit.add(i);
-            }
-        }
-
-        for (int y = 0; y < ImageLoader.getHeight(); y++) {
-            for (int x = 0; x < ImageLoader.getWidth(); x++) {
-                int id = chromosone[y][x];
-                if(toSplit.contains(id)){
-                    chromosone[y][x] = 0;
+    public void mutateSplit(double mutateProb, FitnessCalc f){
+        if(mutateProb > Math.random()){
+            HashMap<Integer, Double> integerDoubleHashMap = f.generateAverageDeviation(this);
+            double maxDev = -1;
+            int segmentId = 0;
+            for(Integer key :integerDoubleHashMap.keySet()){
+                if(integerDoubleHashMap.get(key) > maxDev){
+                    maxDev = integerDoubleHashMap.get(key);
+                    segmentId = key;
                 }
             }
+            for (int y = 0; y < ImageLoader.getHeight(); y++) {
+                for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                    int id = chromosone[y][x];
+                    if(id == segmentId){
+                        chromosone[y][x] = 0;
+                    }
+                }
+            }
+
+        }else{
+            return;
         }
 
-        if(toSplit.size() > 0)
-            nrSegments = repair(chromosone);
+        nrSegments = repairSplit(chromosone);
     }
 
     public Individual[] crossover(Individual mother) {
@@ -269,8 +293,9 @@ public class Individual {
             children[i].nrSegments = fatherTable.size()+motherTable.size();
 
             for(int j = 0; j <checkForRepair.size();j++){
-                if(motherTable.containsKey(checkForRepair.get(j))){
-                    checkForRepair.set(j, motherTable.get(checkForRepair.get(j)));
+                Integer temp = motherTable.get(checkForRepair.get(j));
+                if(temp != null){
+                    checkForRepair.set(j, temp);
                 }else{
                     checkForRepair.set(j,0);
                 }
@@ -326,43 +351,69 @@ public class Individual {
     }
 
     private int repairSplit(short[][]  shadow){
-        Pixel[][] pixels = MOEA.getPixels();
+        ArrayList<Pixel> pixelsNodes = new ArrayList<>(ImageLoader.getHeight() * ImageLoader.getWidth());
+        int toAdd = 2;
+        int added = 0;
+
+        int[] pixelsInSegment = new int[nrSegments+toAdd + 1];
+        for (Pixel[] pixels : MOEA.getPixels()) {
+            for (Pixel pixel : pixels) {
+                pixelsNodes.add(pixel);
+            }
+        }
+        Collections.shuffle(pixelsNodes);
         PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
-        ArrayList<Pixel> segmentsSplit = new ArrayList<>();
+
+        for(int i = 0; i < pixelsNodes.size(); i++){
+            if(added >= toAdd){
+                break;
+            }
+            Pixel root = pixelsNodes.get(i);
+            //roots[i] = root;
+            if(shadow[root.getY()][root.getX()] == 0){
+                shadow[root.getY()][root.getX()] = (short) (nrSegments+added+1);
+                pixelsInSegment[(nrSegments+added+1)] = 1;
+                pQueue.addAll(root.getNeighbors());
+                added++;
+            }
+        }
 
         ArrayList<Integer> segments = new ArrayList<>();
+        while (pQueue.size() != 0){
+            Neighbor newNode = pQueue.poll();
+            if (chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0) {
+                short segment = chromosone[newNode.getPixel().getY()][newNode.getPixel().getX()];
+                chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = segment;
+                pQueue.addAll(newNode.getNeighbor().getNeighbors());
+                pixelsInSegment[segment] += 1;
+            }
+        }
 
-
-        for (int y = 0; y < ImageLoader.getHeight(); y++) {
-            for (int x = 0; x < ImageLoader.getWidth(); x++) {
-                if(shadow[y][x] != 0){
-                    for(Neighbor p :pixels[y][x].getNeighbors()){
-                        if(shadow[p.getPixel().getY()][p.getPixel().getX()] == 0){
-                            pQueue.add(p);
-                        }
+        int max = -1;
+        for(int value : pixelsInSegment){
+            if(value > max){
+                max = value;
+            }
+        }
+        ArrayList<Integer> toMerge = new ArrayList<>();
+        for(int i = 1; i < pixelsInSegment.length; i++){
+            if(pixelsInSegment[i] != 0 && pixelsInSegment[i] < (int)(max*0.2)){
+                toMerge.add(i);
+            }
+        }
+        if(toMerge.size() != 0) {
+            for (int y = 0; y < ImageLoader.getHeight(); y++) {
+                for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                    int id = chromosone[y][x];
+                    if (toMerge.contains(id)) {
+                        chromosone[y][x] = 0;
                     }
-                    if(!segments.contains((int)shadow[y][x])){
-                        segments.add((int)shadow[y][x]);
-                    }
-                }else{
-                    segmentsSplit.add(pixels[y][x]);
                 }
             }
         }
-        Collections.shuffle(segmentsSplit);
-        if(segmentsSplit.size()>2) {
-            pQueue.addAll(segmentsSplit.get(0).getNeighbors());
-            pQueue.addAll(segmentsSplit.get(1).getNeighbors());
-        }
-        while (pQueue.size() != 0){
-            Neighbor newNode = pQueue.poll();
-            if (shadow[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0) {
-                shadow[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = shadow[newNode.getPixel().getY()][newNode.getPixel().getX()];
-                pQueue.addAll(newNode.getNeighbor().getNeighbors());
-            }
-        }
-        return segments.size()+2;
+        return repair(chromosone);
     }
+
     private int translate(HashMap<Integer,Integer> translate, boolean change,int currentId, int segmentId){
         if(change){
             if(translate.containsKey(currentId)){
@@ -414,6 +465,7 @@ public class Individual {
         }
         return -1;
     }
+
     public int compareCrowdTo(Individual other) {
         double cmp = other.crowdingDistance - this.crowdingDistance;
         if(cmp > 0){

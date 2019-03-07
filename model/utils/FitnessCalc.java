@@ -1,6 +1,8 @@
 package model.utils;
 
 import model.Individual;
+import model.Segment;
+import model.supportNodes.SegmentNode;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -98,5 +100,107 @@ public class FitnessCalc {
 
     public void setImageLoader(ImageLoader img) {
         this.img = img;
+    }
+    public HashMap<Integer,Double> generateAverageDeviation(Individual individual){
+        short[][] board = individual.getChromosone();
+
+        HashMap<Integer,int[]> segments = new HashMap<>();
+        HashMap<Integer,Double> avgSegmentDeviation = new HashMap<>();
+
+        for (int y=0; y < board.length; y++) {
+            for(int x=0;  x <board[y].length; x++){
+                int id = board[y][x];
+                Color c = img.getPixelValue(x,y);
+
+                if(segments.containsKey(id)){
+                    int[] color =  segments.get(id);
+                    color[0] += 1;
+                    color[1] += c.getRed();
+                    color[2] += c.getGreen();
+                    color[3] += c.getBlue();
+                }else{
+                    segments.put(id,new int[]{1,c.getRed(),c.getGreen(),c.getBlue()});
+                }
+
+            }
+        }
+        for (int[] value : segments.values()) {
+            value[1] = value[1]/value[0];
+            value[2] = value[2]/value[0];
+            value[3] = value[3]/value[0];
+        }
+        for (int y=0; y<board.length;y++) {
+            for(int x=0; x<board[y].length;x++) {
+                Color color = img.getPixelValue(x,y);
+                int id = board[y][x];
+                int[] c =  segments.get(id);
+
+                if(avgSegmentDeviation.containsKey(id)){
+                    Double sum = avgSegmentDeviation.get(id);
+                    sum += Math.sqrt(Math.pow(color.getRed() - c[1], 2) + Math.pow(color.getGreen() - c[2], 2) + Math.pow(color.getBlue() - c[3], 2))/1000;
+                    avgSegmentDeviation.put(id, sum);
+                }else{
+                    avgSegmentDeviation.put(id, Math.sqrt(Math.pow(color.getRed() - c[1], 2) + Math.pow(color.getGreen() - c[2], 2) + Math.pow(color.getBlue() - c[3], 2))/1000);
+                }
+            }
+        }
+        for (int id : avgSegmentDeviation.keySet()) {
+            Double sum = avgSegmentDeviation.get(id);
+            sum = sum/segments.get(id)[0];
+            avgSegmentDeviation.put(id,sum);
+        }
+        return avgSegmentDeviation;
+    }
+    public HashMap<Integer,SegmentNode> generateAverageValue(Individual individual){
+        short[][] board = individual.getChromosone();
+
+        HashMap<Integer,SegmentNode> segments = new HashMap<>();
+        int lastId = 0;
+        for (int y=0; y < board.length; y++) {
+            for(int x=0;  x <board[y].length; x++){
+                if(x == 0){
+                    lastId = board[y][x];
+                }
+
+                int id = board[y][x];
+                Color c = img.getPixelValue(x,y);
+                SegmentNode node;
+                if(segments.containsKey(id)){
+                    node = segments.get(id);
+                    node.addColor(c);
+                }else{
+                    node =  new SegmentNode();
+                    node.addColor(c);
+                    segments.put(id,node);
+                }
+                if(lastId != id){
+                    if(!node.getNeighbors().contains(lastId)){
+                        node.getNeighbors().add(lastId);
+                        SegmentNode prev = segments.get(lastId);
+                        if(!prev.getNeighbors().contains(id)){
+                            prev.getNeighbors().add(id);
+                        }
+
+                    }
+                }
+                if(y != 0){
+                    int topId = board[y-1][x];
+                    if(topId != id){
+                        if(!node.getNeighbors().contains(topId)){
+                            node.getNeighbors().add(topId);
+                            SegmentNode prev = segments.get(topId);
+                            if(!prev.getNeighbors().contains(id)){
+                                prev.getNeighbors().add(id);
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+        for (SegmentNode node : segments.values()) {
+            node.makeAvg();
+        }
+        return segments;
     }
 }
