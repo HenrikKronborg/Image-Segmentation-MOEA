@@ -30,6 +30,7 @@ public class MOEA {
 
     private final int N = 4;
     private Thread[] threads = new Thread[N];
+    CountDownLatch doneSignal = new CountDownLatch(N);
 
     public MOEA(ImageLoader loader) {
         this.image = loader;
@@ -56,11 +57,11 @@ public class MOEA {
                         }
                     }
                     System.out.println("thread done");
+                    doneSignal.countDown();
                 }
             });
             threads[i].start();
         }
-        joinThreads(msg);
     }
 
     private void crossoverThreads(String msg) {
@@ -89,19 +90,23 @@ public class MOEA {
                         }
                         prod++;
                     }
-
+                    doneSignal.countDown();
                 }
+
             });
 
             threads[i].start();
         }
-        joinThreads(msg);
     }
 
     public void run() {
         population = new ArrayList<>();
         initialPopulationThreads("Thread crash initial population");
-
+        try {
+            doneSignal.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         System.out.println("Initialize population done. " + population.size() + " random solutions found");
 
         // Calculate fitness value
@@ -118,8 +123,14 @@ public class MOEA {
         }
 
         while(generation++ < maxRuns) {
+            doneSignal = new CountDownLatch(N);
             crossoverThreads("Thread crash crossover");
-
+            try {
+                doneSignal.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("loop");
             // Sort and calculate crowding distance
             for(int i = popSize; i < population.size(); i++) {
                 fitness.generateFitness(population.get(i));
