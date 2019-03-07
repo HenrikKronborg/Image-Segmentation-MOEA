@@ -26,7 +26,9 @@ public class Individual {
     public Individual(int segments) {
         generateIndividualSmart(segments);
     }
+
     public Individual() {
+
     }
 
 
@@ -35,6 +37,7 @@ public class Individual {
      */
     // Minimum Spanning Tree (MST)
     public void generateIndividual(double threshold) {
+        ArrayList<Integer> pixelsInSegment = new ArrayList<>();
         chromosone = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
         // List of all pixels in the image
         ArrayList<Pixel> pixelsNodes = new ArrayList<>(ImageLoader.getHeight() * ImageLoader.getWidth());
@@ -50,7 +53,7 @@ public class Individual {
         for (Pixel root : pixelsNodes) {
             if (chromosone[root.getY()][root.getX()] == 0) {
                 chromosone[root.getY()][root.getX()] = segmentId;
-
+                pixelsInSegment.add(1);
                 PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
                 for (Neighbor n : root.getNeighbors()) {
                     pQueue.add(n);
@@ -60,6 +63,7 @@ public class Individual {
                     if (chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0) {
                         if (newNode.getDistance() < threshold) {
                             chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = segmentId;
+                            pixelsInSegment.set(segmentId-1,pixelsInSegment.get(segmentId-1)+1);
                             for (Neighbor n : newNode.getNeighbor().getNeighbors()) {
                                 pQueue.add(n);
                             }
@@ -74,7 +78,31 @@ public class Individual {
                 segmentId++;
             }
         }
-        nrSegments = segmentId-1;
+        int max = -1;
+        for(int value : pixelsInSegment){
+            if(value > max){
+                max = value;
+            }
+        }
+        ArrayList<Integer> toMerge = new ArrayList<>();
+        for(int i = 0; i < pixelsInSegment.size(); i++){
+            if(pixelsInSegment.get(i) < (int)(max*0.05)){
+                toMerge.add(i+1);
+            }
+        }
+        if(toMerge.size() != 0) {
+            for (int y = 0; y < ImageLoader.getHeight(); y++) {
+                for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                    int id = chromosone[y][x];
+                    if (toMerge.contains(id)) {
+                        chromosone[y][x] = 0;
+                    }
+                }
+            }
+            nrSegments = repair(chromosone);
+        }else{
+            nrSegments = pixelsInSegment.size();
+        }
 
     }
 
