@@ -21,19 +21,88 @@ public class MOEA {
     private static ArrayList<Individual> population;
     private static LinkedList<Individual> front;
     private int generation;
-    private final int MINSEGMENTS = 6;
-    private final int MAXSEGMENTS = 30;
+    private final int MINSEGMENTS = 2;
+    private final int MAXSEGMENTS = 20;
 
     private ImageLoader image;
     private static Pixel[][] pixels = new Pixel[ImageLoader.getHeight()][ImageLoader.getWidth()];
+
+    private Thread[] threads = new Thread[4];
 
     public MOEA(ImageLoader loader) {
         this.image = loader;
         generatePixels();
     }
 
+    private void initialPopulationThreads() {
+        for(int i = 0; i < threads.length; i++) {
+            threads[i] = new Thread(new Runnable() {
+                public void run() {
+                    int added = 0;
+                    int counter = 0;
+                    while(added < popSize/threads.length) {
+                        int segments = (int)(Math.random()*(MAXSEGMENTS-MINSEGMENTS))+MINSEGMENTS+1;
+                        Individual indv = new Individual(segments);
+                        if(indv.getNrSegments() >= MINSEGMENTS && indv.getNrSegments() <= MAXSEGMENTS) {
+                            population.add(indv);
+                            added++;
+                        }
+                        counter++;
+                        if(counter > popSize*3){
+                            System.out.println("Mayor problem in init pop");
+                            break;
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    private void crossoverThreads() {
+        for(int i = 0; i < threads.length; i++) {
+            threads[i] = new Thread(new Runnable() {
+                public void run() {
+                    int prod =0;
+                    while (prod < numOffsprings/threads.length) {
+                        Individual father = NSGAIItournament();
+                        Individual mother = NSGAIItournament();
+
+                        for(Individual child : father.crossover(mother)) {
+                            if(child.getNrSegments() >= MAXSEGMENTS-1){
+                                child.mutateMerge(mutationRate);
+                            }else if(child.getNrSegments() > MINSEGMENTS){
+                                child.mutateSplit(mutationRate);
+                            } else{
+                                if(Math.random() >= 0.5){
+                                    child.mutateSplit(mutationRate);
+                                }else{
+                                    child.mutateMerge(mutationRate);
+                                }
+                            }
+                            if(child.getNrSegments() > MINSEGMENTS && child.getNrSegments() < MAXSEGMENTS)
+                                population.add(child);
+                        }
+                        prod++;
+                    }
+
+                }
+            });
+
+            threads[i].start();
+        }
+    }
+
     public void run() {
         population = new ArrayList<>();
+        initialPopulationThreads();
+        for(int i = 0; i < threads.length; i++) {
+            try {
+                threads[i].join();
+            } catch (InterruptedException e) {
+                System.out.println("Thread crash initial population");
+            }
+        }
+        /*
         int counter = 0;
         while(population.size() < popSize) {
             int segments = (int)(Math.random()*(MAXSEGMENTS-MINSEGMENTS))+MINSEGMENTS+1;
@@ -46,6 +115,7 @@ public class MOEA {
                 break;
             }
         }
+        */
 
         System.out.println("Initialize population done. " + popSize + " random solutions found");
 
@@ -63,25 +133,13 @@ public class MOEA {
         }
 
         while(generation++ < maxRuns) {
+            crossoverThreads();
 
-            while (population.size() < popSize + numOffsprings) {
-                Individual father = NSGAIItournament();
-                Individual mother = NSGAIItournament();
-
-                for(Individual child : father.crossover(mother)) {
-                    if(child.getNrSegments() >= MAXSEGMENTS-1){
-                        child.mutateMerge(mutationRate);
-                    }else if(child.getNrSegments() > MINSEGMENTS){
-                        child.mutateSplit(mutationRate);
-                    } else{
-                        if(Math.random() >= 0.5){
-                            child.mutateSplit(mutationRate);
-                        }else{
-                            child.mutateMerge(mutationRate);
-                        }
-                    }
-                    if(child.getNrSegments() > MINSEGMENTS && child.getNrSegments() < MAXSEGMENTS)
-                        population.add(child);
+            for(int i = 0; i < threads.length; i++) {
+                try {
+                    threads[i].join();
+                } catch (InterruptedException e) {
+                    System.out.println("Thread crash crossover");
                 }
             }
 

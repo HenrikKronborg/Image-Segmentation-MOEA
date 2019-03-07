@@ -204,8 +204,6 @@ public class Individual {
 
         if(toSplit.size() > 0)
             nrSegments = repair(chromosone);
-
-
     }
 
     public Individual[] crossover(Individual mother) {
@@ -217,7 +215,7 @@ public class Individual {
 
         for (int i = 0; i < children.length;i++) {
             boolean change = false;
-            HashMap<Integer,Integer> table1 = new HashMap<>();
+            HashMap<Integer,Integer> fatherTable = new HashMap<>();
             int segmentId = 1;
             short[][] newShadow = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
             for (int y = 0; y < ImageLoader.getHeight(); y++) {
@@ -233,8 +231,8 @@ public class Individual {
                         currentId = mother.getChromosone()[y][x];
                     }
 
-                    currentId = translate(table1,change,currentId,segmentId);
-                    segmentId = table1.size();
+                    currentId = translate(fatherTable,change,currentId,segmentId);
+                    segmentId = fatherTable.size();
 
                     if(toPlace){
                         newShadow[y][x] = (short)currentId;
@@ -243,7 +241,7 @@ public class Individual {
                 }
             }
             change = false;
-            HashMap<Integer,Integer> table2 = new HashMap<>();
+            HashMap<Integer,Integer> motherTable = new HashMap<>();
             ArrayList<Integer> checkForRepair = new ArrayList<>();
 
             for (int y = 0; y < ImageLoader.getHeight(); y++) {
@@ -256,8 +254,8 @@ public class Individual {
                             currentId = chromosone[y][x];
                         }
 
-                        currentId = translate(table2,change,currentId,segmentId);
-                        segmentId = table1.size()+table2.size();
+                        currentId = translate(motherTable,change,currentId,segmentId);
+                        segmentId = fatherTable.size()+motherTable.size();
 
                         newShadow[y][x] = (short)currentId;
                     }else{
@@ -268,11 +266,11 @@ public class Individual {
                 }
             }
 
-            children[i].nrSegments = table1.size()+table2.size();
+            children[i].nrSegments = fatherTable.size()+motherTable.size();
 
             for(int j = 0; j <checkForRepair.size();j++){
-                if(table2.containsKey(checkForRepair.get(j))){
-                    checkForRepair.set(j, table2.get(checkForRepair.get(j)));
+                if(motherTable.containsKey(checkForRepair.get(j))){
+                    checkForRepair.set(j, motherTable.get(checkForRepair.get(j)));
                 }else{
                     checkForRepair.set(j,0);
                 }
