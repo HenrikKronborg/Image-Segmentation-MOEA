@@ -72,7 +72,7 @@ public class GUI implements Initializable {
             public void run() {
                 algorithm = new MOEA(image);
                 algorithm.loadObservableList(listener);
-                algorithm.run();
+                algorithm.run2();
 
             }
         });

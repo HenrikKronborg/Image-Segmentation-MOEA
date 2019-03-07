@@ -12,10 +12,10 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 public class MOEA {
-    private static int popSize = 80; // Population size
+    private static int popSize = 40; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.20; // Mutation rate
-    private static int maxRuns = 20; // Maximum number of runs before termination
+    private static int maxRuns = 0; // Maximum number of runs before termination
     private static int tournamentSize = 2; // Number of individuals to choose from population at random
 
     private ThreadNode ob;
@@ -97,6 +97,26 @@ public class MOEA {
 
             threads[i].start();
         }
+    }
+
+    public void run2() {
+        population = new ArrayList<>();
+        initialPopulationThreads("Thread crash initial population");
+        try {
+            doneSignal.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Initialize population done. " + population.size() + " random solutions found");
+
+        LinkedList<Individual> frontiers = new LinkedList<>();
+        for(Individual i : population) {
+            frontiers.add(i);
+        }
+
+        ob.setOb(frontiers);
+        ob.setGeneration(generation);
+        ob.changed.set(true);
     }
 
     public void run() {
