@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 public class MOEA {
-    private static int popSize = 10; // Population size
+    private static int popSize = 20; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.20; // Mutation rate
     private static int maxRuns = 0; // Maximum number of runs before termination
@@ -23,7 +23,7 @@ public class MOEA {
     private static LinkedList<Individual> front;
     private int generation;
     private final int MINSEGMENTS = 3;
-    private final int MAXSEGMENTS = 20;
+    private final int MAXSEGMENTS = 30;
     private FitnessCalc fitness;
 
     private ImageLoader image;
@@ -42,21 +42,25 @@ public class MOEA {
         for(int i = 0; i < threads.length; i++) {
             threads[i] = new Thread(new Runnable() {
                 public void run() {
-                    int threshold = 0;
+                    int threshold = 5;
                     int added = 0;
                     int counter = 0;
+                    System.out.println("thread started");
                     while(added < popSize/threads.length) {
 
                         int segments = (int)(Math.random()*(MAXSEGMENTS-MINSEGMENTS))+MINSEGMENTS+1;
                         Individual indv = new Individual(segments);
-                        indv.generateIndividual(threshold + 0.1);
-                        /*
-                        while(indv.getNrSegments() < MAXSEGMENTS){
-                            indv.mutateMerge(1,fitness);
+                        indv.generateIndividual(threshold + 5*Math.random(),fitness, MAXSEGMENTS, MINSEGMENTS);
+                        if(indv.getNrSegments() > MINSEGMENTS)
+                            population.add(indv);
+                        if(indv.getNrSegments() > MAXSEGMENTS) {
+                            threshold -= 10;
+                            if(threshold < 0){
+                                threshold = 5;
+                            }
+                        }else{
+                            threshold += 3;
                         }
-                        */
-                        population.add(indv);
-                        threshold += 5;
                         added++;
 
                         counter++;
@@ -108,6 +112,8 @@ public class MOEA {
     }
 
     public void run2() {
+        fitness = new FitnessCalc();
+        fitness.setImageLoader(image);
         population = new ArrayList<>();
         initialPopulationThreads("Thread crash initial population");
         try {
@@ -128,6 +134,9 @@ public class MOEA {
     }
 
     public void run() {
+        fitness = new FitnessCalc();
+        fitness.setImageLoader(image);
+
         population = new ArrayList<>();
         initialPopulationThreads("Thread crash initial population");
         try {
@@ -138,12 +147,9 @@ public class MOEA {
         System.out.println("Initialize population done. " + population.size() + " random solutions found");
 
         // Calculate fitness value
-        fitness = new FitnessCalc();
-        fitness.setImageLoader(image);
         for(Individual individual : population) {
             fitness.generateFitness(individual);
         }
-
 
         LinkedList<LinkedList<Individual>> frontiers = fastNonDominatedSort();
         for(LinkedList<Individual> l : frontiers) {

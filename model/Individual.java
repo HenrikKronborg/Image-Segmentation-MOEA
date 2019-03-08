@@ -3,6 +3,7 @@ package model;
 import controller.MOEA;
 import model.supportNodes.Neighbor;
 import model.supportNodes.Pixel;
+import model.supportNodes.SegmentNeighbor;
 import model.supportNodes.SegmentNode;
 import model.utils.FitnessCalc;
 import model.utils.ImageLoader;
@@ -36,8 +37,7 @@ public class Individual {
      * Methods
      */
     // Minimum Spanning Tree (MST)
-    public void generateIndividual(double threshold) {
-        ArrayList<Integer> pixelsInSegment = new ArrayList<>();
+    public void generateIndividual(double threshold,FitnessCalc f,int MAX, int MIN) {
         chromosone = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
         // List of all pixels in the image
         ArrayList<Pixel> pixelsNodes = new ArrayList<>(ImageLoader.getHeight() * ImageLoader.getWidth());
@@ -53,7 +53,6 @@ public class Individual {
         for (Pixel root : pixelsNodes) {
             if (chromosone[root.getY()][root.getX()] == 0) {
                 chromosone[root.getY()][root.getX()] = segmentId;
-                pixelsInSegment.add(1);
                 PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
                 for (Neighbor n : root.getNeighbors()) {
                     pQueue.add(n);
@@ -63,7 +62,6 @@ public class Individual {
                     if (chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0) {
                         if (newNode.getDistance() < threshold) {
                             chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = segmentId;
-                            pixelsInSegment.set(segmentId-1,pixelsInSegment.get(segmentId-1)+1);
                             for (Neighbor n : newNode.getNeighbor().getNeighbors()) {
                                 pQueue.add(n);
                             }
@@ -76,21 +74,127 @@ public class Individual {
                     }
                 }
                 segmentId++;
-                if(segmentId == Short.MAX_VALUE -5){
+                if(segmentId == Short.MAX_VALUE ){
                     break;
                 }
             }
         }
-        int max = -1;
-        for(int value : pixelsInSegment){
-            if(value > max){
-                max = value;
+
+        nrSegments = repair(chromosone);
+        if(nrSegments < MIN)
+            return;
+
+        double newThreshold = threshold*0.5;
+        int lastNrSegments = nrSegments;
+        while(nrSegments > MAX) {
+            double diff = lastNrSegments - nrSegments;
+            lastNrSegments = nrSegments;
+            if (diff/(double)lastNrSegments < 0.1){
+                newThreshold += 5 + Math.random();
+
+            }else if(diff/(double)lastNrSegments < 0.2){
+                newThreshold += 2 + Math.random();
+
+            }else if(diff/(double)lastNrSegments < 0.3){
+                newThreshold += 1 + Math.random();
+
+            }else if(diff/(double)lastNrSegments < 0.4){
+                newThreshold += Math.random();
+
+            }
+            cleanMerge(f, newThreshold, MAX);
+            removeSmallSegments(0.1);
+
+        }
+        removeSmallSegments(0.05);
+        System.out.println("Segment done! "+nrSegments);
+
+    }
+
+    private void cleanMerge(FitnessCalc f, double threshold, int MAX) {
+        HashMap<Integer, SegmentNode> avgColor = f.generateAverageColor(this);
+        HashMap<Integer,Integer> idTable = new HashMap<>();
+        int segments = avgColor.size()-1;
+        int segmentId = 1;
+
+        for(int key : avgColor.keySet()){
+            if(segments <= MAX){
+                break;
+            }
+            if (!idTable.containsKey(key)) {
+                SegmentNode root = avgColor.get(key);
+                idTable.put(key,segmentId);
+                PriorityQueue<SegmentNeighbor> pQueue = new PriorityQueue<>();
+                for (int n : root.getNeighbors()) {
+                    SegmentNode neighbor = avgColor.get(n);
+                    double diff = Math.sqrt(Math.pow(root.getAvgRed() - neighbor.getAvgRed(), 2) + Math.pow(root.getAvgGreen() - neighbor.getAvgGreen(), 2) + Math.pow(root.getAvgBlue() - neighbor.getAvgBlue(), 2));
+                    pQueue.add(new SegmentNeighbor(n,diff));
+                }
+                while (pQueue.size() > 0) {
+                    SegmentNeighbor frontSeg = pQueue.poll();
+                    if (!idTable.containsKey(frontSeg.getId())) {
+                        if (frontSeg.getDistance() < threshold) {
+                            idTable.put(frontSeg.getId(),segmentId);
+                            SegmentNode frontNode = avgColor.get(frontSeg.getId());
+                            segments--;
+                            if(segments <= MAX){
+                                break;
+                            }
+                            for (int n : frontNode.getNeighbors()) {
+                                SegmentNode neighbor = avgColor.get(n);
+                                double diff = Math.sqrt(Math.pow(frontNode.getAvgRed() - neighbor.getAvgRed(), 2) + Math.pow(frontNode.getAvgGreen() - neighbor.getAvgGreen(), 2) + Math.pow(frontNode.getAvgBlue() - neighbor.getAvgBlue(), 2));
+                                pQueue.add(new SegmentNeighbor(n,diff));
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                }
+                if(segmentId == Short.MAX_VALUE ){
+                    System.out.println(":(");
+                    break;
+                }
+                segmentId++;
             }
         }
+        for (int y = 0; y < ImageLoader.getHeight(); y++) {
+            for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                int id = chromosone[y][x];
+                if(idTable.containsKey(id)){
+                    chromosone[y][x] = idTable.get(id).shortValue();
+                }else{
+                    idTable.put(id,segmentId);
+                    segmentId++;
+                }
+            }
+        }
+        nrSegments = segmentId-1;
+    }
+
+    public void removeSmallSegments(double thresholdProcent){
+        ArrayList<Integer> pixelsInSegment = new ArrayList<>();
+
+        for (int y = 0; y < ImageLoader.getHeight(); y++) {
+            for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                int segmentId = chromosone[y][x];
+                if(segmentId != 0){
+                    while(pixelsInSegment.size() <= segmentId){
+                        pixelsInSegment.add(0);
+                    }
+                    pixelsInSegment.set(segmentId,pixelsInSegment.get(segmentId)+1);
+                }
+            }
+        }
+
+        int avg = 0;
+        for(int value : pixelsInSegment){
+                avg += value;
+        }
+        avg /= pixelsInSegment.size();
         ArrayList<Integer> toMerge = new ArrayList<>();
-        for(int i = 0; i < pixelsInSegment.size(); i++){
-            if(pixelsInSegment.get(i) < (int)(max*0.05)){
-                toMerge.add(i+1);
+        for(int i = 1; i < pixelsInSegment.size(); i++){
+            if(pixelsInSegment.get(i) < (int)(avg*thresholdProcent)){
+                toMerge.add(i);
             }
         }
         if(toMerge.size() != 0) {
@@ -104,8 +208,73 @@ public class Individual {
             }
             nrSegments = repair(chromosone);
         }else{
-            nrSegments = pixelsInSegment.size();
+            nrSegments = pixelsInSegment.size()-1;
         }
+    }
+    private short cleanMerge(int maxsegments, FitnessCalc f) {
+        HashMap<Integer, SegmentNode> avgColor = f.generateAverageColor(this);
+        ArrayList<Double[]> toMerge = new ArrayList<>(avgColor.size());
+
+        for(int key : avgColor.keySet()){
+            double smallestDiff = Double.MAX_VALUE;
+
+            SegmentNode node1 = avgColor.get(key);
+            SegmentNode nodeSmall = null;
+            Double keySmall = null;
+            for(int neighbor : node1.getNeighbors()){
+                SegmentNode node2 = avgColor.get(neighbor);
+
+                double diff = Math.sqrt(Math.pow(node1.getAvgRed() - node2.getAvgRed(), 2) + Math.pow(node1.getAvgGreen() - node2.getAvgGreen(), 2) + Math.pow(node1.getAvgBlue() - node2.getAvgBlue(), 2));
+                if(diff < smallestDiff){
+                    //Merg the smallest segment in to the other.
+                    nodeSmall = node2;
+                    keySmall = (double)neighbor;
+                    smallestDiff = diff;
+                }
+            }
+            if(nodeSmall != null) {
+                if (node1.getNrPixels() < nodeSmall.getNrPixels())
+                    toMerge.add(new Double[]{(double) key, keySmall, smallestDiff});
+                else if(node1.getNrPixels() == nodeSmall.getNrPixels()){
+                    if(key < keySmall){
+                        toMerge.add(new Double[]{(double) key, keySmall, smallestDiff});
+                    }else{
+                        toMerge.add(new Double[]{keySmall,(double)key,smallestDiff});
+                    }
+                }else
+                    toMerge.add(new Double[]{keySmall,(double)key,smallestDiff});
+            }
+        }
+
+        toMerge.sort(Comparator.comparing(a -> a[2]));
+        int range = toMerge.size()-maxsegments;
+        HashMap<Integer,Integer> idTable = new HashMap<>();
+        int newId = 1;
+        for (int y = 0; y < ImageLoader.getHeight(); y++) {
+            for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                int id = chromosone[y][x];
+                if(idTable.containsKey(id)){
+                    chromosone[y][x] = idTable.get(id).shortValue();
+                }else{
+                    for (int i = 0; i < range; i++) {
+                        int otherId = toMerge.get(i)[0].intValue();
+                        if(id == otherId){
+                            idTable.put(id,newId);
+                            idTable.put(otherId,newId);
+                            chromosone[y][x] = (short)newId;
+                        }
+                    }
+                    newId++;
+
+                }
+            }
+        }
+        System.out.println("merge.");
+
+        return (short)newId;
+
+
+
 
     }
 
@@ -199,6 +368,7 @@ public class Individual {
         }
 
     }
+
     public boolean dominates(Individual x) {
         // Check if the Solutions have the same fitness value
         if (!(fitnessDeviation == x.getFitnessDeviation() && fitnessConnectivity == x.getFitnessConnectivity())) {

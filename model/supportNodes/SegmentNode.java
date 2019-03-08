@@ -19,6 +19,12 @@ public class SegmentNode {
 
         nrPixels++;
     }
+    public void addColor(double red, double green, double blue) {
+        avgBlue += blue;
+        avgGreen +=  green;
+        avgRed += red;
+
+    }
 
     public void makeAvg() {
         avgBlue /= nrPixels;

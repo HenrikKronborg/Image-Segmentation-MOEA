@@ -164,39 +164,43 @@ public class FitnessCalc {
                 }
 
                 int id = board[y][x];
-                Color c = img.getPixelValue(x,y);
-                SegmentNode node;
-                if(segments.containsKey(id)){
-                    node = segments.get(id);
-                    node.addColor(c);
+                if(id == 0){
+                    System.out.println("ERROR fitness");
                 }else{
-                    node =  new SegmentNode();
-                    node.addColor(c);
-                    segments.put(id,node);
-                }
-                if(lastId != id){
-                    if(!node.getNeighbors().contains(lastId)){
-                        node.getNeighbors().add(lastId);
-                        SegmentNode prev = segments.get(lastId);
-                        if(!prev.getNeighbors().contains(id)){
-                            prev.getNeighbors().add(id);
-                        }
-
+                    Color c = img.getPixelValue(x,y);
+                    SegmentNode node;
+                    if(segments.containsKey(id)){
+                        node = segments.get(id);
+                        node.addColor(c);
+                    }else{
+                        node =  new SegmentNode();
+                        node.addColor(c);
+                        segments.put(id,node);
                     }
-                }
-                if(y != 0){
-                    int topId = board[y-1][x];
-                    if(topId != id){
-                        if(!node.getNeighbors().contains(topId)){
-                            node.getNeighbors().add(topId);
-                            SegmentNode prev = segments.get(topId);
+                    if(lastId != id){
+                        if(!node.getNeighbors().contains(lastId)){
+                            node.getNeighbors().add(lastId);
+                            SegmentNode prev = segments.get(lastId);
                             if(!prev.getNeighbors().contains(id)){
                                 prev.getNeighbors().add(id);
                             }
+
                         }
                     }
+                    if(y != 0){
+                        int topId = board[y-1][x];
+                        if(topId != id){
+                            if(!node.getNeighbors().contains(topId)){
+                                node.getNeighbors().add(topId);
+                                SegmentNode prev = segments.get(topId);
+                                if(!prev.getNeighbors().contains(id)){
+                                    prev.getNeighbors().add(id);
+                                }
+                            }
+                        }
+                    }
+                    lastId = id;
                 }
-
             }
         }
         for (SegmentNode node : segments.values()) {
