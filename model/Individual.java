@@ -111,10 +111,7 @@ public class Individual {
 
         //removeSmallSegments(0.05);
         int segments = (int)((double)(MAX-MIN)*Math.random()+MIN);
-        System.out.println(segments);
-        while ( cleanMergeSmallFirst(segments,f)){
-
-        }
+        while (cleanMergeSmallFirst(segments,f)){ }
 
         System.out.println("Segment done! "+nrSegments);
 
