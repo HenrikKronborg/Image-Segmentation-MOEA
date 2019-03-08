@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 public class SegmentNode {
 
+    short id;
+
     int nrPixels;
     double avgRed;
     double avgGreen;
@@ -72,5 +74,11 @@ public class SegmentNode {
         this.nrPixels = nrPixels;
     }
 
+    public short getId() {
+        return id;
+    }
 
+    public void setId(short id) {
+        this.id = id;
+    }
 }

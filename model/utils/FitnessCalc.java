@@ -175,6 +175,7 @@ public class FitnessCalc {
                     }else{
                         node =  new SegmentNode();
                         node.addColor(c);
+                        node.setId((short)id);
                         segments.put(id,node);
                     }
                     if(lastId != id){

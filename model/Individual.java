@@ -7,6 +7,8 @@ import model.supportNodes.SegmentNeighbor;
 import model.supportNodes.SegmentNode;
 import model.utils.FitnessCalc;
 import model.utils.ImageLoader;
+import model.utils.MutableShort;
+
 
 import java.util.*;
 
@@ -86,7 +88,7 @@ public class Individual {
 
         double newThreshold = threshold*0.5;
         int lastNrSegments = nrSegments;
-        while(nrSegments > MAX) {
+        /*while(nrSegments > MAX) {
             double diff = lastNrSegments - nrSegments;
             lastNrSegments = nrSegments;
             if (diff/(double)lastNrSegments < 0.1){
@@ -105,10 +107,88 @@ public class Individual {
             cleanMerge(f, newThreshold, MAX);
             removeSmallSegments(0.1);
 
+        }*/
+
+        //removeSmallSegments(0.05);
+        int segments = (int)((double)(MAX-MIN)*Math.random()+MIN);
+        System.out.println(segments);
+        while ( cleanMergeSmallFirst(segments,f)){
+
         }
-        removeSmallSegments(0.05);
+
         System.out.println("Segment done! "+nrSegments);
 
+    }
+
+    private boolean cleanMergeSmallFirst(int MAX,FitnessCalc f) {
+        HashMap<Integer, SegmentNode> avgColor = f.generateAverageColor(this);
+        nrSegments = avgColor.size();
+        if(avgColor.size() <= MAX + 1){
+            return false;
+        }
+        HashMap<Integer,MutableShort> idTable = new HashMap<>();
+        ArrayList<SegmentNode> listOfSegments = new ArrayList<SegmentNode>(idTable.size());
+
+        listOfSegments.addAll(avgColor.values());
+        listOfSegments.sort(Comparator.comparing(a -> a.getNrPixels()));
+        double threshold = listOfSegments.get(listOfSegments.size()-MAX).getNrPixels();
+        for(int i = 0; i < listOfSegments.size()-MAX; i++ ){
+            SegmentNode root = listOfSegments.get(i);
+
+            double bestFit = Double.MAX_VALUE;
+            Integer bestNode = -1;
+
+            for(int neig : root.getNeighbors()){
+                SegmentNode neighbor = avgColor.get(neig);
+                if(neighbor.getNrPixels() < threshold){
+                    double diff = Math.sqrt(Math.pow(root.getAvgRed() - neighbor.getAvgRed(), 2) + Math.pow(root.getAvgGreen() - neighbor.getAvgGreen(), 2) + Math.pow(root.getAvgBlue() - neighbor.getAvgBlue(), 2));
+                    if(diff < bestFit){
+                        bestFit = diff;
+                        bestNode = (int) neighbor.getId();
+                    }
+                }
+            }
+            if(bestNode == -1){
+                for(int neig : root.getNeighbors()) {
+                    SegmentNode neighbor = avgColor.get(neig);
+                    double diff = Math.sqrt(Math.pow(root.getAvgRed() - neighbor.getAvgRed(), 2) + Math.pow(root.getAvgGreen() - neighbor.getAvgGreen(), 2) + Math.pow(root.getAvgBlue() - neighbor.getAvgBlue(), 2));
+                    if (diff < bestFit) {
+                        bestFit = diff;
+                        bestNode = (int) neighbor.getId();
+                    }
+                }
+            }
+            if(bestNode == -1){
+                System.out.println("oops?");
+            }else{
+                if(idTable.containsKey(bestNode)){
+                    if(idTable.containsKey((int)root.getId())){
+                        idTable.get((int)root.getId()).setValue(idTable.get(bestNode).getValue());
+                    }else{
+                        idTable.put((int)root.getId(), idTable.get(bestNode));
+                    }
+                }else{
+                    if(idTable.containsKey((int)root.getId())){
+                        idTable.put(bestNode, idTable.get((int)root.getId()));
+                    }else {
+                        MutableShort m = new MutableShort(root.getId());
+
+                        idTable.put((int)root.getId(), m);
+                        idTable.put(bestNode, m);
+                    }
+                }
+            }
+        }
+
+        for (int y = 0; y < ImageLoader.getHeight(); y++) {
+            for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                int id = chromosone[y][x];
+                if(idTable.containsKey(id)){
+                    chromosone[y][x] = idTable.get(id).getValue();
+                }
+            }
+        }
+        return true;
     }
 
     private void cleanMerge(FitnessCalc f, double threshold, int MAX) {
