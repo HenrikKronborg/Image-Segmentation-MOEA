@@ -164,66 +164,6 @@ public class Individual {
         return true;
     }
 
-    private void cleanMerge(FitnessCalc f, double threshold, int MAX) {
-        HashMap<Integer, SegmentNode> avgColor = f.generateAverageColor(this);
-        HashMap<Integer,Integer> idTable = new HashMap<>();
-        int segments = avgColor.size()-1;
-        int segmentId = 1;
-
-        for(int key : avgColor.keySet()){
-            if(segments <= MAX){
-                break;
-            }
-            if (!idTable.containsKey(key)) {
-                SegmentNode root = avgColor.get(key);
-                idTable.put(key,segmentId);
-                PriorityQueue<SegmentNeighbor> pQueue = new PriorityQueue<>();
-                for (int n : root.getNeighbors()) {
-                    SegmentNode neighbor = avgColor.get(n);
-                    double diff = Math.sqrt(Math.pow(root.getAvgRed() - neighbor.getAvgRed(), 2) + Math.pow(root.getAvgGreen() - neighbor.getAvgGreen(), 2) + Math.pow(root.getAvgBlue() - neighbor.getAvgBlue(), 2));
-                    pQueue.add(new SegmentNeighbor(n,diff));
-                }
-                while (pQueue.size() > 0) {
-                    SegmentNeighbor frontSeg = pQueue.poll();
-                    if (!idTable.containsKey(frontSeg.getId())) {
-                        if (frontSeg.getDistance() < threshold) {
-                            idTable.put(frontSeg.getId(),segmentId);
-                            SegmentNode frontNode = avgColor.get(frontSeg.getId());
-                            segments--;
-                            if(segments <= MAX){
-                                break;
-                            }
-                            for (int n : frontNode.getNeighbors()) {
-                                SegmentNode neighbor = avgColor.get(n);
-                                double diff = Math.sqrt(Math.pow(frontNode.getAvgRed() - neighbor.getAvgRed(), 2) + Math.pow(frontNode.getAvgGreen() - neighbor.getAvgGreen(), 2) + Math.pow(frontNode.getAvgBlue() - neighbor.getAvgBlue(), 2));
-                                pQueue.add(new SegmentNeighbor(n,diff));
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                if(segmentId == Short.MAX_VALUE ){
-                    System.out.println(":(");
-                    break;
-                }
-                segmentId++;
-            }
-        }
-        for (int y = 0; y < ImageLoader.getHeight(); y++) {
-            for (int x = 0; x < ImageLoader.getWidth(); x++) {
-                int id = chromosone[y][x];
-                if(idTable.containsKey(id)){
-                    chromosone[y][x] = idTable.get(id).shortValue();
-                }else{
-                    idTable.put(id,segmentId);
-                    segmentId++;
-                }
-            }
-        }
-        nrSegments = segmentId-1;
-    }
-
     public void removeSmallSegments(double thresholdPrecent){
         HashMap<Integer,Integer> pixelsInSegment = new HashMap<>();
 
@@ -269,72 +209,6 @@ public class Individual {
         }else{
             nrSegments = pixelsInSegment.size();
         }
-    }
-    private short cleanMerge(int maxsegments, FitnessCalc f) {
-        HashMap<Integer, SegmentNode> avgColor = f.generateAverageColor(this);
-        ArrayList<Double[]> toMerge = new ArrayList<>(avgColor.size());
-
-        for(int key : avgColor.keySet()){
-            double smallestDiff = Double.MAX_VALUE;
-
-            SegmentNode node1 = avgColor.get(key);
-            SegmentNode nodeSmall = null;
-            Double keySmall = null;
-            for(int neighbor : node1.getNeighbors()){
-                SegmentNode node2 = avgColor.get(neighbor);
-
-                double diff = Math.sqrt(Math.pow(node1.getAvgRed() - node2.getAvgRed(), 2) + Math.pow(node1.getAvgGreen() - node2.getAvgGreen(), 2) + Math.pow(node1.getAvgBlue() - node2.getAvgBlue(), 2));
-                if(diff < smallestDiff){
-                    //Merg the smallest segment in to the other.
-                    nodeSmall = node2;
-                    keySmall = (double)neighbor;
-                    smallestDiff = diff;
-                }
-            }
-            if(nodeSmall != null) {
-                if (node1.getNrPixels() < nodeSmall.getNrPixels())
-                    toMerge.add(new Double[]{(double) key, keySmall, smallestDiff});
-                else if(node1.getNrPixels() == nodeSmall.getNrPixels()){
-                    if(key < keySmall){
-                        toMerge.add(new Double[]{(double) key, keySmall, smallestDiff});
-                    }else{
-                        toMerge.add(new Double[]{keySmall,(double)key,smallestDiff});
-                    }
-                }else
-                    toMerge.add(new Double[]{keySmall,(double)key,smallestDiff});
-            }
-        }
-
-        toMerge.sort(Comparator.comparing(a -> a[2]));
-        int range = toMerge.size()-maxsegments;
-        HashMap<Integer,Integer> idTable = new HashMap<>();
-        int newId = 1;
-        for (int y = 0; y < ImageLoader.getHeight(); y++) {
-            for (int x = 0; x < ImageLoader.getWidth(); x++) {
-                int id = chromosone[y][x];
-                if(idTable.containsKey(id)){
-                    chromosone[y][x] = idTable.get(id).shortValue();
-                }else{
-                    for (int i = 0; i < range; i++) {
-                        int otherId = toMerge.get(i)[0].intValue();
-                        if(id == otherId){
-                            idTable.put(id,newId);
-                            idTable.put(otherId,newId);
-                            chromosone[y][x] = (short)newId;
-                        }
-                    }
-                    newId++;
-
-                }
-            }
-        }
-        System.out.println("merge.");
-
-        return (short)newId;
-
-
-
-
     }
 
     public void generateIndividual(int segments) {
