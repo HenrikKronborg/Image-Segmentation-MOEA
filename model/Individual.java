@@ -86,33 +86,9 @@ public class Individual {
         if(nrSegments < MIN)
             return;
 
-        double newThreshold = threshold*0.5;
-        int lastNrSegments = nrSegments;
-        /*while(nrSegments > MAX) {
-            double diff = lastNrSegments - nrSegments;
-            lastNrSegments = nrSegments;
-            if (diff/(double)lastNrSegments < 0.1){
-                newThreshold += 5 + Math.random();
-
-            }else if(diff/(double)lastNrSegments < 0.2){
-                newThreshold += 2 + Math.random();
-
-            }else if(diff/(double)lastNrSegments < 0.3){
-                newThreshold += 1 + Math.random();
-
-            }else if(diff/(double)lastNrSegments < 0.4){
-                newThreshold += Math.random();
-
-            }
-            cleanMerge(f, newThreshold, MAX);
-            removeSmallSegments(0.1);
-
-        }*/
-
-        //removeSmallSegments(0.05);
         int segments = (int)((double)(MAX-MIN)*Math.random()+MIN);
         while (cleanMergeSmallFirst(segments,f)){ }
-
+        removeSmallSegments(0.1);
         System.out.println("Segment done! "+nrSegments);
 
     }
@@ -248,30 +224,36 @@ public class Individual {
         nrSegments = segmentId-1;
     }
 
-    public void removeSmallSegments(double thresholdProcent){
-        ArrayList<Integer> pixelsInSegment = new ArrayList<>();
+    public void removeSmallSegments(double thresholdPrecent){
+        HashMap<Integer,Integer> pixelsInSegment = new HashMap<>();
 
         for (int y = 0; y < ImageLoader.getHeight(); y++) {
             for (int x = 0; x < ImageLoader.getWidth(); x++) {
                 int segmentId = chromosone[y][x];
                 if(segmentId != 0){
-                    while(pixelsInSegment.size() <= segmentId){
-                        pixelsInSegment.add(0);
+                    Integer pixels = pixelsInSegment.getOrDefault(segmentId,null);
+                    if(pixels == null){
+                        pixelsInSegment.put(segmentId,1);
+                    }else{
+                        pixelsInSegment.replace(segmentId,pixels+1);
                     }
-                    pixelsInSegment.set(segmentId,pixelsInSegment.get(segmentId)+1);
                 }
             }
         }
 
-        int avg = 0;
-        for(int value : pixelsInSegment){
+        long avg = 0;
+        for(Integer value : pixelsInSegment.values()){
                 avg += value;
         }
         avg /= pixelsInSegment.size();
+        if(avg < -1){
+            System.out.println("ERROR avg.");
+        }
+
         ArrayList<Integer> toMerge = new ArrayList<>();
-        for(int i = 1; i < pixelsInSegment.size(); i++){
-            if(pixelsInSegment.get(i) < (int)(avg*thresholdProcent)){
-                toMerge.add(i);
+        for(Integer key : pixelsInSegment.keySet()){
+            if(pixelsInSegment.get(key) < (int)(avg*thresholdPrecent)){
+                toMerge.add(key);
             }
         }
         if(toMerge.size() != 0) {
@@ -285,7 +267,7 @@ public class Individual {
             }
             nrSegments = repair(chromosone);
         }else{
-            nrSegments = pixelsInSegment.size()-1;
+            nrSegments = pixelsInSegment.size();
         }
     }
     private short cleanMerge(int maxsegments, FitnessCalc f) {

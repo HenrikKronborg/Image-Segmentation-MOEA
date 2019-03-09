@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 public class MOEA {
-    private static int popSize = 4; // Population size
+    private static int popSize = 80; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.20; // Mutation rate
     private static int maxRuns = 0; // Maximum number of runs before termination
@@ -23,7 +23,7 @@ public class MOEA {
     private static LinkedList<Individual> front;
     private int generation;
     private final int MINSEGMENTS = 3;
-    private final int MAXSEGMENTS = 30;
+    private final int MAXSEGMENTS = 9;
     private FitnessCalc fitness;
 
     private ImageLoader image;
@@ -48,23 +48,24 @@ public class MOEA {
                     System.out.println("thread started");
                     while(added < popSize/threads.length) {
 
-                        int segments = (int)(Math.random()*(MAXSEGMENTS-MINSEGMENTS))+MINSEGMENTS+1;
+                        int segments = (int) (Math.random() * (MAXSEGMENTS - MINSEGMENTS)) + MINSEGMENTS + 1;
                         Individual indv = new Individual(segments);
-                        indv.generateIndividual(threshold + 5*Math.random(),fitness, MAXSEGMENTS, MINSEGMENTS);
-                        if(indv.getNrSegments() > MINSEGMENTS)
+                        indv.generateIndividual(threshold + 5 * Math.random(), fitness, MAXSEGMENTS, MINSEGMENTS);
+
+                        if (indv.getNrSegments() >= MINSEGMENTS && indv.getNrSegments() <= MAXSEGMENTS){
                             population.add(indv);
-                        if(indv.getNrSegments() > MAXSEGMENTS) {
-                            threshold -= 10;
-                            if(threshold < 0){
-                                threshold = 5;
-                            }
+                            added++;
+                        }
+
+                        if(indv.getNrSegments() < MINSEGMENTS) {
+                            threshold = 5;
                         }else{
                             threshold += 3;
                         }
-                        added++;
+
 
                         counter++;
-                        if(counter > popSize*3){
+                        if(counter > popSize*1.5){
                             System.out.println("Mayor problem in init pop");
                             break;
                         }
