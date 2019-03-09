@@ -5,12 +5,16 @@ import java.util.ArrayList;
 
 public class SegmentNode {
 
-    short id;
+    private short id;
 
-    int nrPixels;
-    double avgRed;
-    double avgGreen;
-    double avgBlue;
+    private int nrPixels;
+    private double avgRed;
+    private double avgGreen;
+    private double avgBlue;
+
+    private short rank;
+
+    private boolean f = false;
 
     ArrayList<Integer> neighbors = new ArrayList<>();
 
@@ -80,5 +84,21 @@ public class SegmentNode {
 
     public void setId(short id) {
         this.id = id;
+    }
+
+    public boolean isF() {
+        return f;
+    }
+
+    public void setF(boolean f) {
+        this.f = f;
+    }
+
+    public short getRank() {
+        return rank;
+    }
+
+    public void setRank(short rank) {
+        this.rank = rank;
     }
 }

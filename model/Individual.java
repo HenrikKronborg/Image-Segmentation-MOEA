@@ -471,6 +471,64 @@ public class Individual {
         return children;
     }
 
+    public Individual[] crossoverSize(Individual mother, FitnessCalc f) {
+        short[][] mChrom = mother.getChromosone();
+
+        Individual smallPri = new Individual();
+        Individual bigPri = new Individual();
+        short[][] sChrom = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
+        short[][] bChrom = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
+        smallPri.setChromosone(sChrom);
+        bigPri.setChromosone(bChrom);
+
+        //Sort mother and father on segments size.
+        HashMap<Integer, SegmentNode> avgColorFather = f.generateAverageColor(this);
+        HashMap<Integer, SegmentNode> avgColorMother = f.generateAverageColor(mother);
+
+        HashMap<Integer,MutableShort> idTable = new HashMap<>();
+
+        ArrayList<SegmentNode> listOfSegments = new ArrayList<>(avgColorFather.size()+avgColorMother.size());
+
+        listOfSegments.addAll(avgColorFather.values());
+        listOfSegments.forEach(a-> a.setF(true));   // Sets that all current nodes are from father.
+
+        listOfSegments.addAll(avgColorMother.values());
+
+        listOfSegments.sort(Comparator.comparing(SegmentNode::getNrPixels)); // Sort on size.
+
+        //First prioritize small segments.
+        for(int i = 0; i < listOfSegments.size(); i++){
+            listOfSegments.get(i).setRank((short)i);
+        }
+
+        for (int y = 0; y < ImageLoader.getHeight(); y++) {
+            for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                int idF = chromosone[y][x];
+                int idM = mChrom[y][x];
+                if(avgColorFather.get(idF).getRank() < avgColorMother.get(idM).getRank() ){
+                    sChrom[y][x] = chromosone[y][x];
+                }else{
+                    sChrom[y][x] = mChrom[y][x];
+                }
+            }
+        }
+
+        for (int y = 0; y < ImageLoader.getHeight(); y++) {
+            for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                int idF = chromosone[y][x];
+                int idM = mChrom[y][x];
+                if(avgColorFather.get(idF).getRank() > avgColorMother.get(idM).getRank() ){
+                    bChrom[y][x] = chromosone[y][x];
+                }else{
+                    bChrom[y][x] = mChrom[y][x];
+                }
+            }
+        }
+        
+        return new Individual[]{smallPri, bigPri};
+        //return new Individual[]{smallPri};
+    }
+
     private int repair(short[][]  shadow){
         Pixel[][] pixels = MOEA.getPixels();
         PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();

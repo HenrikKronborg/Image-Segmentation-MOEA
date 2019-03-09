@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 public class MOEA {
-    private static int popSize = 80; // Population size
+    private static int popSize = 20; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.20; // Mutation rate
     private static int maxRuns = 0; // Maximum number of runs before termination
@@ -23,7 +23,7 @@ public class MOEA {
     private static LinkedList<Individual> front;
     private int generation;
     private final int MINSEGMENTS = 3;
-    private final int MAXSEGMENTS = 9;
+    private final int MAXSEGMENTS = 20;
     private FitnessCalc fitness;
 
     private ImageLoader image;
@@ -86,8 +86,8 @@ public class MOEA {
                         Individual father = NSGAIItournament();
                         Individual mother = NSGAIItournament();
 
-                        for(Individual child : father.crossover(mother)) {
-                            if(child.getNrSegments() >= MAXSEGMENTS-1){
+                        for(Individual child : father.crossoverSize(mother,fitness)) {
+                           /* if(child.getNrSegments() >= MAXSEGMENTS-1){
                                 child.mutateMerge(mutationRate,fitness);
                             }else if(child.getNrSegments() > MINSEGMENTS){
                                 child.mutateSplit(mutationRate,fitness);
@@ -97,8 +97,8 @@ public class MOEA {
                                 }else{
                                     child.mutateMerge(mutationRate,fitness);
                                 }
-                            }
-                            if(child.getNrSegments() >= MINSEGMENTS && child.getNrSegments() <= MAXSEGMENTS)
+                            }*/
+                            //if(child.getNrSegments() >= MINSEGMENTS && child.getNrSegments() <= MAXSEGMENTS)
                                 population.add(child);
                         }
                         prod++;
@@ -124,12 +124,27 @@ public class MOEA {
         }
         System.out.println("Initialize population done. " + population.size() + " random solutions found");
 
-        LinkedList<Individual> frontiers = new LinkedList<>();
-        for(Individual i : population) {
-            frontiers.add(i);
+        for(Individual individual : population) {
+            fitness.generateFitness(individual);
         }
 
-        ob.setOb(frontiers);
+        LinkedList<LinkedList<Individual>> frontiers = fastNonDominatedSort();
+        for(LinkedList<Individual> l : frontiers) {
+            crowdingDistance(l);
+        }
+
+        doneSignal = new CountDownLatch(N);
+        crossoverThreads("Thread crash crossover");
+        try {
+            doneSignal.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        LinkedList<Individual> children = new LinkedList<>();
+        for(int i = popSize; i < population.size(); i++){
+            children.add(population.get(i));
+        }
+        ob.setOb(children);
         ob.setGeneration(generation);
         ob.changed.set(true);
     }
