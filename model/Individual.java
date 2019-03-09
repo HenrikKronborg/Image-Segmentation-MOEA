@@ -168,7 +168,7 @@ public class Individual {
                 }
             }
         }
-        
+
         return true;
     }
 
@@ -490,10 +490,10 @@ public class Individual {
         listOfSegments.sort(Comparator.comparing(SegmentNode::getNrPixels)); // Sort on size.
 
         for(int i = 0; i < listOfSegments.size(); i++){
-            listOfSegments.get(i).setRank((short)i);
+            listOfSegments.get(i).setRank(i);
         }
 
-        short[][] explored = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
+        int[][] explored = new int[ImageLoader.getHeight()][ImageLoader.getWidth()];
         // Small first.
         short segmentId = 1;
         for(SegmentNodeWhitPos node : listOfSegments){
@@ -523,13 +523,27 @@ public class Individual {
                     }else{
                         cantPlaceQueue.add(n.getNeighbor());
                     }
+                    explored[n.getNeighbor().getY()][n.getNeighbor().getX()] = node.getRank();
                 }
             }
-            do{             // Steps: 1: Mark as explored. 2: AddNeighbors. 2.a: only if not explored.
+            if(cantPlaceQueue.isEmpty() && placeQueue.isEmpty()){
+                System.out.println("noo");
+
+                for(Neighbor n : currPixel.getNeighbors()){
+                    if(currBoard[n.getNeighbor().getY()][n.getNeighbor().getX()] == currId){
+                        if(sChrom[n.getNeighbor().getY()][n.getNeighbor().getX()] == 0){
+                            placeQueue.add(n.getNeighbor());
+                        }else{
+                            cantPlaceQueue.add(n.getNeighbor());
+                        }
+                        explored[n.getNeighbor().getY()][n.getNeighbor().getX()] = node.getRank();
+                    }
+                }
+            }
+            while (!cantPlaceQueue.isEmpty() || !placeQueue.isEmpty()){ // Steps: 1: Mark as explored. 2: AddNeighbors. 2.a: only if not explored.
                 boolean wasPlaced = false;
                 while (!placeQueue.isEmpty()){
                     currPixel = placeQueue.poll();
-                    explored[currPixel.getY()][currPixel.getX()] = node.getRank();
 
                     for(Neighbor n : currPixel.getNeighbors()){
                         if(explored[n.getNeighbor().getY()][n.getNeighbor().getX()] != node.getRank()){
@@ -550,12 +564,10 @@ public class Individual {
                 }
                 if (wasPlaced) {
                     segmentId++;
-                    System.out.println(segmentId);
-                }       // Important segmentId is incremented.
+                }
 
                 if(!cantPlaceQueue.isEmpty()){
                     currPixel = cantPlaceQueue.poll();
-                    explored[currPixel.getY()][currPixel.getX()] = node.getRank();
                     for(Neighbor n : currPixel.getNeighbors()){
                         if(explored[n.getNeighbor().getY()][n.getNeighbor().getX()] != node.getRank()){
                             if(currBoard[n.getNeighbor().getY()][n.getNeighbor().getX()] == currId){
@@ -569,36 +581,55 @@ public class Individual {
                         }
                     }
                 }
-            }while (!cantPlaceQueue.isEmpty() || !placeQueue.isEmpty());
+            }
 
         }
+
+
         smallPri.setChromosone(sChrom);
-        HashMap<Integer,Integer> nrOfSmallSegments = smallPri.getSegmentSizes();
+        for (int y = 0; y < ImageLoader.getHeight(); y++) {
+            for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                int id = sChrom[y][x];
+                if (id == 0) {
+                    sChrom[y][x] = segmentId;
+                    Pixel currPixel = pixels[y][x];
+                    LinkedList<Pixel> placeQueue = new LinkedList<>();
+                    for(Neighbor n : currPixel.getNeighbors()){
+                        if(sChrom[n.getNeighbor().getY()][n.getNeighbor().getX()] == 0){
+                            sChrom[n.getNeighbor().getY()][n.getNeighbor().getX()] = segmentId;
+                            placeQueue.add(n.getNeighbor());
+                        }
+                    }
+                    segmentId++;
+                    System.out.println("oops!3");
+                }
+                //smallPri.nrSegments = 7;
+                //return new Individual[]{smallPri};
+            }
+        }
 
 
+
+        HashMap<Integer,Integer> nrOfSegments = smallPri.getSegmentSizes();
         long avg = 0;
         byte nrOfSmall = 0;
-        for(Integer value : nrOfSmallSegments.values()){
+        for(Integer value : nrOfSegments.values()){
             avg += value;
         }
-        avg /= nrOfSmallSegments.size();
+        avg /= nrOfSegments.size();
         if(avg < -1){
             System.out.println("ERROR avg.");
         }
-        for(Integer value : nrOfSmallSegments.values()){
+        for(Integer value : nrOfSegments.values()){
             if(value < avg *0.05){
                 nrOfSmall += (byte)1;
             }
         }
-        if(nrOfSmallSegments.containsKey(0)){
-            System.out.println("ERROR");
-        }
-        System.out.println("Segmtes:" + nrOfSmallSegments.size());
-        if(nrOfSmallSegments.size() > MAX + nrOfSmall){
+        if(nrOfSegments.size() - nrOfSmall > MAX){
             while(smallPri.cleanMergeSmallFirst(MAX,f));
 
         }else{
-            while (smallPri.cleanMergeSmallFirst(MAX-nrOfSmall,f));
+            while (smallPri.cleanMergeSmallFirst(nrOfSegments.size()-nrOfSmall,f));
 
         }
 

@@ -12,7 +12,7 @@ public class SegmentNode {
     private double avgGreen;
     private double avgBlue;
 
-    private short rank;
+    private int rank;
 
     private boolean f = false;
 
@@ -94,11 +94,11 @@ public class SegmentNode {
         this.f = f;
     }
 
-    public short getRank() {
+    public int getRank() {
         return rank;
     }
 
-    public void setRank(short rank) {
+    public void setRank(int rank) {
         this.rank = rank;
     }
 }
