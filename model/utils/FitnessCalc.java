@@ -2,6 +2,7 @@ package model.utils;
 
 import model.Individual;
 import model.supportNodes.SegmentNode;
+import model.supportNodes.SegmentNodeWhitPos;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -175,6 +176,70 @@ public class FitnessCalc {
                     }else{
                         node =  new SegmentNode();
                         node.addColor(c);
+                        node.setId((short)id);
+                        segments.put(id,node);
+                    }
+                    if(lastId != id){
+                        if(!node.getNeighbors().contains(lastId)){
+                            node.getNeighbors().add(lastId);
+                            SegmentNode prev = segments.get(lastId);
+                            if(!prev.getNeighbors().contains(id)){
+                                prev.getNeighbors().add(id);
+                            }
+
+                        }
+                    }
+                    if(y != 0){
+                        int topId = board[y-1][x];
+                        if(topId != id){
+                            if(!node.getNeighbors().contains(topId)){
+                                node.getNeighbors().add(topId);
+                                SegmentNode prev = segments.get(topId);
+                                if(prev == null){
+                                    return null;
+                                }else{
+                                    if(!prev.getNeighbors().contains(id)){
+                                        prev.getNeighbors().add(id);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    lastId = id;
+                }
+            }
+        }
+        for (SegmentNode node : segments.values()) {
+            node.makeAvg();
+        }
+        return segments;
+    }
+
+    public HashMap<Integer,SegmentNodeWhitPos> generateAverageColorWPos(Individual individual){
+        short[][] board = individual.getChromosone();
+
+        HashMap<Integer,SegmentNodeWhitPos> segments = new HashMap<>();
+        int lastId = 0;
+        for (int y=0; y < board.length; y++) {
+            for(int x=0;  x <board[y].length; x++){
+                if(x == 0){
+                    lastId = board[y][x];
+                }
+
+                int id = board[y][x];
+                if(id == 0){
+                    System.out.println("ERROR fitness");
+                }else{
+                    Color c = img.getPixelValue(x,y);
+                    SegmentNodeWhitPos node;
+                    if(segments.containsKey(id)){
+                        node = segments.get(id);
+                        node.addColor(c);
+                    }else{
+                        node =  new SegmentNodeWhitPos();
+                        node.addColor(c);
+                        node.setX(x);
+                        node.setY(y);
                         node.setId((short)id);
                         segments.put(id,node);
                     }

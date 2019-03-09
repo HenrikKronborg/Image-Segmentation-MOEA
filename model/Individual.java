@@ -1,10 +1,7 @@
 package model;
 
 import controller.MOEA;
-import model.supportNodes.Neighbor;
-import model.supportNodes.Pixel;
-import model.supportNodes.SegmentNeighbor;
-import model.supportNodes.SegmentNode;
+import model.supportNodes.*;
 import model.utils.FitnessCalc;
 import model.utils.ImageLoader;
 import model.utils.MutableShort;
@@ -95,6 +92,10 @@ public class Individual {
 
     private boolean cleanMergeSmallFirst(int MAX,FitnessCalc f) {
         HashMap<Integer, SegmentNode> avgColor = f.generateAverageColor(this);
+        if(avgColor == null){
+            System.out.println("");
+            return false;
+        }
         nrSegments = avgColor.size();
         if(avgColor.size() <= MAX + 1){
             return false;
@@ -156,30 +157,23 @@ public class Individual {
         for (int y = 0; y < ImageLoader.getHeight(); y++) {
             for (int x = 0; x < ImageLoader.getWidth(); x++) {
                 int id = chromosone[y][x];
+                if(id == 0){
+                    System.out.println("oops!");
+                }
                 if(idTable.containsKey(id)){
                     chromosone[y][x] = idTable.get(id).getValue();
-                }
-            }
-        }
-        return true;
-    }
-
-    public void removeSmallSegments(double thresholdPrecent){
-        HashMap<Integer,Integer> pixelsInSegment = new HashMap<>();
-
-        for (int y = 0; y < ImageLoader.getHeight(); y++) {
-            for (int x = 0; x < ImageLoader.getWidth(); x++) {
-                int segmentId = chromosone[y][x];
-                if(segmentId != 0){
-                    Integer pixels = pixelsInSegment.getOrDefault(segmentId,null);
-                    if(pixels == null){
-                        pixelsInSegment.put(segmentId,1);
-                    }else{
-                        pixelsInSegment.replace(segmentId,pixels+1);
+                    if(0 == idTable.get(id).getValue()){
+                        System.out.println("oops!");
                     }
                 }
             }
         }
+        
+        return true;
+    }
+
+    public void removeSmallSegments(double thresholdPrecent){
+        HashMap<Integer,Integer> pixelsInSegment = getSegmentSizes();
 
         long avg = 0;
         for(Integer value : pixelsInSegment.values()){
@@ -471,23 +465,22 @@ public class Individual {
         return children;
     }
 
-    public Individual[] crossoverSize(Individual mother, FitnessCalc f) {
+    public Individual[] crossoverSize(Individual mother, FitnessCalc f, int MAX) {
+        Pixel[][] pixels = MOEA.getPixels();
         short[][] mChrom = mother.getChromosone();
 
         Individual smallPri = new Individual();
         Individual bigPri = new Individual();
         short[][] sChrom = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
-        short[][] bChrom = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
-        smallPri.setChromosone(sChrom);
-        bigPri.setChromosone(bChrom);
+        //short[][] bChrom = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
+
 
         //Sort mother and father on segments size.
-        HashMap<Integer, SegmentNode> avgColorFather = f.generateAverageColor(this);
-        HashMap<Integer, SegmentNode> avgColorMother = f.generateAverageColor(mother);
+        HashMap<Integer, SegmentNodeWhitPos> avgColorFather = f.generateAverageColorWPos(this);
+        HashMap<Integer, SegmentNodeWhitPos> avgColorMother = f.generateAverageColorWPos(mother);
 
-        HashMap<Integer,MutableShort> idTable = new HashMap<>();
 
-        ArrayList<SegmentNode> listOfSegments = new ArrayList<>(avgColorFather.size()+avgColorMother.size());
+        ArrayList<SegmentNodeWhitPos> listOfSegments = new ArrayList<>(avgColorFather.size()+avgColorMother.size());
 
         listOfSegments.addAll(avgColorFather.values());
         listOfSegments.forEach(a-> a.setF(true));   // Sets that all current nodes are from father.
@@ -496,39 +489,142 @@ public class Individual {
 
         listOfSegments.sort(Comparator.comparing(SegmentNode::getNrPixels)); // Sort on size.
 
-        //First prioritize small segments.
         for(int i = 0; i < listOfSegments.size(); i++){
             listOfSegments.get(i).setRank((short)i);
         }
 
-        for (int y = 0; y < ImageLoader.getHeight(); y++) {
-            for (int x = 0; x < ImageLoader.getWidth(); x++) {
-                int idF = chromosone[y][x];
-                int idM = mChrom[y][x];
-                if(avgColorFather.get(idF).getRank() < avgColorMother.get(idM).getRank() ){
-                    sChrom[y][x] = chromosone[y][x];
-                }else{
-                    sChrom[y][x] = mChrom[y][x];
+        short[][] explored = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
+        // Small first.
+        short segmentId = 1;
+        for(SegmentNodeWhitPos node : listOfSegments){
+
+            short currId = node.getId();
+            Pixel currPixel =  pixels[node.getY()][node.getX()];
+            short[][] currBoard;
+            if(node.isF()){
+                currBoard = chromosone;
+            }else{
+                currBoard = mChrom;
+            }
+
+
+            LinkedList<Pixel> cantPlaceQueue = new LinkedList<>();
+            LinkedList<Pixel> placeQueue = new LinkedList<>();
+
+            explored[currPixel.getY()][currPixel.getX()] = node.getRank();
+
+            if(sChrom[currPixel.getY()][currPixel.getX()] == 0){
+                sChrom[currPixel.getY()][currPixel.getX()] = segmentId;
+            }
+            for(Neighbor n : currPixel.getNeighbors()){
+                if(currBoard[n.getNeighbor().getY()][n.getNeighbor().getX()] == currId){
+                    if(sChrom[n.getNeighbor().getY()][n.getNeighbor().getX()] == 0){
+                        placeQueue.add(n.getNeighbor());
+                    }else{
+                        cantPlaceQueue.add(n.getNeighbor());
+                    }
                 }
             }
+            do{             // Steps: 1: Mark as explored. 2: AddNeighbors. 2.a: only if not explored.
+                boolean wasPlaced = false;
+                while (!placeQueue.isEmpty()){
+                    currPixel = placeQueue.poll();
+                    explored[currPixel.getY()][currPixel.getX()] = node.getRank();
+
+                    for(Neighbor n : currPixel.getNeighbors()){
+                        if(explored[n.getNeighbor().getY()][n.getNeighbor().getX()] != node.getRank()){
+                            if(currBoard[n.getNeighbor().getY()][n.getNeighbor().getX()] == currId){
+                                if(sChrom[n.getNeighbor().getY()][n.getNeighbor().getX()] == 0){
+                                    placeQueue.add(n.getNeighbor());
+                                }else{
+                                    cantPlaceQueue.add(n.getNeighbor());
+                                }
+                                explored[n.getNeighbor().getY()][n.getNeighbor().getX()] = node.getRank();
+                            }
+                        }
+                    }
+                    if(sChrom[currPixel.getY()][currPixel.getX()] == 0){
+                        sChrom[currPixel.getY()][currPixel.getX()] = segmentId;
+                        wasPlaced = true;
+                    }
+                }
+                if (wasPlaced) {
+                    segmentId++;
+                    System.out.println(segmentId);
+                }       // Important segmentId is incremented.
+
+                if(!cantPlaceQueue.isEmpty()){
+                    currPixel = cantPlaceQueue.poll();
+                    explored[currPixel.getY()][currPixel.getX()] = node.getRank();
+                    for(Neighbor n : currPixel.getNeighbors()){
+                        if(explored[n.getNeighbor().getY()][n.getNeighbor().getX()] != node.getRank()){
+                            if(currBoard[n.getNeighbor().getY()][n.getNeighbor().getX()] == currId){
+                                if(sChrom[n.getNeighbor().getY()][n.getNeighbor().getX()] == 0){
+                                    placeQueue.add(n.getNeighbor());
+                                }else{
+                                    cantPlaceQueue.add(n.getNeighbor());
+                                }
+                                explored[n.getNeighbor().getY()][n.getNeighbor().getX()] = node.getRank();
+                            }
+                        }
+                    }
+                }
+            }while (!cantPlaceQueue.isEmpty() || !placeQueue.isEmpty());
+
+        }
+        smallPri.setChromosone(sChrom);
+        HashMap<Integer,Integer> nrOfSmallSegments = smallPri.getSegmentSizes();
+
+
+        long avg = 0;
+        byte nrOfSmall = 0;
+        for(Integer value : nrOfSmallSegments.values()){
+            avg += value;
+        }
+        avg /= nrOfSmallSegments.size();
+        if(avg < -1){
+            System.out.println("ERROR avg.");
+        }
+        for(Integer value : nrOfSmallSegments.values()){
+            if(value < avg *0.05){
+                nrOfSmall += (byte)1;
+            }
+        }
+        if(nrOfSmallSegments.containsKey(0)){
+            System.out.println("ERROR");
+        }
+        System.out.println("Segmtes:" + nrOfSmallSegments.size());
+        if(nrOfSmallSegments.size() > MAX + nrOfSmall){
+            while(smallPri.cleanMergeSmallFirst(MAX,f));
+
+        }else{
+            while (smallPri.cleanMergeSmallFirst(MAX-nrOfSmall,f));
+
         }
 
-        for (int y = 0; y < ImageLoader.getHeight(); y++) {
-            for (int x = 0; x < ImageLoader.getWidth(); x++) {
-                int idF = chromosone[y][x];
-                int idM = mChrom[y][x];
-                if(avgColorFather.get(idF).getRank() > avgColorMother.get(idM).getRank() ){
-                    bChrom[y][x] = chromosone[y][x];
-                }else{
-                    bChrom[y][x] = mChrom[y][x];
-                }
-            }
-        }
-        
-        return new Individual[]{smallPri, bigPri};
-        //return new Individual[]{smallPri};
+        //bigPri.setChromosone(bChrom);
+        //return new Individual[]{smallPri, bigPri};
+        return new Individual[]{smallPri};
     }
 
+    public HashMap<Integer,Integer> getSegmentSizes() {
+        HashMap<Integer,Integer> pixelsInSegment = new HashMap<>();
+
+        for (int y = 0; y < ImageLoader.getHeight(); y++) {
+            for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                int segmentId = chromosone[y][x];
+                if(segmentId != 0){
+                    Integer pixels = pixelsInSegment.getOrDefault(segmentId,null);
+                    if(pixels == null){
+                        pixelsInSegment.put(segmentId,1);
+                    }else{
+                        pixelsInSegment.replace(segmentId,pixels+1);
+                    }
+                }
+            }
+        }
+        return pixelsInSegment;
+    }
     private int repair(short[][]  shadow){
         Pixel[][] pixels = MOEA.getPixels();
         PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
@@ -839,4 +935,5 @@ public class Individual {
     public int getNrSegments() {
         return nrSegments;
     }
+
 }

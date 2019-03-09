@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 public class MOEA {
-    private static int popSize = 20; // Population size
+    private static int popSize = 2; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.20; // Mutation rate
     private static int maxRuns = 0; // Maximum number of runs before termination
@@ -24,12 +24,13 @@ public class MOEA {
     private int generation;
     private final int MINSEGMENTS = 3;
     private final int MAXSEGMENTS = 20;
+    private final int PREFEGMENTS = 8;
     private FitnessCalc fitness;
 
     private ImageLoader image;
     private static Pixel[][] pixels = new Pixel[ImageLoader.getHeight()][ImageLoader.getWidth()];
 
-    private final int N = 4;
+    private final int N = 1;
     private Thread[] threads = new Thread[N];
     CountDownLatch doneSignal = new CountDownLatch(N);
 
@@ -86,7 +87,7 @@ public class MOEA {
                         Individual father = NSGAIItournament();
                         Individual mother = NSGAIItournament();
 
-                        for(Individual child : father.crossoverSize(mother,fitness)) {
+                        for(Individual child : father.crossoverSize(mother,fitness,PREFEGMENTS)) {
                            /* if(child.getNrSegments() >= MAXSEGMENTS-1){
                                 child.mutateMerge(mutationRate,fitness);
                             }else if(child.getNrSegments() > MINSEGMENTS){
