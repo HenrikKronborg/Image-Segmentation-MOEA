@@ -12,10 +12,10 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 public class MOEA {
-    private static int popSize = 40; // Population size
+    private static int popSize = 4; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.20; // Mutation rate
-    private static int maxRuns = 0; // Maximum number of runs before termination
+    private static int maxRuns = 20; // Maximum number of runs before termination
     private static int tournamentSize = 2; // Number of individuals to choose from population at random
 
     private ThreadNode ob;
@@ -24,7 +24,7 @@ public class MOEA {
     private int generation;
     private final int MINSEGMENTS = 3;
     private final int MAXSEGMENTS = 20;
-    private final int PREFEGMENTS = 8;
+    private final int PREFEGMENTS = 5;
     private FitnessCalc fitness;
 
     private ImageLoader image;
@@ -32,7 +32,7 @@ public class MOEA {
 
     private final int N = 4;
     private Thread[] threads = new Thread[N];
-    CountDownLatch doneSignal = new CountDownLatch(N);
+    private CountDownLatch doneSignal = new CountDownLatch(N);
 
     public MOEA(ImageLoader loader) {
         this.image = loader;
@@ -89,22 +89,26 @@ public class MOEA {
                             mother = NSGAIItournament();
                         }
 
-                        for(Individual child : father.crossoverSize(mother,fitness,PREFEGMENTS)) {
-                           /* if(child.getNrSegments() >= MAXSEGMENTS-1){
-                                child.mutateMerge(mutationRate,fitness);
-                            }else if(child.getNrSegments() > MINSEGMENTS){
-                                child.mutateSplit(mutationRate,fitness);
-                            } else{
-                                if(Math.random() >= 0.5){
-                                    child.mutateSplit(mutationRate,fitness);
-                                }else{
-                                    child.mutateMerge(mutationRate,fitness);
+                        for(Individual child : father.crossoverSize(mother,fitness,MAXSEGMENTS)) {
+                            if(child != null){
+                               if(child.getNrSegments() > PREFEGMENTS){
+                                    //child.mutateMerge(mutationRate,fitness,PREFEGMENTS);
+                                }else if(child.getNrSegments() < PREFEGMENTS){
+                                    //child.mutateSplit(mutationRate,fitness);
+                                } else{
+                                    if(Math.random() >= 0.5){
+                                        //child.mutateSplit(mutationRate,fitness);
+                                    }else{
+                                        //child.mutateMerge(mutationRate,fitness,PREFEGMENTS);
+                                    }
                                 }
-                            }*/
-                            //if(child.getNrSegments() >= MINSEGMENTS && child.getNrSegments() <= MAXSEGMENTS)
-                                population.add(child);
+                                if(child.getNrSegments() >= MINSEGMENTS && child.getNrSegments() <= MAXSEGMENTS) {
+                                    population.add(child);
+                                    prod++;
+                                    System.out.println("Created child");
+                                }
+                            }
                         }
-                        prod++;
                     }
                     doneSignal.countDown();
                 }

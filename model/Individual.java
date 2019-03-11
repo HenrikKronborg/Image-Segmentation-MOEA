@@ -204,43 +204,93 @@ public class Individual {
         return false;
     }
 
-    public void mutateMerge(double mutateProb, FitnessCalc f){
-        if(mutateProb > Math.random()){
-            HashMap<Integer, SegmentNode> avgColor = f.generateAverageColor(this);// N, R, G, B, Neighbors
-            Double smallestDiff = Double.MAX_VALUE;
-            int toMerge = 0;
-            for(int key : avgColor.keySet()){
-                for(int key2 : avgColor.keySet()){
-                    if(key != key2){
-                        SegmentNode node1 = avgColor.get(key);
-                        if(node1.getNeighbors().contains(key2)){
-                            SegmentNode node2 = avgColor.get(key2);
-                            double diff = Math.sqrt(Math.pow(node1.getAvgRed() - node2.getAvgRed(), 2) + Math.pow(node1.getAvgGreen() - node2.getAvgGreen(), 2) + Math.pow(node1.getAvgBlue() - node2.getAvgBlue(), 2));
-                            if(diff < smallestDiff){
-                                //Merg the smallest segment in to the other.
-                                if(node1.getNrPixels() < node2.getNrPixels())
-                                    toMerge = key;
-                                else
-                                    toMerge = key2;
-                                smallestDiff = diff;
-                            }
+    public void mutateMerge(double mutateProb, FitnessCalc f,int PREFEGMENTS){
+
+        HashMap<Integer, SegmentNode> avgColor = f.generateAverageColor(this);
+
+        HashMap<Integer,MutableShort> idTable = new HashMap<>();
+        ArrayList<SegmentNode> listOfSegments = new ArrayList<SegmentNode>(idTable.size());
+
+        listOfSegments.addAll(avgColor.values());
+        listOfSegments.sort(Comparator.comparing(a -> a.getNrPixels()));
+
+        double threshold = listOfSegments.get(listOfSegments.size()-PREFEGMENTS).getNrPixels();
+        int extraRemoved = 0;
+        if(PREFEGMENTS+1 < listOfSegments.size()){
+            if(threshold > listOfSegments.get(listOfSegments.size()-PREFEGMENTS-1).getNrPixels()*0.8){
+                extraRemoved++;
+                threshold = listOfSegments.get(listOfSegments.size()-PREFEGMENTS-1).getNrPixels();
+                if(PREFEGMENTS+2 < listOfSegments.size()){
+                    if(threshold > listOfSegments.get(listOfSegments.size()-PREFEGMENTS-2).getNrPixels()*0.8) {
+                        extraRemoved++;
+                        threshold = listOfSegments.get(listOfSegments.size()-PREFEGMENTS-2).getNrPixels();
+                    }
+                }
+            }
+        }
+        int MAXDeletes = 3;
+        int deleted = 0;
+        for(int i = 0; i < listOfSegments.size()-PREFEGMENTS-extraRemoved; i++ ){
+            if(deleted < MAXDeletes && mutateProb < Math.random()){
+                deleted++;
+                nrSegments--;
+
+                SegmentNode root = listOfSegments.get(i);
+                double bestFit = Double.MAX_VALUE;
+                Integer bestNode = -1;
+
+                for(int neig : root.getNeighbors()){
+                    SegmentNode neighbor = avgColor.get(neig);
+                    if(neighbor.getNrPixels() < threshold){
+                        double diff = Math.sqrt(Math.pow(root.getAvgRed() - neighbor.getAvgRed(), 2) + Math.pow(root.getAvgGreen() - neighbor.getAvgGreen(), 2) + Math.pow(root.getAvgBlue() - neighbor.getAvgBlue(), 2));
+                        if(diff < bestFit){
+                            bestFit = diff;
+                            bestNode = (int) neighbor.getId();
                         }
                     }
                 }
+                if(bestNode == -1){
+                    for(int neig : root.getNeighbors()) {
+                        SegmentNode neighbor = avgColor.get(neig);
+                        double diff = Math.sqrt(Math.pow(root.getAvgRed() - neighbor.getAvgRed(), 2) + Math.pow(root.getAvgGreen() - neighbor.getAvgGreen(), 2) + Math.pow(root.getAvgBlue() - neighbor.getAvgBlue(), 2));
+                        if (diff < bestFit) {
+                            bestFit = diff;
+                            bestNode = (int) neighbor.getId();
+                        }
+                    }
+                }
+                if(bestNode == -1){
+                    System.out.println("oops?");
+                }else{
+                    if(idTable.containsKey(bestNode)){
+                        if(idTable.containsKey((int)root.getId())){
+                            idTable.get((int)root.getId()).setValue(idTable.get(bestNode).getValue());
+                        }else{
+                            idTable.put((int)root.getId(), idTable.get(bestNode));
+                        }
+                    }else{
+                        if(idTable.containsKey((int)root.getId())){
+                            idTable.put(bestNode, idTable.get((int)root.getId()));
+                        }else {
+                            MutableShort m = new MutableShort(root.getId());
 
-            }
-
-            for (int y = 0; y < ImageLoader.getHeight(); y++) {
-                for (int x = 0; x < ImageLoader.getWidth(); x++) {
-                    int id = chromosone[y][x];
-                    if(id == toMerge){
-                        chromosone[y][x] = 0;
+                            idTable.put((int)root.getId(), m);
+                            idTable.put(bestNode, m);
+                        }
                     }
                 }
             }
-
-            nrSegments = repair(chromosone);
         }
+
+        for (int y = 0; y < ImageLoader.getHeight(); y++) {
+            for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                int id = chromosone[y][x];
+                if(idTable.containsKey(id)){
+                    chromosone[y][x] = idTable.get(id).getValue();
+                }
+            }
+        }
+
 
     }
 
@@ -278,6 +328,7 @@ public class Individual {
         Individual smallPri = new Individual();
         Individual bigPri = new Individual();
         short[][] sChrom = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
+        smallPri.setChromosone(sChrom);
         //short[][] bChrom = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
 
 
@@ -294,6 +345,10 @@ public class Individual {
         listOfSegments.addAll(avgColorMother.values());
 
         listOfSegments.sort(Comparator.comparing(SegmentNode::getNrPixels)); // Sort on size.
+
+        int sizeThreshold  = listOfSegments.get(listOfSegments.size()-1).getNrPixels();
+        if(listOfSegments.size() > 8)
+            sizeThreshold = listOfSegments.get(listOfSegments.size()-8).getNrPixels();
 
         for(int i = 0; i < listOfSegments.size(); i++){
             listOfSegments.get(i).setRank(i);
@@ -316,6 +371,8 @@ public class Individual {
 
             LinkedList<Pixel> cantPlaceQueue = new LinkedList<>();
             LinkedList<Pixel> placeQueue = new LinkedList<>();
+            ArrayList<Integer> neighborSegment = new ArrayList<>(); //neighbors (only smaller segments)
+            int placedPixels = 0;
 
             explored[currPixel.getY()][currPixel.getX()] = node.getRank();
 
@@ -345,7 +402,6 @@ public class Individual {
                 }
             }
             while (!cantPlaceQueue.isEmpty() || !placeQueue.isEmpty()){ // Steps: 1: Mark as explored. 2: AddNeighbors. 2.a: only if not explored.
-                boolean wasPlaced = false;
                 while (!placeQueue.isEmpty()){
                     currPixel = placeQueue.poll();
 
@@ -363,12 +419,48 @@ public class Individual {
                     }
                     if(sChrom[currPixel.getY()][currPixel.getX()] == 0){
                         sChrom[currPixel.getY()][currPixel.getX()] = segmentId;
-                        wasPlaced = true;
+                        placedPixels++;
+
+                        for(Neighbor n : currPixel.getNeighbors()){
+                            int nValue = (int)sChrom[n.getNeighbor().getY()][n.getNeighbor().getX()];
+                            if(nValue != 0){
+                                if(!neighborSegment.contains(nValue)){
+                                    neighborSegment.add(nValue);
+                                }
+                            }
+                        }
                     }
                 }
-                if (wasPlaced) {
+                if (placedPixels > 0) {
                     segmentId++;
                 }
+                // devour if smaller than half its size, but not if it is still larger than treshold
+
+                if(placedPixels != 0 && placedPixels < ((double)node.getNrPixels())*0.5){
+                    if(placedPixels < sizeThreshold) {
+                        int devourId = neighborSegment.get((int)(Math.random()*neighborSegment.size()));
+                        sChrom[currPixel.getY()][currPixel.getX()] = (short)devourId;
+                        LinkedList<Pixel> devourQueue = new LinkedList<>();
+
+                        for(Neighbor n : currPixel.getNeighbors()){
+                            if(currBoard[n.getNeighbor().getY()][n.getNeighbor().getX()] == segmentId){
+                                devourQueue.add(n.getNeighbor());
+                                sChrom[n.getNeighbor().getY()][n.getNeighbor().getX()] = (short)devourId;
+                            }
+                        }
+                        while (!devourQueue.isEmpty()){
+                            for(Neighbor n : currPixel.getNeighbors()){
+                                if(currBoard[n.getNeighbor().getY()][n.getNeighbor().getX()] == segmentId){
+                                    devourQueue.add(n.getNeighbor());
+                                    sChrom[n.getNeighbor().getY()][n.getNeighbor().getX()] = (short)devourId;
+                                }
+                            }
+                        }
+
+                    }
+                }
+                neighborSegment.clear(); //clears
+                placedPixels = 0;
 
                 if(!cantPlaceQueue.isEmpty()){
                     currPixel = cantPlaceQueue.poll();
@@ -388,12 +480,11 @@ public class Individual {
             }
 
         }
-
-        smallPri.setChromosone(sChrom);
         for (int y = 0; y < ImageLoader.getHeight(); y++) {
             for (int x = 0; x < ImageLoader.getWidth(); x++) {
                 int id = sChrom[y][x];
                 if (id == 0) {
+                    return null;/*
                     sChrom[y][x] = segmentId;
                     Pixel currPixel = pixels[y][x];
                     LinkedList<Pixel> placeQueue = new LinkedList<>();
@@ -403,7 +494,15 @@ public class Individual {
                             placeQueue.add(n.getNeighbor());
                         }
                     }
-                    segmentId++;
+                    while (!placeQueue.isEmpty()){
+                        for(Neighbor n : currPixel.getNeighbors()){
+                            if(sChrom[n.getNeighbor().getY()][n.getNeighbor().getX()] == 0){
+                                placeQueue.add(n.getNeighbor());
+                                sChrom[n.getNeighbor().getY()][n.getNeighbor().getX()] = segmentId;
+                            }
+                        }
+                    }
+                    segmentId++;*/
                 }
                 //smallPri.nrSegments = 7;
                 //return new Individual[]{smallPri};
