@@ -119,7 +119,7 @@ public class GUI implements Initializable {
             public void run() {
                 algorithm = new MOEA(image);
                 algorithm.loadObservableList(listener);
-                algorithm.run2();
+                algorithm.run();
 
             }
         });
@@ -131,8 +131,7 @@ public class GUI implements Initializable {
         canvasBlackWhite.snapshot(null, image);
 
         String filename = "GT_" + bestIndividual.getNrSegments();
-        // Funker ikke med formatName = jpg, jpeg, JPG, JPEG..???
-        ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", new File("./src/output/" + filename + ".jpg"));
+        ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", new File("./src/output/" + filename + ".png"));
     }
 
     @FXML
