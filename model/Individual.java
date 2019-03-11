@@ -518,8 +518,6 @@ public class Individual {
                 }
             }
             if(cantPlaceQueue.isEmpty() && placeQueue.isEmpty()){
-                System.out.println("noo");
-
                 for(Neighbor n : currPixel.getNeighbors()){
                     if(currBoard[n.getNeighbor().getY()][n.getNeighbor().getX()] == currId){
                         if(sChrom[n.getNeighbor().getY()][n.getNeighbor().getX()] == 0){
@@ -646,6 +644,7 @@ public class Individual {
         }
         return pixelsInSegment;
     }
+
     private int repair(short[][]  shadow){
         Pixel[][] pixels = MOEA.getPixels();
         PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();

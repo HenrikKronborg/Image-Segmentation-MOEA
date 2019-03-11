@@ -49,8 +49,7 @@ public class MOEA {
                     System.out.println("thread started");
                     while(added < popSize/threads.length) {
 
-                        int segments = (int) (Math.random() * (MAXSEGMENTS - MINSEGMENTS)) + MINSEGMENTS + 1;
-                        Individual indv = new Individual(segments);
+                        Individual indv = new Individual();
                         indv.generateIndividual(threshold + 5 * Math.random(), fitness, MAXSEGMENTS, MINSEGMENTS);
 
                         if (indv.getNrSegments() >= MINSEGMENTS && indv.getNrSegments() <= MAXSEGMENTS){
