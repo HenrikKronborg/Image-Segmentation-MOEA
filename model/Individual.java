@@ -92,14 +92,11 @@ public class Individual {
 
     private boolean cleanMergeSmallFirst(int MAX,FitnessCalc f) {
         HashMap<Integer, SegmentNode> avgColor = f.generateAverageColor(this);
-        if(avgColor == null){
-            System.out.println("");
-            return false;
-        }
         nrSegments = avgColor.size();
         if(avgColor.size() <= MAX + 1){
             return false;
         }
+
         HashMap<Integer,MutableShort> idTable = new HashMap<>();
         ArrayList<SegmentNode> listOfSegments = new ArrayList<SegmentNode>(idTable.size());
 
@@ -157,14 +154,8 @@ public class Individual {
         for (int y = 0; y < ImageLoader.getHeight(); y++) {
             for (int x = 0; x < ImageLoader.getWidth(); x++) {
                 int id = chromosone[y][x];
-                if(id == 0){
-                    System.out.println("oops!");
-                }
                 if(idTable.containsKey(id)){
                     chromosone[y][x] = idTable.get(id).getValue();
-                    if(0 == idTable.get(id).getValue()){
-                        System.out.println("oops!");
-                    }
                 }
             }
         }
@@ -601,7 +592,6 @@ public class Individual {
                         }
                     }
                     segmentId++;
-                    System.out.println("oops!3");
                 }
                 //smallPri.nrSegments = 7;
                 //return new Individual[]{smallPri};
