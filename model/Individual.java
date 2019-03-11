@@ -23,10 +23,6 @@ public class Individual {
     public ArrayList<Individual> S = new ArrayList<>();
     Random r = new Random();
 
-    public Individual(int segments) {
-        generateIndividualSmart(segments);
-    }
-
     public Individual() {
 
     }
@@ -196,97 +192,6 @@ public class Individual {
         }
     }
 
-    public void generateIndividual(int segments) {
-        chromosone = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
-        // List of all pixels in the image
-        ArrayList<Pixel> pixelsNodes = new ArrayList<>(ImageLoader.getHeight() * ImageLoader.getWidth());
-
-        for (Pixel[] pixels : MOEA.getPixels()) {
-            for (Pixel pixel : pixels) {
-                pixelsNodes.add(pixel);
-            }
-        }
-        Collections.shuffle(pixelsNodes);
-        Pixel[] roots =  new Pixel[segments];
-        PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
-
-        for(int i = 0; i < roots.length; i++){
-            Pixel root = pixelsNodes.get(i);
-            roots[i] = root;
-            chromosone[root.getY()][root.getX()] = (short) (i+1);
-            pQueue.addAll(root.getNeighbors());
-        }
-        while (pQueue.size() != 0){
-            Neighbor newNode = pQueue.poll();
-            if (chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0) {
-                chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = chromosone[newNode.getPixel().getY()][newNode.getPixel().getX()];
-                pQueue.addAll(newNode.getNeighbor().getNeighbors());
-            }
-        }
-
-        nrSegments = segments;
-
-    }
-
-    public void generateIndividualSmart(int segments) {
-        int[] pixelsInSegment = new int[segments+1];
-        chromosone = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
-        // List of all pixels in the image
-        ArrayList<Pixel> pixelsNodes = new ArrayList<>(ImageLoader.getHeight() * ImageLoader.getWidth());
-
-        for (Pixel[] pixels : MOEA.getPixels()) {
-            for (Pixel pixel : pixels) {
-                pixelsNodes.add(pixel);
-            }
-        }
-        Collections.shuffle(pixelsNodes);
-        Pixel[] roots =  new Pixel[segments];
-        PriorityQueue<Neighbor> pQueue = new PriorityQueue<>();
-
-        for(int i = 0; i < roots.length; i++){
-            Pixel root = pixelsNodes.get(i);
-            roots[i] = root;
-            chromosone[root.getY()][root.getX()] = (short) (i+1);
-            pixelsInSegment[(i+1)] = 1;
-            pQueue.addAll(root.getNeighbors());
-        }
-        while (pQueue.size() != 0){
-            Neighbor newNode = pQueue.poll();
-            if (chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] == 0) {
-                short segment = chromosone[newNode.getPixel().getY()][newNode.getPixel().getX()];
-                chromosone[newNode.getNeighbor().getY()][newNode.getNeighbor().getX()] = segment;
-                pQueue.addAll(newNode.getNeighbor().getNeighbors());
-                pixelsInSegment[(segment)] += 1;
-            }
-        }
-        int max = -1;
-        for(int value : pixelsInSegment){
-            if(value > max){
-                max = value;
-            }
-        }
-        ArrayList<Integer> toMerge = new ArrayList<>();
-        for(int i = 1; i < pixelsInSegment.length; i++){
-            if(pixelsInSegment[i] < (int)(max*0.05)){
-                toMerge.add(i);
-            }
-        }
-        if(toMerge.size() != 0) {
-            for (int y = 0; y < ImageLoader.getHeight(); y++) {
-                for (int x = 0; x < ImageLoader.getWidth(); x++) {
-                    int id = chromosone[y][x];
-                    if (toMerge.contains(id)) {
-                        chromosone[y][x] = 0;
-                    }
-                }
-            }
-            nrSegments = repair(chromosone);
-        }else{
-            nrSegments = segments;
-        }
-
-    }
-
     public boolean dominates(Individual x) {
         // Check if the Solutions have the same fitness value
         if (!(fitnessDeviation == x.getFitnessDeviation() && fitnessConnectivity == x.getFitnessConnectivity())) {
@@ -364,96 +269,6 @@ public class Individual {
         }
 
         nrSegments = repairSplit(chromosone);
-    }
-
-    public Individual[] crossover(Individual mother) {
-
-        int crossoverPointX = (int) (Math.random() * ImageLoader.getWidth());
-        int crossoverPointY = (int) (Math.random() * ImageLoader.getHeight());
-
-        Individual[] children = {new Individual(), new Individual()};
-
-        for (int i = 0; i < children.length;i++) {
-            boolean change = false;
-            HashMap<Integer,Integer> fatherTable = new HashMap<>();
-            int segmentId = 1;
-            short[][] newShadow = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
-            for (int y = 0; y < ImageLoader.getHeight(); y++) {
-                for (int x = 0; x < ImageLoader.getWidth(); x++) {
-                    if (y == crossoverPointY && x == crossoverPointX) {
-                        change = true;
-                    }
-                    int currentId;
-                    boolean toPlace = true;
-                    if (i == 0) {
-                        currentId = chromosone[y][x];
-                    } else {
-                        currentId = mother.getChromosone()[y][x];
-                    }
-
-                    currentId = translate(fatherTable,change,currentId,segmentId);
-                    segmentId = fatherTable.size();
-
-                    if(toPlace){
-                        newShadow[y][x] = (short)currentId;
-                    }
-
-                }
-            }
-            change = false;
-            HashMap<Integer,Integer> motherTable = new HashMap<>();
-            ArrayList<Integer> checkForRepair = new ArrayList<>();
-
-            for (int y = 0; y < ImageLoader.getHeight(); y++) {
-                for (int x = 0; x < ImageLoader.getWidth(); x++) {
-                    if (newShadow[y][x] == 0) {
-                        int currentId;
-                        if (i == 0) {
-                            currentId = mother.getChromosone()[y][x];
-                        } else {
-                            currentId = chromosone[y][x];
-                        }
-
-                        currentId = translate(motherTable,change,currentId,segmentId);
-                        segmentId = fatherTable.size()+motherTable.size();
-
-                        newShadow[y][x] = (short)currentId;
-                    }else{
-                        if(!checkForRepair.contains((int)mother.getChromosone()[y][x]))
-                            checkForRepair.add((int)mother.getChromosone()[y][x]);
-                    }
-
-                }
-            }
-
-            children[i].nrSegments = fatherTable.size()+motherTable.size();
-
-            for(int j = 0; j <checkForRepair.size();j++){
-                Integer temp = motherTable.get(checkForRepair.get(j));
-                if(temp != null){
-                    checkForRepair.set(j, temp);
-                }else{
-                    checkForRepair.set(j,0);
-                }
-            }
-            boolean repair = false;
-            for (int y = 0; y < ImageLoader.getHeight(); y++) {
-                for (int x = 0; x < ImageLoader.getWidth(); x++) {
-                    int temp = newShadow[y][x];
-                    if(checkForRepair.contains(temp)){
-                        newShadow[y][x] = 0;
-                        repair = true;
-                    }
-                }
-            }
-
-            if(repair){
-                children[i].nrSegments = repair(newShadow); // Corrects and returns nr of segments.
-            }
-            children[i].setChromosone(newShadow);
-        }
-
-        return children;
     }
 
     public Individual[] crossoverSize(Individual mother, FitnessCalc f, int MAX) {
@@ -576,7 +391,6 @@ public class Individual {
 
         }
 
-
         smallPri.setChromosone(sChrom);
         for (int y = 0; y < ImageLoader.getHeight(); y++) {
             for (int x = 0; x < ImageLoader.getWidth(); x++) {
@@ -597,8 +411,6 @@ public class Individual {
                 //return new Individual[]{smallPri};
             }
         }
-
-
 
         HashMap<Integer,Integer> nrOfSegments = smallPri.getSegmentSizes();
         long avg = 0;
@@ -740,26 +552,7 @@ public class Individual {
         return repair(chromosone);
     }
 
-    private int translate(HashMap<Integer,Integer> translate, boolean change,int currentId, int segmentId){
-        if(change){
-            if(translate.containsKey(currentId)){
-                currentId = translate.get(currentId);
-            }else {
-                return 0;
-            }
-        }else{
-            if(translate.containsKey(currentId)){
-                currentId = translate.get(currentId);
-            }else{
-                translate.put(currentId, segmentId);
-                currentId = translate.get(currentId);
-            }
-        }
-        return currentId;
-
-    }
-
-        /*
+    /*
      * Compares
      */
     public int compareDeviationTo(Individual other) {
