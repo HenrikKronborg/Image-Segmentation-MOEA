@@ -228,7 +228,7 @@ public class Individual {
                 }
             }
         }
-        int MAXDeletes = 5;
+        int MAXDeletes = 3;
         int deleted = 0;
         for(int i = 0; i < listOfSegments.size()-PREFEGMENTS-extraRemoved; i++ ){
             if(deleted < MAXDeletes && mutateProb < Math.random()){
@@ -453,10 +453,20 @@ public class Individual {
                             placeQueue.add(n.getNeighbor());
                         }
                     }
+                    while (!placeQueue.isEmpty()){
+                        currPixel = placeQueue.pop();
+
+                        for(Neighbor n : currPixel.getNeighbors()){
+                            if(sChrom[n.getNeighbor().getY()][n.getNeighbor().getX()] == 0){
+                                sChrom[n.getNeighbor().getY()][n.getNeighbor().getX()] = segmentId;
+                                placeQueue.add(n.getNeighbor());
+                            }
+                        }
+                    }
                     segmentId++;
+                    if(sChrom[y][x] == 0)
+                        System.out.println("whoops");
                 }
-                //smallPri.nrSegments = 7;
-                //return new Individual[]{smallPri};
             }
         }
 
