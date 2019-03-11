@@ -15,7 +15,7 @@ public class MOEA {
     private static int popSize = 4; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.20; // Mutation rate
-    private static int maxRuns = 20; // Maximum number of runs before termination
+    private static int maxRuns = 40; // Maximum number of runs before termination
     private static int tournamentSize = 2; // Number of individuals to choose from population at random
 
     private ThreadNode ob;
@@ -23,14 +23,14 @@ public class MOEA {
     private static LinkedList<Individual> front;
     private int generation;
     private final int MINSEGMENTS = 3;
-    private final int MAXSEGMENTS = 20;
+    private final int MAXSEGMENTS = 15;
     private final int PREFEGMENTS = 5;
     private FitnessCalc fitness;
 
     private ImageLoader image;
     private static Pixel[][] pixels = new Pixel[ImageLoader.getHeight()][ImageLoader.getWidth()];
 
-    private final int N = 4;
+    private final int N = 1;
     private Thread[] threads = new Thread[N];
     private CountDownLatch doneSignal = new CountDownLatch(N);
 
@@ -89,24 +89,29 @@ public class MOEA {
                             mother = NSGAIItournament();
                         }
 
-                        for(Individual child : father.crossoverSize(mother,fitness,MAXSEGMENTS)) {
+                        for(Individual child : father.crossoverSize(mother,fitness,MAXSEGMENTS-1)) {
                             if(child != null){
                                if(child.getNrSegments() > PREFEGMENTS){
-                                    //child.mutateMerge(mutationRate,fitness,PREFEGMENTS);
+                                    child.mutateMerge(mutationRate,fitness,PREFEGMENTS);
                                 }else if(child.getNrSegments() < PREFEGMENTS){
                                     //child.mutateSplit(mutationRate,fitness);
                                 } else{
                                     if(Math.random() >= 0.5){
                                         //child.mutateSplit(mutationRate,fitness);
                                     }else{
-                                        //child.mutateMerge(mutationRate,fitness,PREFEGMENTS);
+                                        child.mutateMerge(mutationRate,fitness,PREFEGMENTS);
                                     }
                                 }
                                 if(child.getNrSegments() >= MINSEGMENTS && child.getNrSegments() <= MAXSEGMENTS) {
                                     population.add(child);
                                     prod++;
                                     System.out.println("Created child");
-                                }
+                                }else{
+                                    System.out.println(child.getNrSegments());
+                                    System.out.println("not: size");
+                               }
+                            }else{
+                                System.out.println("not: null");
                             }
                         }
                     }
