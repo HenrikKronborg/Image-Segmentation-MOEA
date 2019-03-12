@@ -16,7 +16,6 @@ public class Individual {
     private int rank;
     private double fitnessDeviation;
     private double fitnessConnectivity;
-    private double fitnessEdge;
     private double crowdingDistance;
 
     public int n; // Number of dominating elements.
@@ -634,16 +633,6 @@ public class Individual {
         return -1;
     }
 
-    public int compareEdgeTo(Individual other) {
-        double cmp = this.fitnessEdge - other.fitnessEdge;
-        if(cmp > 0){
-            return 1;
-        } else if(cmp == 0){
-            return 0;
-        }
-        return -1;
-    }
-
     public int compareCrowdTo(Individual other) {
         double cmp = other.crowdingDistance - this.crowdingDistance;
         if(cmp > 0){
@@ -731,15 +720,6 @@ public class Individual {
     /*
      * Getters and Setters
      */
-
-    public double getFitnessEdge() {
-        return fitnessEdge;
-    }
-
-    public void setFitnessEdge(double fitnessEdge) {
-        this.fitnessEdge = fitnessEdge;
-    }
-
     public double getFitnessConnectivity() {
         return fitnessConnectivity;
     }
