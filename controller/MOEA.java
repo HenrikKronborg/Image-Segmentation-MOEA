@@ -23,7 +23,7 @@ public class MOEA {
     private static LinkedList<Individual> front;
     private int generation;
     private final int MINSEGMENTS = 3;
-    private final int MAXSEGMENTS = 15;
+    private final int MAXSEGMENTS = 12;
     private final int PREFEGMENTS = 5;
     private FitnessCalc fitness;
 

@@ -346,7 +346,7 @@ public class Individual {
         listOfSegments.sort(Comparator.comparing(SegmentNode::getNrPixels)); // Sort on size.
 
         for(int i = 0; i < listOfSegments.size(); i++){
-            listOfSegments.get(i).setRank(i);
+            listOfSegments.get(i).setRank(i+1);
         }
 
         int[][] explored = new int[ImageLoader.getHeight()][ImageLoader.getWidth()];
@@ -370,30 +370,11 @@ public class Individual {
             explored[currPixel.getY()][currPixel.getX()] = node.getRank();
 
             if(sChrom[currPixel.getY()][currPixel.getX()] == 0){
-                sChrom[currPixel.getY()][currPixel.getX()] = segmentId;
+                placeQueue.add(currPixel);
+            }else{
+                cantPlaceQueue.add(currPixel);
             }
-            for(Neighbor n : currPixel.getNeighbors()){
-                if(currBoard[n.getNeighbor().getY()][n.getNeighbor().getX()] == currId){
-                    if(sChrom[n.getNeighbor().getY()][n.getNeighbor().getX()] == 0){
-                        placeQueue.add(n.getNeighbor());
-                    }else{
-                        cantPlaceQueue.add(n.getNeighbor());
-                    }
-                    explored[n.getNeighbor().getY()][n.getNeighbor().getX()] = node.getRank();
-                }
-            }
-            if(cantPlaceQueue.isEmpty() && placeQueue.isEmpty()){
-                for(Neighbor n : currPixel.getNeighbors()){
-                    if(currBoard[n.getNeighbor().getY()][n.getNeighbor().getX()] == currId){
-                        if(sChrom[n.getNeighbor().getY()][n.getNeighbor().getX()] == 0){
-                            placeQueue.add(n.getNeighbor());
-                        }else{
-                            cantPlaceQueue.add(n.getNeighbor());
-                        }
-                        explored[n.getNeighbor().getY()][n.getNeighbor().getX()] = node.getRank();
-                    }
-                }
-            }
+
             while (!cantPlaceQueue.isEmpty() || !placeQueue.isEmpty()){ // Steps: 1: Mark as explored. 2: AddNeighbors. 2.a: only if not explored.
                 boolean wasPlaced = false;
                 while (!placeQueue.isEmpty()){
@@ -444,6 +425,7 @@ public class Individual {
             for (int x = 0; x < ImageLoader.getWidth(); x++) {
                 int id = sChrom[y][x];
                 if (id == 0) {
+                    System.out.println("Was 0");
                     sChrom[y][x] = segmentId;
                     Pixel currPixel = pixels[y][x];
                     LinkedList<Pixel> placeQueue = new LinkedList<>();
