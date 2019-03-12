@@ -9,6 +9,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
@@ -40,13 +43,25 @@ public class GUI implements Initializable {
     @FXML
     private Label segments;
     @FXML
+    private Label stats;
+    @FXML
     private Button nextIndividual;
+    @FXML
+    private Button start;
     @FXML
     private Label individualNumber;
     @FXML
     private HBox individualNumberHBox;
     @FXML
     private ChoiceBox cBox;
+    @FXML
+    private LineChart<Number, Number> linechart;
+    @FXML
+    private NumberAxis yAxis;
+    @FXML
+    private NumberAxis xAxis;
+
+    XYChart.Series series = new XYChart.Series();
 
     private GraphicsContext gc1;
     private GraphicsContext gc2;
@@ -71,6 +86,10 @@ public class GUI implements Initializable {
 
         image = new ImageLoader();
 
+        linechart.getData().add(series);
+        yAxis.forceZeroInRangeProperty().setValue(false);
+        xAxis.forceZeroInRangeProperty().setValue(false);
+
         initChoiceBox();
     }
 
@@ -87,6 +106,8 @@ public class GUI implements Initializable {
         // Hide controllers
         frontNumber = 0;
         nextIndividual.setDisable(true);
+        start.setDisable(true);
+        cBox.setDisable(true);
         individualNumberHBox.setVisible(false);
 
         // Clear the segment drawings
@@ -98,6 +119,11 @@ public class GUI implements Initializable {
 
         gcBlackWhite.setFill(javafx.scene.paint.Color.rgb(255,255,255));
         gcBlackWhite.fillRect(1, 1, ImageLoader.getWidth()-2, ImageLoader.getHeight()-2);
+
+        linechart.getData().clear();
+        series = new XYChart.Series();
+        linechart.getData().add(series);
+
     }
 
     private void initChoiceBox() {
@@ -161,6 +187,7 @@ public class GUI implements Initializable {
         generation.setText(Integer.toString(listener.getGeneration()));
         segments.setText(Integer.toString(bestIndividual.getNrSegments()));
     }
+
     private void drawSegments(Individual individual) {
         gc2.clearRect(0,0,canvas2.getWidth(),canvas2.getHeight());
         HashMap<Integer, Color> colorMap =  new HashMap<>();
@@ -186,7 +213,10 @@ public class GUI implements Initializable {
             }
         }
     }
+
     public void drawResult(Individual individual) {
+
+        stats.setText("Connectivity: "+Math.round(individual.getFitnessConnectivity())+", Deviation: "+Math.round(individual.getFitnessDeviation()));
         gcBlackWhite.setFill(javafx.scene.paint.Color.rgb(255,255,255));
         gcBlackWhite.fillRect(1, 1, ImageLoader.getWidth()-2, ImageLoader.getHeight()-2);
 
@@ -206,6 +236,15 @@ public class GUI implements Initializable {
         }
     }
 
+    private void upDateChart(LinkedList<Individual> front){
+        linechart.getData().clear();
+        series = new XYChart.Series();
+        linechart.getData().add(series);
+        for(Individual i : front){
+            series.getData().add(new XYChart.Data(i.getFitnessConnectivity(), i.getFitnessDeviation()));
+        }
+    }
+
     public void initListener(){
         listener = new ThreadNode();
 
@@ -219,9 +258,12 @@ public class GUI implements Initializable {
                     drawSegments(bestIndividual);
                     drawResult(bestIndividual);
                     drawText();
+                    upDateChart(front);
 
                     if(listener.getGeneration() == MOEA.getMaxRuns()) {
                         nextIndividual.setDisable(false);
+                        start.setDisable(false);
+                        cBox.setDisable(false);
                     }
                 }
             }
