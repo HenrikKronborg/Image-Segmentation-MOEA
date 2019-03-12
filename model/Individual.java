@@ -88,7 +88,7 @@ public class Individual {
     private boolean cleanMergeSmallFirst(int MAX,FitnessCalc f) {
         HashMap<Integer, SegmentNode> avgColor = f.generateAverageColor(this);
         nrSegments = avgColor.size();
-        if(avgColor.size() <= MAX + 1){
+        if(avgColor.size() <= MAX){
             return false;
         }
 
