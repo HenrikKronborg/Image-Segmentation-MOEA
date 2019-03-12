@@ -141,7 +141,7 @@ public class FitnessCalc {
                     sum += Math.sqrt(Math.pow(color.getRed() - c[1], 2) + Math.pow(color.getGreen() - c[2], 2) + Math.pow(color.getBlue() - c[3], 2))/1000;
                     avgSegmentDeviation.put(id, sum);
                 }else{
-                    avgSegmentDeviation.put(id, Math.sqrt(Math.pow(color.getRed() - c[1], 2) + Math.pow(color.getGreen() - c[2], 2) + Math.pow(color.getBlue() - c[3], 2))/1000);
+                    avgSegmentDeviation.put(id, Math.sqrt(Math.pow(color.getRed() - c[1], 2) + Math.pow(color.getGreen() - c[2], 2) + Math.pow(color.getBlue() - c[3], 2)));
                 }
             }
         }
