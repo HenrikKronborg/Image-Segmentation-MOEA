@@ -157,6 +157,16 @@ public class GUI implements Initializable {
         canvasBlackWhite.snapshot(null, image);
 
         String filename = "GT_" + bestIndividual.getNrSegments();
+
+        File file = new File("./src/output/" + filename + ".png");
+
+        int i = 1;
+        while(file.exists()) {
+            filename = "GT_" + bestIndividual.getNrSegments() + "_" + i;
+            file = new File("./src/output/" + filename + ".png");
+            i++;
+        }
+
         ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", new File("./src/output/" + filename + ".png"));
     }
 

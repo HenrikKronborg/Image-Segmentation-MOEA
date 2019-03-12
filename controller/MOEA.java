@@ -63,7 +63,6 @@ public class MOEA {
                             threshold += 3;
                         }
 
-
                         counter++;
                         if(counter > popSize*1.5){
                             System.out.println("Mayor problem in init pop");
@@ -89,7 +88,7 @@ public class MOEA {
                             mother = NSGAIItournament();
                         }
 
-                        for(Individual child : father.crossoverSize(mother,fitness,MAXSEGMENTS-1)) {
+                        for(Individual child : father.crossoverSize(mother,fitness,MAXSEGMENTS)) {
                             if(child != null){
                                if(child.getNrSegments() > PREFEGMENTS){
                                     child.mutateMerge(mutationRate,fitness,PREFEGMENTS);

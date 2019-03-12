@@ -88,7 +88,7 @@ public class Individual {
     private boolean cleanMergeSmallFirst(int MAX,FitnessCalc f) {
         HashMap<Integer, SegmentNode> avgColor = f.generateAverageColor(this);
         nrSegments = avgColor.size();
-        if(avgColor.size() <= MAX + 1){
+        if(avgColor.size() <= MAX){
             return false;
         }
 
@@ -623,80 +623,6 @@ public class Individual {
             return 0;
         }
         return -1;
-    }
-
-    /**
-     Available nodes to link explained:
-     Method returns an int where the int represents a neighboring Node.
-     Given a node N (where 0 represents N):
-          3
-     2    N   1
-          4
-     Edges of the image (frame): A node that will be outside the image will not be returned.
-     */
-    private int getRandomAvailableNode(int x, int y){
-        int select = 0;
-        if(x == 0) {
-            if(y == 0) {
-                int rnd = r.nextInt(3); // 0,1 and 4 available.
-                if(rnd == 2) {
-                    rnd = 4;
-                }
-                select = rnd;
-
-            } else if(y == chromosone.length -1) {
-                int rnd = r.nextInt(3); // 0,1 and 3 available.
-                if(rnd == 2) {
-                    rnd = 3;
-                }
-                select = rnd;
-
-            } else {
-                int rnd = r.nextInt(4); // 0,1,3 and 4 available.
-                if(rnd == 2) {
-                    rnd = 4;
-                }
-                select = rnd;
-            }
-        } else if(x == chromosone[0].length -1) {
-            if(y == 0) {
-                int rnd = r.nextInt(3); // 0,2 and 4 available.
-                if(rnd == 1) {
-                    rnd = 4;
-                }
-                select = rnd;
-
-            } else if(y == chromosone.length -1) {
-                int rnd = r.nextInt(3); // 0,2 and 3 available.
-                if(rnd == 1){
-                    rnd = 3;
-                }
-                select = rnd;
-
-            } else {
-                int rnd = r.nextInt(4); // 0,2,3 and 4 available.
-                if(rnd == 1) {
-                    rnd = 4;
-                }
-                select = rnd;
-            }
-        } else {
-            if(y == 0) {
-                int rnd = r.nextInt(4); // 0,1,2 and 4 available.
-                if(rnd == 3) {
-                    rnd = 4;
-                }
-                select = rnd;
-
-            } else if(y == chromosone.length -1) {
-                select = r.nextInt(4); // 0,1,2 and 3 available.
-
-            } else {
-                select = r.nextInt(5);// 0,1,2,3 and 4 available.
-            }
-        }
-
-        return select;
     }
 
     /*
