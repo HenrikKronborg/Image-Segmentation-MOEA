@@ -183,16 +183,24 @@ public class GUI implements Initializable {
         if(!individualNumberHBox.isVisible()) {
             individualNumberHBox.setVisible(true);
         }
+        LinkedList<Individual> list = new LinkedList<>();
 
-        if(frontNumber == front.size()) {
-            frontNumber = 0;
-        }
         front.sort((Individual a, Individual b)-> a.compareCrowdTo(b));
 
-        bestIndividual = front.get(frontNumber);
+        for(Individual i : front) {
+            if(i.getCrowdingDistance() != Double.MAX_VALUE && list.size() < 5) {
+                list.add(i);
+            }
+        }
+
+        if(frontNumber == list.size()) {
+            frontNumber = 0;
+        }
+
+        bestIndividual = list.get(frontNumber);
 
         // Update text
-        individualNumber.setText((frontNumber + 1) + " out of " + front.size());
+        individualNumber.setText((frontNumber + 1) + " out of " + list.size());
         segments.setText(Integer.toString(bestIndividual.getNrSegments()));
 
         drawSegments(bestIndividual);
