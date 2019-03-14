@@ -12,17 +12,17 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 public class MOEA {
-    private static int popSize = 40; // Population size
+    private static int popSize = 16; // Population size
     private static int numOffsprings = popSize; // Number of offsprings
     private static double mutationRate = 0.20; // Mutation rate
-    private static int maxRuns = 5; // Maximum number of runs before termination
+    private static int maxRuns = 20; // Maximum number of runs before termination
     private static int tournamentSize = 2; // Number of individuals to choose from population at random
 
     private ThreadNode ob;
     private static ArrayList<Individual> population;
     private static LinkedList<Individual> front;
     private int generation;
-    private final int MINSEGMENTS = 3;
+    private final int MINSEGMENTS = 2;
     private final int MAXSEGMENTS = 12;
     private final int PREFEGMENTS = 5;
     private FitnessCalc fitness;
@@ -90,7 +90,9 @@ public class MOEA {
 
                         for(Individual child : father.crossoverSize(mother,fitness,MAXSEGMENTS)) {
                             if(child != null){
-                               if(child.getNrSegments() > PREFEGMENTS){
+                                //child.mutateSplit(mutationRate, fitness, PREFEGMENTS);
+
+                                if(child.getNrSegments() > PREFEGMENTS){
                                     child.mutateMerge(mutationRate,fitness,PREFEGMENTS);
                                 }else if(child.getNrSegments() < PREFEGMENTS){
                                     //child.mutateSplit(mutationRate,fitness);
@@ -101,6 +103,7 @@ public class MOEA {
                                         child.mutateMerge(mutationRate,fitness,PREFEGMENTS);
                                     }
                                 }
+
                                 if(child.getNrSegments() >= MINSEGMENTS && child.getNrSegments() <= MAXSEGMENTS) {
                                     population.add(child);
                                     prod++;
@@ -234,7 +237,6 @@ public class MOEA {
             ob.changed.set(true);
        }
     }
-
 
     /*
      * Methods

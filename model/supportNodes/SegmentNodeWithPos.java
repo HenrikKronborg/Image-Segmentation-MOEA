@@ -1,6 +1,6 @@
 package model.supportNodes;
 
-public class SegmentNodeWhitPos extends SegmentNode {
+public class SegmentNodeWithPos extends SegmentNode {
     private int x;
     private int y;
 

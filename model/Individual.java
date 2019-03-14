@@ -31,7 +31,7 @@ public class Individual {
      * Methods
      */
     // Minimum Spanning Tree (MST)
-    public void generateIndividual(double threshold,FitnessCalc f,int MAX, int MIN) {
+    public void generateIndividual(double threshold, FitnessCalc f, int MAX, int MIN) {
         chromosone = new short[ImageLoader.getHeight()][ImageLoader.getWidth()];
         // List of all pixels in the image
         ArrayList<Pixel> pixelsNodes = new ArrayList<>(ImageLoader.getHeight() * ImageLoader.getWidth());
@@ -81,8 +81,7 @@ public class Individual {
         int segments = (int)((double)(MAX-MIN)*Math.random()+MIN);
         while (cleanMergeSmallFirst(segments,f)){ }
         removeSmallSegments(0.1);
-        System.out.println("Segment done! "+nrSegments);
-
+        System.out.println("Segment done! " + nrSegments);
     }
 
     private boolean cleanMergeSmallFirst(int MAX,FitnessCalc f) {
@@ -204,7 +203,6 @@ public class Individual {
     }
 
     public void mutateMerge(double mutateProb, FitnessCalc f,int PREFEGMENTS){
-
         HashMap<Integer, SegmentNode> avgColor = f.generateAverageColor(this);
 
         HashMap<Integer,MutableShort> idTable = new HashMap<>();
@@ -289,32 +287,35 @@ public class Individual {
                 }
             }
         }
-
-
     }
 
-    public void mutateSplit(double mutateProb, FitnessCalc f){
-        if(mutateProb > Math.random()){
-            HashMap<Integer, Double> integerDoubleHashMap = f.generateAverageDeviation(this);
-            double maxDev = -1;
-            int segmentId = 0;
-            for(Integer key :integerDoubleHashMap.keySet()){
-                if(integerDoubleHashMap.get(key) > maxDev){
-                    maxDev = integerDoubleHashMap.get(key);
-                    segmentId = key;
-                }
-            }
-            for (int y = 0; y < ImageLoader.getHeight(); y++) {
-                for (int x = 0; x < ImageLoader.getWidth(); x++) {
-                    int id = chromosone[y][x];
-                    if(id == segmentId){
-                        chromosone[y][x] = 0;
+    public void mutateSplit(double mutateRate, FitnessCalc f, int PREFSEGMENTS) {
+        HashMap<Integer, Double> averageDeviation = f.generateAverageDeviation(this);
+
+        for(int i = 0; i < 2; i++) {
+            if (mutateRate > Math.random()) {
+                System.out.println("split");
+
+                double worstDeviation = Collections.max(averageDeviation.values());
+                int worstSegmentId = -1;
+
+                for (Map.Entry<Integer, Double> entry : averageDeviation.entrySet()) {
+                    if (entry.getValue() == worstDeviation) {
+                        worstSegmentId = entry.getKey();
                     }
                 }
-            }
 
-        }else{
-            return;
+                for (int y = 0; y < ImageLoader.getHeight(); y++) {
+                    for (int x = 0; x < ImageLoader.getWidth(); x++) {
+                        if (chromosone[y][x] == worstSegmentId) {
+                            chromosone[y][x] = 0;
+                        }
+                    }
+                }
+
+                averageDeviation.remove(worstSegmentId);
+            }
+            i++;
         }
 
         nrSegments = repairSplit(chromosone);
@@ -331,11 +332,11 @@ public class Individual {
 
 
         //Sort mother and father on segments size.
-        HashMap<Integer, SegmentNodeWhitPos> avgColorFather = f.generateAverageColorWPos(this);
-        HashMap<Integer, SegmentNodeWhitPos> avgColorMother = f.generateAverageColorWPos(mother);
+        HashMap<Integer, SegmentNodeWithPos> avgColorFather = f.generateAverageColorWPos(this);
+        HashMap<Integer, SegmentNodeWithPos> avgColorMother = f.generateAverageColorWPos(mother);
 
 
-        ArrayList<SegmentNodeWhitPos> listOfSegments = new ArrayList<>(avgColorFather.size()+avgColorMother.size());
+        ArrayList<SegmentNodeWithPos> listOfSegments = new ArrayList<>(avgColorFather.size()+avgColorMother.size());
 
         listOfSegments.addAll(avgColorFather.values());
         listOfSegments.forEach(a-> a.setF(true));   // Sets that all current nodes are from father.
@@ -351,7 +352,7 @@ public class Individual {
         int[][] explored = new int[ImageLoader.getHeight()][ImageLoader.getWidth()];
         // Small first.
         short segmentId = 1;
-        for(SegmentNodeWhitPos node : listOfSegments){
+        for(SegmentNodeWithPos node : listOfSegments){
 
             short currId = node.getId();
             Pixel currPixel =  pixels[node.getY()][node.getX()];
@@ -420,6 +421,8 @@ public class Individual {
         }
 
         smallPri.setChromosone(sChrom);
+
+        // Safety measure
         for (int y = 0; y < ImageLoader.getHeight(); y++) {
             for (int x = 0; x < ImageLoader.getWidth(); x++) {
                 int id = sChrom[y][x];
@@ -506,7 +509,7 @@ public class Individual {
         for (int y = 0; y < ImageLoader.getHeight(); y++) {
             for (int x = 0; x < ImageLoader.getWidth(); x++) {
                 if(shadow[y][x] != 0){
-                    for(Neighbor p :pixels[y][x].getNeighbors()){
+                    for(Neighbor p : pixels[y][x].getNeighbors()){
                         if(shadow[p.getNeighbor().getY()][p.getNeighbor().getX()] == 0){
                             pQueue.add(p);
                         }
