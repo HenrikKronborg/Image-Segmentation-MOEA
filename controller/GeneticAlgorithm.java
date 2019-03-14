@@ -11,16 +11,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.CountDownLatch;
 
-public class GeneticAlgorithm {
-    private static int popSize = 40; // Population size
-    private static int numOffsprings = popSize; // Number of offsprings
-    private static double mutationRate = 0.20; // Mutation rate
-    private static int maxRuns = 5; // Maximum number of runs before termination
-    private static int tournamentSize = 2; // Number of individuals to choose from population at random
+public class GeneticAlgorithm implements GAInterface{
 
     private ThreadNode ob;
     private static ArrayList<Individual> population;
-    private static LinkedList<Individual> front;
     private int generation;
     private final int MINSEGMENTS = 3;
     private final int MAXSEGMENTS = 12;
@@ -28,11 +22,13 @@ public class GeneticAlgorithm {
     private FitnessCalc fitness;
 
 
+    private ImageLoader image;
     private final int N = 4;
     private Thread[] threads = new Thread[N];
     private CountDownLatch doneSignal = new CountDownLatch(N);
 
     public GeneticAlgorithm(ImageLoader loader) {
+        image = loader;
         MOEA temp = new MOEA(loader); // Setting static variables, it is not used for evolution of individuals.
     }
 
@@ -74,7 +70,136 @@ public class GeneticAlgorithm {
         }
     }
 
+    private void crossoverThreads(String msg) {
+        for(int i = 0; i < threads.length; i++) {
+            threads[i] = new Thread(new Runnable() {
+                public void run() {
+                    int prod =0;
+                    while (prod < numOffsprings/threads.length) {
+                        Individual father = tournament();
+                        Individual mother = tournament();
+                        while (father.equals(mother)){
+                            mother = tournament();
+                        }
+
+                        for(Individual child : father.crossoverSize(mother,fitness,MAXSEGMENTS)) {
+                            if(child != null){
+                                //child.mutateSplit(mutationRate, fitness, PREFEGMENTS);
+
+                                if(child.getNrSegments() > PREFEGMENTS){
+                                    child.mutateMerge(mutationRate,fitness,PREFEGMENTS);
+                                }else if(child.getNrSegments() < PREFEGMENTS){
+                                    //child.mutateSplit(mutationRate,fitness);
+                                } else{
+                                    if(Math.random() >= 0.5){
+                                        //child.mutateSplit(mutationRate,fitness);
+                                    }else{
+                                        child.mutateMerge(mutationRate,fitness,PREFEGMENTS);
+                                    }
+                                }
+
+                                if(child.getNrSegments() >= MINSEGMENTS && child.getNrSegments() <= MAXSEGMENTS) {
+                                    population.add(child);
+                                    prod++;
+                                    System.out.println("Created child");
+                                }else{
+                                    System.out.println(child.getNrSegments());
+                                    System.out.println("not: size");
+                                }
+                            }else{
+                                System.out.println("not: null");
+                            }
+                        }
+                    }
+                    doneSignal.countDown();
+                }
+
+            });
+
+            threads[i].start();
+        }
+    }
 
 
+    public void run() {
+        fitness = new FitnessCalc();
+        fitness.setImageLoader(image);
+
+        population = new ArrayList<>();
+        initialPopulationThreads("Thread crash initial population");
+        try {
+            doneSignal.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Initialize population done. " + population.size() + " random solutions found");
+
+        // Calculate fitness value
+        for(Individual individual : population) {
+            fitness.generateFitness(individual);
+        }
+
+        // Sort on fitness
+        population.sort(Individual::compareSumFitnessTo);
+
+        // Run generations
+        while(generation++ < maxRuns) {
+            doneSignal = new CountDownLatch(N);
+            crossoverThreads("Thread crash crossover");
+            try {
+                doneSignal.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // Sort and calculate crowding distance
+            for(int i = popSize; i < population.size(); i++) {
+                fitness.generateFitness(population.get(i));
+            }
+
+            population.sort(Individual::compareSumFitnessTo);
+
+            ArrayList<Individual> tempPopulation = new ArrayList<>();
+            for(Individual ind : population) {
+                if(tempPopulation.size() >= popSize) {
+                    break;
+                }
+                tempPopulation.add(ind);
+            }
+
+            population = tempPopulation;
+            LinkedList<Individual> best = new LinkedList<>();
+            best.add(population.get(0));
+            ob.setOb(best);
+            ob.setGeneration(generation);
+
+            ob.changed.set(true);
+        }
+    }
+
+    public Individual tournament() {
+        Individual first, second;
+
+        int randomIndex = (int) (Math.random()*popSize);
+        first = population.get(randomIndex);
+        while(true) {
+            randomIndex = (int) (Math.random()*popSize);
+            second = population.get(randomIndex);
+
+            if(!second.equals(first)) {
+                break;
+            }
+        }
+
+        if(first.compareSumFitnessTo(second) > 0) {
+            return first;
+        } else {
+            return second;
+        }
+
+    }
+
+    @Override
+    public void loadObservableList(ThreadNode ob) { this.ob = ob; }
 
 }

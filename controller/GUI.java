@@ -60,6 +60,8 @@ public class GUI implements Initializable {
     private NumberAxis yAxis;
     @FXML
     private NumberAxis xAxis;
+    @FXML
+    private Button switchBtn;
 
     XYChart.Series series = new XYChart.Series();
 
@@ -67,7 +69,7 @@ public class GUI implements Initializable {
     private GraphicsContext gc2;
     private GraphicsContext gcBlackWhite;
 
-    private MOEA algorithm;
+    private GAInterface algorithm;
     private ImageLoader image;
     private Thread calculateThread;
     private ThreadNode listener;
@@ -76,6 +78,8 @@ public class GUI implements Initializable {
     private int frontNumber;
     Individual bestIndividual;
     Random r = new Random();
+
+    boolean GASwitch = false;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -140,10 +144,15 @@ public class GUI implements Initializable {
         cBox.setItems(objects.sorted());
         cBox.setValue(cBox.getItems().get(0));
     }
+
     private void initCalculateThread() {
         calculateThread = new Thread(new Runnable() {
             public void run() {
-                algorithm = new MOEA(image);
+                if(GASwitch){
+                    algorithm = new GeneticAlgorithm(image);
+                }else{
+                    algorithm = new MOEA(image);
+                }
                 algorithm.loadObservableList(listener);
                 algorithm.run();
             }
@@ -192,6 +201,16 @@ public class GUI implements Initializable {
         frontNumber++;
     }
 
+    @FXML
+    private void switchAlg(){
+        if(!GASwitch){
+            GASwitch = true;
+            switchBtn.setText("Switch to MOEA II");
+        }else{
+            GASwitch = false;
+            switchBtn.setText("Switch to weighted-sum");
+        }
+    }
     private void drawText() {
         generation.setText(Integer.toString(listener.getGeneration()));
         segments.setText(Integer.toString(bestIndividual.getNrSegments()));
@@ -269,7 +288,7 @@ public class GUI implements Initializable {
                     drawText();
                     upDateChart(front);
 
-                    if(listener.getGeneration() == MOEA.getMaxRuns()) {
+                    if(listener.getGeneration() == MOEA.maxRuns) {
                         nextIndividual.setDisable(false);
                         start.setDisable(false);
                         cBox.setDisable(false);

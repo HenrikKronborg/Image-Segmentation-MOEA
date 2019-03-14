@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<SplitPane dividerPositions="0.564128256513026" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.GUI">
+<SplitPane dividerPositions="0.564128256513026" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1150.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.GUI">
    <items>
       <AnchorPane minWidth="-Infinity" prefHeight="200.0" prefWidth="200.0">
          <children>
@@ -37,6 +37,10 @@
                   <Insets bottom="10.0" left="30.0" right="30.0" top="10.0" />
                </padding></Button>
             <Button fx:id="start" layoutX="152.0" layoutY="54.0" mnemonicParsing="false" onAction="#startAlgorithm" text="Start">
+               <padding>
+                  <Insets bottom="10.0" left="30.0" right="30.0" top="10.0" />
+               </padding></Button>
+            <Button fx:id="switchBtn" layoutX="252.0" layoutY="54.0" mnemonicParsing="false" onAction="#switchAlg" text="Switch to weighted-sum">
                <padding>
                   <Insets bottom="10.0" left="30.0" right="30.0" top="10.0" />
                </padding></Button>

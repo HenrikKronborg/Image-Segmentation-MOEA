@@ -11,12 +11,7 @@ import model.utils.Validators;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
-public class MOEA {
-    private static int popSize = 16; // Population size
-    private static int numOffsprings = popSize; // Number of offsprings
-    private static double mutationRate = 0.20; // Mutation rate
-    private static int maxRuns = 20; // Maximum number of runs before termination
-    private static int tournamentSize = 2; // Number of individuals to choose from population at random
+public class MOEA implements GAInterface {
 
     private ThreadNode ob;
     private static ArrayList<Individual> population;
@@ -124,43 +119,6 @@ public class MOEA {
 
             threads[i].start();
         }
-    }
-
-    public void run2() {
-        fitness = new FitnessCalc();
-        fitness.setImageLoader(image);
-        population = new ArrayList<>();
-        initialPopulationThreads("Thread crash initial population");
-        try {
-            doneSignal.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Initialize population done. " + population.size() + " random solutions found");
-
-        for(Individual individual : population) {
-            fitness.generateFitness(individual);
-        }
-
-        LinkedList<LinkedList<Individual>> frontiers = fastNonDominatedSort();
-        for(LinkedList<Individual> l : frontiers) {
-            crowdingDistance(l);
-        }
-
-        doneSignal = new CountDownLatch(N);
-        crossoverThreads("Thread crash crossover");
-        try {
-            doneSignal.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        LinkedList<Individual> children = new LinkedList<>();
-        for(int i = popSize; i < population.size(); i++){
-            children.add(population.get(i));
-        }
-        ob.setOb(children);
-        ob.setGeneration(generation);
-        ob.changed.set(true);
     }
 
     public void run() {
@@ -291,7 +249,7 @@ public class MOEA {
 
 
 
-    public LinkedList<LinkedList<Individual>> fastNonDominatedSort() {
+    private LinkedList<LinkedList<Individual>> fastNonDominatedSort() {
         LinkedList<LinkedList<Individual>> frontier = new LinkedList<>();
 
         for(Individual p : population) {
@@ -341,7 +299,7 @@ public class MOEA {
         return frontier;
     }
 
-    public void crowdingDistance(LinkedList<Individual> I) {
+    private void crowdingDistance(LinkedList<Individual> I) {
         I.sort((Individual a, Individual b)-> a.compareDeviationTo(b));
         Individual first = I.getFirst();
         Individual last = I.getLast();
@@ -367,7 +325,7 @@ public class MOEA {
         }
     }
 
-    public Individual NSGAIItournament() {
+    private Individual NSGAIItournament() {
         Individual first, second;
 
         int randomIndex = (int) (Math.random()*popSize);
@@ -394,7 +352,7 @@ public class MOEA {
         return second;
     }
 
-    public void printRank(LinkedList<LinkedList<Individual>> rankedPopulation) {
+    private void printRank(LinkedList<LinkedList<Individual>> rankedPopulation) {
         int rankInt = 0;
         for(List<Individual> rank : rankedPopulation) {
             rankInt++;
@@ -408,16 +366,6 @@ public class MOEA {
     /*
      * Getters and Setters
      */
-    public static int getPopSize() { return popSize; }
-    public void setPopSize(int popSize) { this.popSize = popSize; }
-    public static int getNumOffsprings() { return numOffsprings; }
-    public void setNumOffsprings(int numOffsprings) { this.numOffsprings = numOffsprings; }
-    public static double getMutationRate() { return mutationRate; }
-    public void setMutationRate(double mutationRate) { this.mutationRate = mutationRate; }
-    public static int getMaxRuns() { return maxRuns; }
-    public void setMaxRuns(int maxRuns) { this.maxRuns = maxRuns; }
-    public static int getTournamentSize() { return tournamentSize; }
-    public void setTournamentSize(int tournamentSize) { this.tournamentSize = tournamentSize; }
 
     public void loadObservableList(ThreadNode ob) { this.ob = ob; }
 

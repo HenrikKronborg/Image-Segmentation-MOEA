@@ -628,6 +628,16 @@ public class Individual {
         return -1;
     }
 
+    public int compareSumFitnessTo(Individual other) {
+        double cmp = (this.getFitnessConnectivity() + this.getFitnessDeviation()) - (other.getFitnessConnectivity() + other.getFitnessDeviation());
+        if(cmp > 0){
+            return 1;
+        } else if(cmp == 0){
+            return 0;
+        }
+        return -1;
+    }
+
     /*
      * Getters and Setters
      */
