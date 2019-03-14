@@ -2,7 +2,7 @@ package model.utils;
 
 import model.Individual;
 import model.supportNodes.SegmentNode;
-import model.supportNodes.SegmentNodeWhitPos;
+import model.supportNodes.SegmentNodeWithPos;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -215,10 +215,10 @@ public class FitnessCalc {
         return segments;
     }
 
-    public HashMap<Integer,SegmentNodeWhitPos> generateAverageColorWPos(Individual individual){
+    public HashMap<Integer, SegmentNodeWithPos> generateAverageColorWPos(Individual individual){
         short[][] board = individual.getChromosone();
 
-        HashMap<Integer,SegmentNodeWhitPos> segments = new HashMap<>();
+        HashMap<Integer, SegmentNodeWithPos> segments = new HashMap<>();
         int lastId = 0;
         for (int y=0; y < board.length; y++) {
             for(int x=0;  x <board[y].length; x++){
@@ -231,12 +231,12 @@ public class FitnessCalc {
                     System.out.println("ERROR fitness");
                 }else{
                     Color c = img.getPixelValue(x,y);
-                    SegmentNodeWhitPos node;
+                    SegmentNodeWithPos node;
                     if(segments.containsKey(id)){
                         node = segments.get(id);
                         node.addColor(c);
                     }else{
-                        node =  new SegmentNodeWhitPos();
+                        node =  new SegmentNodeWithPos();
                         node.addColor(c);
                         node.setX(x);
                         node.setY(y);

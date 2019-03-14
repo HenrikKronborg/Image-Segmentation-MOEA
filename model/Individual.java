@@ -332,11 +332,11 @@ public class Individual {
 
 
         //Sort mother and father on segments size.
-        HashMap<Integer, SegmentNodeWhitPos> avgColorFather = f.generateAverageColorWPos(this);
-        HashMap<Integer, SegmentNodeWhitPos> avgColorMother = f.generateAverageColorWPos(mother);
+        HashMap<Integer, SegmentNodeWithPos> avgColorFather = f.generateAverageColorWPos(this);
+        HashMap<Integer, SegmentNodeWithPos> avgColorMother = f.generateAverageColorWPos(mother);
 
 
-        ArrayList<SegmentNodeWhitPos> listOfSegments = new ArrayList<>(avgColorFather.size()+avgColorMother.size());
+        ArrayList<SegmentNodeWithPos> listOfSegments = new ArrayList<>(avgColorFather.size()+avgColorMother.size());
 
         listOfSegments.addAll(avgColorFather.values());
         listOfSegments.forEach(a-> a.setF(true));   // Sets that all current nodes are from father.
@@ -352,7 +352,7 @@ public class Individual {
         int[][] explored = new int[ImageLoader.getHeight()][ImageLoader.getWidth()];
         // Small first.
         short segmentId = 1;
-        for(SegmentNodeWhitPos node : listOfSegments){
+        for(SegmentNodeWithPos node : listOfSegments){
 
             short currId = node.getId();
             Pixel currPixel =  pixels[node.getY()][node.getX()];
