@@ -21,6 +21,9 @@ public class GeneticAlgorithm implements GAInterface{
     private final int PREFEGMENTS = 5;
     private FitnessCalc fitness;
 
+    public static final double weightDeviation = 0;
+    public static final double weightConnectivity = 1;
+
 
     private ImageLoader image;
     private final int N = 4;

@@ -1,5 +1,6 @@
 package model;
 
+import controller.GeneticAlgorithm;
 import controller.MOEA;
 import model.supportNodes.*;
 import model.utils.FitnessCalc;
@@ -629,7 +630,7 @@ public class Individual {
     }
 
     public int compareSumFitnessTo(Individual other) {
-        double cmp = (this.getFitnessConnectivity() + this.getFitnessDeviation()) - (other.getFitnessConnectivity() + other.getFitnessDeviation());
+        double cmp = (GeneticAlgorithm.weightConnectivity * this.getFitnessConnectivity() + GeneticAlgorithm.weightDeviation * this.getFitnessDeviation()) - (GeneticAlgorithm.weightConnectivity * this.getFitnessConnectivity() + GeneticAlgorithm.weightDeviation * other.getFitnessDeviation());
         if(cmp > 0){
             return 1;
         } else if(cmp == 0){

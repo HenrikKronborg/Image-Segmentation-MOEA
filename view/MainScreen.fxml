@@ -2,7 +2,6 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
@@ -15,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<SplitPane dividerPositions="0.564128256513026" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1150.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.GUI">
+<SplitPane dividerPositions="0.564128256513026" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1150.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.GUI">
    <items>
       <AnchorPane minWidth="-Infinity" prefHeight="200.0" prefWidth="200.0">
          <children>
@@ -26,7 +25,7 @@
                </children>
             </StackPane>
             <Canvas fx:id="canvasBlackWhite" height="321.0" layoutX="56.0" layoutY="348.0" width="481.0" />
-             <Label fx:id="stats" prefHeight="35.0" prefWidth="481.0"  layoutX="56.0" layoutY="675.0" text="" />
+             <Label fx:id="stats" layoutX="56.0" layoutY="675.0" prefHeight="35.0" prefWidth="481.0" text="" />
          </children>
       </AnchorPane>
       <AnchorPane minWidth="250.0" prefHeight="200.0" prefWidth="500.0">
@@ -55,7 +54,7 @@
                   <Insets bottom="10.0" left="30.0" right="30.0" top="10.0" />
                </padding></Button>
 
-             <LineChart fx:id="linechart" layoutX="29.0" layoutY="194.0" prefHeight="416.0" prefWidth="381.0" title="Front" legendVisible="true">
+             <LineChart fx:id="linechart" layoutX="29.0" layoutY="194.0" legendVisible="true" prefHeight="416.0" prefWidth="381.0" title="Front">
                  <xAxis>
                      <NumberAxis label="Connectivity" fx:id="xAxis" />
                  </xAxis>
@@ -95,6 +94,11 @@
                   </HBox>
                </children>
             </VBox>
+            <Button fx:id="toggleViewBtn" disable="true" layoutX="249.0" layoutY="139.0" mnemonicParsing="false" onAction="#toggleView" prefWidth="140.0" text="View all">
+               <padding>
+                  <Insets bottom="10.0" left="30.0" right="30.0" top="10.0" />
+               </padding>
+            </Button>
          </children>
       </AnchorPane>
    </items>

@@ -49,6 +49,8 @@ public class GUI implements Initializable {
     @FXML
     private Button start;
     @FXML
+    private Button toggleViewBtn;
+    @FXML
     private Label individualNumber;
     @FXML
     private HBox individualNumberHBox;
@@ -80,6 +82,7 @@ public class GUI implements Initializable {
     Random r = new Random();
 
     boolean GASwitch = false;
+    boolean viewAll = false;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -179,28 +182,54 @@ public class GUI implements Initializable {
     }
 
     @FXML
+    public void toggleView() {
+        viewAll = !viewAll;
+        frontNumber = 0;
+
+        if(viewAll) {
+            toggleViewBtn.setText("View 5");
+        }
+        else {
+            toggleViewBtn.setText("View all");
+        }
+    }
+
+    @FXML
     public void showIndividual() {
         if(!individualNumberHBox.isVisible()) {
             individualNumberHBox.setVisible(true);
         }
-        LinkedList<Individual> list = new LinkedList<>();
 
-        front.sort((Individual a, Individual b)-> a.compareCrowdTo(b));
-
-        for(Individual i : front) {
-            if(i.getCrowdingDistance() != Double.MAX_VALUE && list.size() < 5) {
-                list.add(i);
+        if(viewAll) {
+            if (frontNumber == front.size()) {
+                frontNumber = 0;
             }
-        }
 
-        if(frontNumber == list.size()) {
-            frontNumber = 0;
-        }
+            bestIndividual = front.get(frontNumber);
 
-        bestIndividual = list.get(frontNumber);
+            individualNumber.setText((frontNumber + 1) + " out of " + front.size());
+        }
+        else {
+            LinkedList<Individual> list = new LinkedList<>();
+
+            front.sort((Individual a, Individual b) -> a.compareCrowdTo(b));
+
+            for (Individual i : front) {
+                if (i.getCrowdingDistance() != Double.MAX_VALUE && list.size() < 5) {
+                    list.add(i);
+                }
+            }
+
+            if (frontNumber == list.size()) {
+                frontNumber = 0;
+            }
+
+            bestIndividual = list.get(frontNumber);
+
+            individualNumber.setText((frontNumber + 1) + " out of " + list.size());
+        }
 
         // Update text
-        individualNumber.setText((frontNumber + 1) + " out of " + list.size());
         segments.setText(Integer.toString(bestIndividual.getNrSegments()));
 
         drawSegments(bestIndividual);
@@ -298,6 +327,7 @@ public class GUI implements Initializable {
 
                     if(listener.getGeneration() == MOEA.maxRuns) {
                         nextIndividual.setDisable(false);
+                        toggleViewBtn.setDisable(false);
                         start.setDisable(false);
                         cBox.setDisable(false);
                     }
