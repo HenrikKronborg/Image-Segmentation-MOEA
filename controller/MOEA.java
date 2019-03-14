@@ -6,12 +6,11 @@ import model.supportNodes.Pixel;
 import model.supportNodes.Position;
 import model.utils.FitnessCalc;
 import model.utils.ImageLoader;
-import model.utils.Validators;
 
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
-public class MOEA implements GAInterface {
+public class MOEA implements GeneticAlgorithm {
 
     private ThreadNode ob;
     private static ArrayList<Individual> population;

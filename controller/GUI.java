@@ -6,7 +6,6 @@ import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.chart.LineChart;
@@ -24,8 +23,6 @@ import model.supportNodes.ThreadNode;
 import model.utils.ImageLoader;
 
 import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -71,7 +68,7 @@ public class GUI implements Initializable {
     private GraphicsContext gc2;
     private GraphicsContext gcBlackWhite;
 
-    private GAInterface algorithm;
+    private GeneticAlgorithm algorithm;
     private ImageLoader image;
     private Thread calculateThread;
     private ThreadNode listener;
@@ -152,7 +149,7 @@ public class GUI implements Initializable {
         calculateThread = new Thread(new Runnable() {
             public void run() {
                 if(GASwitch){
-                    algorithm = new GeneticAlgorithm(image);
+                    algorithm = new WeightedSum(image);
                 }else{
                     algorithm = new MOEA(image);
                 }
