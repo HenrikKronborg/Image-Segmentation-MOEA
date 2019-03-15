@@ -54,7 +54,7 @@
                   <Insets bottom="10.0" left="30.0" right="30.0" top="10.0" />
                </padding></Button>
 
-             <LineChart fx:id="linechart" layoutX="29.0" layoutY="194.0" legendVisible="true" prefHeight="416.0" prefWidth="381.0" title="Front">
+             <LineChart fx:id="linechart" layoutX="15.0" layoutY="176.0" legendVisible="false" prefHeight="416.0" prefWidth="381.0" title="Front">
                  <xAxis>
                      <NumberAxis label="Connectivity" fx:id="xAxis" />
                  </xAxis>
@@ -62,7 +62,7 @@
                      <NumberAxis fx:id="yAxis" label="Deviation" side="LEFT" upperBound="160.0" />
                  </yAxis>
              </LineChart>
-            <VBox layoutX="14.0" layoutY="576.0" prefHeight="108.0" prefWidth="230.0">
+            <VBox layoutX="10.0" layoutY="590.0" prefHeight="108.0" prefWidth="230.0">
                <children>
                   <HBox prefHeight="53.0" prefWidth="199.0">
                      <children>
