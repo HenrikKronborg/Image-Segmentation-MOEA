@@ -208,15 +208,7 @@ public class MOEA implements GeneticAlgorithm {
         findNeighbors();
     }
 
-    private void joinThreads(String msg){
-        for(int i = 0; i < threads.length; i++) {
-            try {
-                threads[i].join();
-            } catch (InterruptedException e) {
-                System.out.println(msg);
-            }
-        }
-    }
+
 
     private void findNeighbors() {
         for(int y = 0; y < ImageLoader.getHeight(); y++) {
@@ -351,16 +343,6 @@ public class MOEA implements GeneticAlgorithm {
         return second;
     }
 
-    private void printRank(LinkedList<LinkedList<Individual>> rankedPopulation) {
-        int rankInt = 0;
-        for(List<Individual> rank : rankedPopulation) {
-            rankInt++;
-            System.out.println("\nRank: "+rankInt);
-            for (Individual ind : rank) {
-                System.out.println("<"+ind.getFitnessDeviation()+", "+ind.getFitnessConnectivity()+">");
-            }
-        }
-    }
 
     /*
      * Getters and Setters
