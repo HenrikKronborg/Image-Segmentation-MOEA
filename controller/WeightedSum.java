@@ -87,7 +87,9 @@ public class WeightedSum implements GeneticAlgorithm {
                             if(child != null){
                                 if(child.getNrSegments() > PREFEGMENTS){
                                     child.mutateMerge(mutationRate,fitness,PREFEGMENTS);
-                                } else{
+                                }else if(child.getNrSegments() < PREFEGMENTS){
+                                    //child.mutateSplit(mutationRate,fitness);
+                                }else{
                                     if(Math.random() >= 0.5){
                                         //child.mutateSplit(mutationRate,fitness);
                                     }else{

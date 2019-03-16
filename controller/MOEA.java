@@ -89,6 +89,8 @@ public class MOEA implements GeneticAlgorithm {
                                 }else{
                                     if(Math.random() >= 0.5){
                                         //child.mutateSplit(mutationRate,fitness);
+                                    }else if(child.getNrSegments() < PREFEGMENTS){
+                                        //child.mutateSplit(mutationRate,fitness);
                                     }else{
                                         child.mutateMerge(mutationRate,fitness,PREFEGMENTS);
                                     }
