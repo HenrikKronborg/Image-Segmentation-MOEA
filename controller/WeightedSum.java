@@ -34,7 +34,7 @@ public class WeightedSum implements GeneticAlgorithm {
     }
 
 
-    private void initialPopulationThreads(String msg) {
+    private void initialPopulationThreads() {
         for(int i = 0; i < threads.length; i++) {
             threads[i] = new Thread(new Runnable() {
                 public void run() {
@@ -71,7 +71,7 @@ public class WeightedSum implements GeneticAlgorithm {
         }
     }
 
-    private void crossoverThreads(String msg) {
+    private void crossoverThreads() {
         for(int i = 0; i < threads.length; i++) {
             threads[i] = new Thread(new Runnable() {
                 public void run() {
@@ -85,12 +85,8 @@ public class WeightedSum implements GeneticAlgorithm {
 
                         for(Individual child : father.crossoverSize(mother,fitness,MAXSEGMENTS)) {
                             if(child != null){
-                                //child.mutateSplit(mutationRate, fitness, PREFEGMENTS);
-
                                 if(child.getNrSegments() > PREFEGMENTS){
                                     child.mutateMerge(mutationRate,fitness,PREFEGMENTS);
-                                }else if(child.getNrSegments() < PREFEGMENTS){
-                                    //child.mutateSplit(mutationRate,fitness);
                                 } else{
                                     if(Math.random() >= 0.5){
                                         //child.mutateSplit(mutationRate,fitness);
@@ -127,7 +123,7 @@ public class WeightedSum implements GeneticAlgorithm {
         fitness.setImageLoader(image);
 
         population = new ArrayList<>();
-        initialPopulationThreads("Thread crash initial population");
+        initialPopulationThreads();
         try {
             doneSignal.await();
         } catch (InterruptedException e) {
@@ -146,7 +142,7 @@ public class WeightedSum implements GeneticAlgorithm {
         // Run generations
         while(generation++ < maxRuns) {
             doneSignal = new CountDownLatch(N);
-            crossoverThreads("Thread crash crossover");
+            crossoverThreads();
             try {
                 doneSignal.await();
             } catch (InterruptedException e) {
