@@ -19,7 +19,7 @@ public class WeightedSum implements GeneticAlgorithm {
     private final int PREFEGMENTS = 5;
     private FitnessCalc fitness;
 
-    public static final double weightDeviation = 0;
+    public static final double weightDeviation = 1;
     public static final double weightConnectivity = 1;
 
 
@@ -167,6 +167,7 @@ public class WeightedSum implements GeneticAlgorithm {
             }
 
             population = tempPopulation;
+            
             LinkedList<Individual> best = new LinkedList<>();
             best.add(population.get(0));
             ob.setOb(best);
